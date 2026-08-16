@@ -194,3 +194,47 @@ describe("sample data", () => {
     expect(generateSalesData(10, 1)).toEqual(generateSalesData(10, 1));
   });
 });
+
+describe("field drag & drop helpers", () => {
+  const cfg = createDefaultConfig({
+    rows: ["region"],
+    cols: ["category"],
+    values: [{ field: "revenue", aggregator: "sum" }],
+  });
+
+  it("reports the area a field lives in", () => {
+    expect(areaOfField(cfg, "region")).toBe("rows");
+    expect(areaOfField(cfg, "category")).toBe("cols");
+    expect(areaOfField(cfg, "revenue")).toBe("values");
+    expect(areaOfField(cfg, "cost")).toBe("fields");
+  });
+
+  it("moves a field between areas without duplicating it", () => {
+    const patch = moveField(cfg, "region", "cols", 0);
+    expect(patch.rows).toEqual([]);
+    expect(patch.cols).toEqual(["region", "category"]);
+  });
+
+  it("defaults numbers to sum when dropped on measures", () => {
+    const patch = moveField(cfg, "cost", "values", undefined, "number");
+    expect(patch.values?.at(-1)).toMatchObject({ field: "cost", aggregator: "sum" });
+  });
+
+  it("creates an all-members filter when dropped on report filters", () => {
+    const patch = moveField(cfg, "region", "filters");
+    expect(patch.filters?.[0]).toMatchObject({ kind: "values", field: "region", members: [] });
+  });
+
+  it("removes a field and reorders within an area", () => {
+    expect(removeField(cfg, "region").rows).toEqual([]);
+    const two = { ...cfg, rows: ["region", "category"] };
+    expect(reorderField(two, "rows", 0, 1).rows).toEqual(["category", "region"]);
+  });
+
+  it("treats an empty include filter as keep everything", () => {
+    const rows = [{ region: "North" }, { region: "South" }];
+    expect(
+      applyFilters(rows, [{ kind: "values", field: "region", mode: "include", members: [] }]),
+    ).toHaveLength(2);
+  });
+});
