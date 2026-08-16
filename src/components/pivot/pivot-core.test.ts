@@ -472,3 +472,40 @@ describe("field drag & drop helpers", () => {
     ).toHaveLength(2);
   });
 });
+
+describe("multiple measures", () => {
+  it("adds a second aggregation of the same field instead of replacing it", () => {
+    const cfg = createDefaultConfig({ values: [{ field: "revenue", aggregator: "sum" }] });
+    const patch = moveField(cfg, "revenue", "values", undefined, "number");
+    expect(patch.values).toHaveLength(2);
+    expect(patch.values?.map((v) => v.field)).toEqual(["revenue", "revenue"]);
+  });
+
+  it("defaults each field type to a sensible aggregation", () => {
+    expect(defaultAggregatorFor("number")).toBe("sum");
+    expect(defaultAggregatorFor("date")).toBe("min");
+    expect(defaultAggregatorFor("time")).toBe("min");
+    expect(defaultAggregatorFor("string")).toBe("count");
+  });
+
+  it("renders every measure side by side under each column", () => {
+    const result = buildLocalResult(rows, {
+      ...createDefaultConfig({
+        rows: ["region"],
+        cols: ["category"],
+        values: [
+          { field: "revenue", aggregator: "sum", type: "number" },
+          { field: "revenue", aggregator: "average", type: "number" },
+          { field: "category", aggregator: "distinctCount", type: "string" },
+        ],
+      }),
+    });
+    expect(result.measures).toHaveLength(3);
+    // 2 categories x 3 measures
+    expect(result.columns).toHaveLength(6);
+    const north = result.rows.find((r) => r.label === "North");
+    expect(north?.cells[0]).toBe(100); // sum of Bikes
+    expect(north?.cells[1]).toBe(100); // average of Bikes
+    expect(north?.cells[2]).toBe(1); // distinct categories
+  });
+});
