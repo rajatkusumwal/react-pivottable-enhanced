@@ -10,6 +10,8 @@ export type FeatureRow = {
   flexmonster: Cell;
   reactPivottable: Cell;
   orb: Cell;
+  /** What the Pivot Studio demo on the /demos page actually delivers. */
+  studio: Cell;
 };
 
 export type FeatureCategory = {
@@ -41,6 +43,12 @@ export const products = [
     subtitle: "Open source • MIT, unmaintained",
     url: "https://nnajm.github.io/orb/index.html",
   },
+  {
+    key: "studio" as const,
+    name: "Pivot Studio (this demo)",
+    subtitle: "Free • built on the two free engines",
+    url: "/demos",
+  },
 ];
 
 export type ProductKey = (typeof products)[number]["key"];
@@ -51,6 +59,8 @@ export const verdicts: Record<ProductKey, string> = {
   reactPivottable:
     "Free and quick to drop into a React app. Good for simple internal dashboards, but there is no Excel/PDF export, no toolbar and no help desk if you get stuck.",
   orb: "Free grid with drag-and-drop and subtotals, but no charts and no exports. The project has not been updated in years, so nobody is fixing bugs.",
+  studio:
+    "The ready-made setup you can try on the demos page: the two free engines wrapped with a toolbar, charts, exports, filters, calculated values and language packs. Closes most of the gap for free, but you maintain the code and there is no help desk.",
 };
 
 export const categories: FeatureCategory[] = [
