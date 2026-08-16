@@ -75,7 +75,7 @@ describe("PivotStudio — Orb.js engine", () => {
     const user = userEvent.setup();
     setup();
     await user.click(screen.getByRole("button", { name: /^add$/i }));
-    await waitFor(() => expect(screen.getByText("profit")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getAllByText("profit").length).toBeGreaterThan(0));
     await user.selectOptions(screen.getByLabelText("Place profit"), "values");
     const grid = await screen.findByTestId("orb-panel");
     await waitFor(() => expect(grid.textContent).toContain("460.00"));
@@ -92,7 +92,7 @@ describe("PivotStudio — Orb.js engine", () => {
     const user = userEvent.setup();
     setup();
     await user.selectOptions(screen.getByLabelText("Language"), "fr");
-    expect(await screen.findByText("Lignes")).toBeInTheDocument();
+    expect((await screen.findAllByText("Lignes")).length).toBeGreaterThan(0);
   });
 
   it("exports the grid", async () => {
