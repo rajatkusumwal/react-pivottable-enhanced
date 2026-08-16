@@ -17,10 +17,10 @@ export interface DrillThroughDialogProps {
   /** Header & footer printed on the drill-through export. */
   decoration?: ExportDecoration;
   onStatus?: (message: string) => void;
-  /** Columns of the configured slice; empty = every field in the records. */
-  fields?: string[];
+  /** Columns of the configured slice; undefined = show every field in the records, [] = show none. */
+  fields?: string[] | undefined;
   /** Persists a change made with the drill-through field list. */
-  onFieldsChange?: ((fields: string[]) => void) | undefined;
+  onFieldsChange?: ((fields: string[] | undefined) => void) | undefined;
   /** Row cap applied when the records were fetched. */
   maxRows?: number;
   /** Total number of matching records before the cap (when the engine reports it). */
