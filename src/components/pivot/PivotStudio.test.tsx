@@ -162,7 +162,7 @@ describe("Flexmonster-style field list", () => {
   it("opens the field list dialog from the toolbar and shows the four areas", async () => {
     const user = userEvent.setup();
     setup({ fieldsUi: "dialog" });
-    await user.click(screen.getByRole("button", { name: /^fields$/i }));
+    await user.click(screen.getAllByRole("button", { name: /^fields$/i })[0]!);
     const dialog = await screen.findByTestId("field-list-dialog");
     for (const area of ["filters", "cols", "rows", "values"]) {
       expect(within(dialog).getByTestId(`drop-area-${area}`)).toBeInTheDocument();
