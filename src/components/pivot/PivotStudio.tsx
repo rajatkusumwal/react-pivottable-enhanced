@@ -15,6 +15,7 @@ import type { PivotEngineAdapter, PivotQuery, PivotResult } from "./result";
 import { PivotToolbar } from "./ui/PivotToolbar";
 import { PivotSidebar } from "./ui/PivotSidebar";
 import { PivotChart } from "./ui/PivotChart";
+import { ChartFilterBar } from "./ui/ChartFilterBar";
 import { DrillThroughDialog } from "./ui/DrillThroughDialog";
 import { FieldListDialog } from "./ui/FieldListDialog";
 import { GridFieldBar } from "./ui/GridFieldBar";
@@ -364,6 +365,15 @@ export function PivotStudio({
 
           {config.chart.visible && (
             <div className="mt-3 border-t border-border pt-3">
+              {config.showChartFilters && (
+                <ChartFilterBar
+                  strings={strings}
+                  config={config}
+                  rows={baseRows}
+                  readOnly={readOnly}
+                  onChange={update}
+                />
+              )}
               <PivotChart
                 data={chart.data}
                 series={chart.series}

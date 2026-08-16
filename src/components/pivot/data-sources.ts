@@ -54,10 +54,12 @@ export function inferFields(rows: PivotRow[]): FieldDef[] {
     const allNumbers = values.length > 0 && values.every((v) => Number.isFinite(Number(v)));
     const looksLikeDate =
       !allNumbers && values.length > 0 && values.every((v) => /^\d{4}-\d{2}(-\d{2})?/.test(String(v)));
+    const looksLikeTime =
+      !allNumbers && values.length > 0 && values.every((v) => /^\d{1,2}:\d{2}(:\d{2})?$/.test(String(v)));
     return {
       name,
       caption: name.replace(/[_-]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
-      type: allNumbers ? "number" : looksLikeDate ? "date" : "string",
+      type: allNumbers ? "number" : looksLikeDate ? "date" : looksLikeTime ? "time" : "string",
     } satisfies FieldDef;
   });
 }

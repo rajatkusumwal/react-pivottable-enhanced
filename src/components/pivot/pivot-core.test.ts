@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { areaOfField, moveField, removeField, reorderField } from "./dnd";
 import { aggregate, registerAggregator } from "./aggregators";
-import { applyFilters, describeFilter, matchesCondition, uniqueMembers } from "./filters";
+import {
+  applyFilters,
+  describeFilter,
+  matchesCondition,
+  parseTime,
+  uniqueMembers,
+} from "./filters";
 import { applyCalculatedFields, evaluateFormula, validateFormula } from "./calculated";
 import { buildChartData, drillThroughRows, applyDisplayMode } from "./analysis";
 import { matrixFromTable, toCsv, toHtml, toTsv } from "./export";
@@ -135,6 +141,108 @@ describe("filters", () => {
         valueType: "date",
       }),
     ).toBe("orderDate is before 2024-02-01");
+  });
+
+  it("parses clock times into seconds of day", () => {
+    expect(parseTime("09:30")).toBe(9 * 3600 + 30 * 60);
+    expect(parseTime("09:30:15")).toBe(9 * 3600 + 30 * 60 + 15);
+    expect(parseTime("2024-02-01T18:45:00Z")).toBe(18 * 3600 + 45 * 60);
+    expect(parseTime("25:00")).toBeNaN();
+    expect(parseTime("nope")).toBeNaN();
+  });
+
+  it("compares time fields with the time operators", () => {
+    const t = (raw: string, op: Parameters<typeof matchesCondition>[1], v: string, v2?: string) =>
+      matchesCondition(raw, op, v, v2, "time");
+    expect(t("09:30", "gt", "09:00")).toBe(true);
+    expect(t("09:30", "gte", "09:30")).toBe(true);
+    expect(t("08:59", "lt", "09:00")).toBe(true);
+    expect(t("09:00", "lte", "09:00")).toBe(true);
+    expect(t("09:00", "eq", "09:00")).toBe(true);
+    expect(t("09:00", "neq", "09:01")).toBe(true);
+    expect(t("12:15", "between", "09:00", "17:00")).toBe(true);
+    expect(t("18:15", "between", "09:00", "17:00")).toBe(false);
+    expect(t("bad", "gt", "09:00")).toBe(false);
+  });
+
+  it("filters rows by a time window and describes it", () => {
+    const timed: PivotRow[] = [
+      { orderTime: "08:15", revenue: 10 },
+      { orderTime: "12:00", revenue: 20 },
+      { orderTime: "19:45", revenue: 30 },
+    ];
+    expect(
+      applyFilters(timed, [
+        {
+          kind: "condition",
+          field: "orderTime",
+          operator: "between",
+          value: "09:00",
+          value2: "17:00",
+          valueType: "time",
+        },
+      ]),
+    ).toHaveLength(1);
+    expect(
+      describeFilter({
+        kind: "condition",
+        field: "orderTime",
+        operator: "gte",
+        value: "09:00",
+        valueType: "time",
+      }),
+    ).toBe("orderTime is at or after 09:00");
+  });
+
+  it("applies subquery (group condition) filters", () => {
+    // North totals 300, South totals 700.
+    expect(
+      applyFilters(rows, [
+        {
+          kind: "subquery",
+          field: "region",
+          measure: "revenue",
+          aggregator: "sum",
+          operator: "gt",
+          value: 500,
+        },
+      ]).every((r) => r["region"] === "South"),
+    ).toBe(true);
+    expect(
+      applyFilters(rows, [
+        {
+          kind: "subquery",
+          field: "region",
+          measure: "revenue",
+          aggregator: "sum",
+          operator: "between",
+          value: 100,
+          value2: 400,
+        },
+      ]),
+    ).toHaveLength(2);
+    expect(
+      applyFilters(rows, [
+        {
+          kind: "subquery",
+          field: "region",
+          measure: "revenue",
+          aggregator: "average",
+          operator: "gte",
+          value: 350,
+        },
+      ]),
+    ).toHaveLength(2);
+    expect(
+      describeFilter({
+        kind: "subquery",
+        field: "region",
+        measure: "revenue",
+        aggregator: "sum",
+        operator: "gt",
+        value: 500,
+      }),
+    ).toBe("region where sum of revenue gt 500");
   });
 
   it("applies top-N filters", () => {

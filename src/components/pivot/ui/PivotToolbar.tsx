@@ -156,6 +156,24 @@ export function PivotToolbar({
       <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
         <input
           type="checkbox"
+          checked={config.showReportFilterArea}
+          onChange={(e) => onChange({ showReportFilterArea: e.target.checked })}
+        />
+        Filter area
+      </label>
+
+      <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+        <input
+          type="checkbox"
+          checked={config.showChartFilters}
+          onChange={(e) => onChange({ showChartFilters: e.target.checked })}
+        />
+        Chart filters
+      </label>
+
+      <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+        <input
+          type="checkbox"
           checked={config.dragAndDrop}
           disabled={readOnly}
           onChange={(e) => onChange({ dragAndDrop: e.target.checked })}

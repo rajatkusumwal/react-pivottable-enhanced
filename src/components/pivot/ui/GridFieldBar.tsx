@@ -29,8 +29,8 @@ export function GridFieldBar({
 }: GridFieldBarProps) {
   const [openFilter, setOpenFilter] = useState<string | null>(null);
 
-  const group = (label: string, children: React.ReactNode) => (
-    <div className="flex items-center gap-1.5">
+  const group = (label: string, children: React.ReactNode, testId?: string) => (
+    <div className="flex items-center gap-1.5" {...(testId ? { "data-testid": testId } : {})}>
       <span className="text-[11px] font-semibold uppercase text-muted-foreground">{label}</span>
       {children}
     </div>
@@ -43,7 +43,8 @@ export function GridFieldBar({
       data-testid="grid-field-bar"
       className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-md border border-border bg-surface px-2 py-1.5"
     >
-      {config.filters.length > 0 &&
+      {config.showReportFilterArea &&
+        config.filters.length > 0 &&
         group(
           "Report filters",
           config.filters.map((f, i) => (
@@ -89,6 +90,7 @@ export function GridFieldBar({
               )}
             </span>
           )),
+          "report-filter-area",
         )}
 
       {config.cols.length > 0 &&
