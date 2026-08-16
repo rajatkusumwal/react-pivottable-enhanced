@@ -43,7 +43,8 @@ export function GridFieldBar({
       data-testid="grid-field-bar"
       className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-md border border-border bg-surface px-2 py-1.5"
     >
-      {config.filters.length > 0 &&
+      {config.showReportFilterArea &&
+        config.filters.length > 0 &&
         group(
           "Report filters",
           config.filters.map((f, i) => (
