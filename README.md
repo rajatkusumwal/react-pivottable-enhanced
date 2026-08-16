@@ -244,6 +244,22 @@ Rules the server must respect:
   over `sort`; `by: "rows"` sorts row members, a number sorts by that leaf column.
 * `grandTotalsPosition` decides whether the `kind: "grand"` row is emitted first or last.
 * `limit` / `offset` page the source records before aggregation.
+* Each measure may carry a `displayMode` ("show values as"), applied **after** aggregation and
+  per measure. Return `null` when the reference total is missing or zero:
+
+  | `displayMode` | Cell value |
+  | --- | --- |
+  | `raw` (default) | the aggregate |
+  | `percentOfGrandTotal` | value / grand total × 100 |
+  | `percentOfRowTotal` / `percentOfColumnTotal` | value / row (column) total × 100 |
+  | `percentOfParentRowTotal` | value / the same column's value for the row's **parent member**; falls back to the row total at the top level |
+  | `percentOfParentColumnTotal` | value / the parent column group's value for that row; falls back to the column total |
+  | `index` | (value × grand total) / (row total × column total) |
+  | `differenceOfRow` / `differenceOfColumn` | value − previous column (previous row); `null` in the first column (row) |
+  | `percentDifferenceOfRow` / `percentDifferenceOfColumn` | that difference ÷ the previous value × 100 |
+  | `runningTotalOfRow` | cumulative sum across the row, left to right |
+  | `runningTotalOfColumn` (`runningTotal` is an alias of the row variant) | cumulative sum down the column, top to bottom |
+
 * Condition filters carry an optional `valueType`
   (`"auto" | "number" | "text" | "date" | "time"`).
   With `"date"` the server must compare on the date timeline at **day granularity** —
