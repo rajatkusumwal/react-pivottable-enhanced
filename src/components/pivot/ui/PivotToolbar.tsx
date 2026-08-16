@@ -130,6 +130,22 @@ export function PivotToolbar({
         />
         Grand totals
       </label>
+      {config.showGrandTotals && (
+        <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <span className="sr-only">Grand totals position</span>
+          <select
+            aria-label="Grand totals position"
+            value={config.grandTotalsPosition}
+            onChange={(e) =>
+              onChange({ grandTotalsPosition: e.target.value as PivotConfig["grandTotalsPosition"] })
+            }
+            className={select}
+          >
+            <option value="bottom">Totals at bottom</option>
+            <option value="top">Totals at top</option>
+          </select>
+        </label>
+      )}
 
       <span className="mx-1 h-5 w-px bg-border" aria-hidden="true" />
 

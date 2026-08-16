@@ -116,6 +116,7 @@ export function PivotStudio({
       filters: config.filters,
       showSubTotals: config.showSubTotals,
       showGrandTotals: config.showGrandTotals,
+      grandTotalsPosition: config.grandTotalsPosition,
       layout: config.layout,
       collapsed: config.collapsed,
       sort: config.sort,
