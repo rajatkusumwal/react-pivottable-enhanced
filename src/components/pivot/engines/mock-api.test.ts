@@ -188,6 +188,69 @@ describe("sorting and filtering over the API", () => {
     expect(drill.rows[0]?.["orderDate"]).toBe("2024-02-10");
   });
 
+  it("applies time conditional filters server-side", async () => {
+    const timed: PivotRow[] = [
+      { region: "North", category: "Bikes", orderTime: "08:15", revenue: 100 },
+      { region: "North", category: "Bikes", orderTime: "12:00", revenue: 200 },
+      { region: "South", category: "Bikes", orderTime: "19:45", revenue: 300 },
+    ];
+    const timeApi = createMockPivotApi({ rows: timed, datasetId: "times" });
+    const timeEngine = createBackendEngine({
+      baseUrl: "https://api.test",
+      fetchImpl: timeApi.fetch,
+      datasetId: "times",
+    });
+    const filters = [
+      {
+        kind: "condition" as const,
+        field: "orderTime",
+        operator: "between" as const,
+        value: "09:00",
+        value2: "17:00",
+        valueType: "time" as const,
+      },
+    ];
+    const result = await timeEngine.query(query({ rows: ["region"], filters }), []);
+    expect(result.grandTotal).toBe(200);
+    expect((timeApi.requests.at(-1)?.body as PivotQuery).filters).toEqual(filters);
+
+    const after = await timeEngine.query(
+      query({
+        rows: ["region"],
+        filters: [
+          {
+            kind: "condition",
+            field: "orderTime",
+            operator: "gte",
+            value: "12:00",
+            valueType: "time",
+          },
+        ],
+      }),
+      [],
+    );
+    expect(after.grandTotal).toBe(500);
+  });
+
+  it("applies subquery filters server-side", async () => {
+    // North totals 450, South totals 600.
+    const filters = [
+      {
+        kind: "subquery" as const,
+        field: "region",
+        measure: "revenue",
+        aggregator: "sum" as const,
+        operator: "gt" as const,
+        value: 500,
+      },
+    ];
+    const result = await ask({ rows: ["region"], filters });
+    expect(labels(result)).toContain("South");
+    expect(labels(result)).not.toContain("North");
+    expect(result.grandTotal).toBe(600);
+    expect((api.requests.at(-1)?.body as PivotQuery).filters).toEqual(filters);
+  });
+
   it("pages results with limit and offset", async () => {
     const first = await ask({ layout: "flat", rows: ["country"], limit: 2, offset: 0 });
     const second = await ask({ layout: "flat", rows: ["country"], limit: 2, offset: 3 });
