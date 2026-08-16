@@ -147,10 +147,54 @@ other than Tailwind tokens (`--color-border`, `--color-card`, …) and `@/lib/ut
   ];
   ```
 * **Charts** — Recharts bar / stacked / line / area / pie with click-to-drill.
-* **Drill-through** — click any number to inspect the source records.
+* **Drill-through** — click any number to inspect the source records. The dialog has its own
+  **Export…**, **Print** and **Copy** controls (respecting `permissions.allowExport`), so the
+  records behind a cell can leave the app as CSV/TSV/Excel/HTML/JSON:
+
+  ```ts
+  import { matrixFromRows, exportMatrix } from "@/components/pivot";
+
+  exportMatrix(matrixFromRows(rows, "Records behind North", { header: "Acme Ltd" }), "csv");
+  ```
 * **Export & print** — Excel (.xls), CSV, TSV, HTML, JSON, clipboard, print/PDF.
+  **Custom headers and footers**: set `config.exportHeader` / `config.exportFooter` (or type
+  them in Format → *Export header & footer*) and every export and the print view prints them
+  above and below the table. Programmatically, pass a decoration object:
+
+  ```ts
+  import { matrixFromResult, printMatrix } from "@/components/pivot";
+
+  printMatrix(matrixFromResult(result, "en", "Q4 revenue", {
+    header: "Acme Ltd\nQ4 board pack",
+    footer: "Confidential — do not distribute",
+  }));
+  ```
+* **Formatting UI** — the toolbar **Format** button (also on the cell right-click menu) opens a
+  dialog with three tabs: *Number formatting* (decimals, thousands separator, ISO currency
+  code, prefix, suffix — written to `ValueDef.format`), *Conditional formatting* (rules of
+  `{ field, operator, value, color, background }` written to `config.conditionalFormats`) and
+  *Export header & footer*.
+* **Share a report by link** — the toolbar **Share link** button serialises the whole report
+  (fields, filters, formatting, layout, locale) into a `?report=` query parameter, copies the
+  URL to the clipboard and updates the address bar. On mount, an uncontrolled `PivotStudio`
+  restores a report found in the URL, so links work with no backend storage:
+
+  ```ts
+  import { buildReportUrl, readReportFromUrl, encodeReport, decodeReport } from "@/components/pivot";
+
+  const url = buildReportUrl(window.location.href, config); // share this
+  const restored = readReportFromUrl(url);                  // PivotConfig | null
+  ```
+  For very large reports, store `encodeReport(config)` server-side and share a short id instead.
+* **Fullscreen mode** — the toolbar **Full screen** button uses the browser Fullscreen API when
+  available and always applies a fixed overlay; `Esc` leaves it.
+* **Context menu** — right-click any value cell for drill-through, copy this value, copy the
+  whole table, export to CSV, number/conditional formatting and drill up/down all levels.
+  Reuse it standalone with the exported `GridContextMenu` plus `PivotGrid`'s
+  `onCellContextMenu({ x, y, rowKey, colKey, label, value })` callback.
 * **Localisation** — bundled `en`, `fr`, `de`, `es`; locale-aware number formats.
 * **Security** — `rowFilter` row-level security, field masking, denied fields, read-only mode.
+
 
 ---
 
