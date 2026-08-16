@@ -52,7 +52,9 @@ function useDates(
   if (!dateOperators.includes(operator)) return false;
   if (valueType === "date") return true;
   if (valueType && valueType !== "auto") return false;
-  return !Number.isNaN(parseDate(raw)) && !Number.isNaN(parseDate(value));
+  // In auto mode only ISO-like text counts, so plain numbers stay numeric.
+  const isoText = (v: unknown) => typeof v === "string" && !Number.isNaN(parseDate(v));
+  return isoText(raw) && isoText(value);
 }
 
 export function matchesCondition(
