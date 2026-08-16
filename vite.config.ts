@@ -15,13 +15,19 @@ function keepHmrSocketAlive(): Plugin {
     name: "keep-hmr-socket-alive",
     apply: "serve",
     configureServer(server: ViteDevServer) {
-      server.ws.on("connection", (socket: { on: (e: string, cb: (err: Error) => void) => void }) => {
-        socket.on("error", (error) => {
-          server.config.logger.warn(`[hmr] ignored websocket error: ${error.message}`);
-        });
-      });
+      server.ws.on(
+        "connection",
+        (socket: { on: (e: string, cb: (err: Error) => void) => void }) => {
+          socket.on("error", (error) => {
+            server.config.logger.warn(`[hmr] ignored websocket error: ${error.message}`);
+          });
+        },
+      );
       process.on("uncaughtException", (error: NodeJS.ErrnoException) => {
-        if (error.code === "WS_ERR_UNEXPECTED_RSV_1" || /Invalid WebSocket frame/.test(error.message)) {
+        if (
+          error.code === "WS_ERR_UNEXPECTED_RSV_1" ||
+          /Invalid WebSocket frame/.test(error.message)
+        ) {
           server.config.logger.warn(`[hmr] ignored websocket error: ${error.message}`);
           return;
         }
@@ -59,4 +65,3 @@ export default defineConfig({
     server: { hmr: { timeout: 120_000 } },
   },
 });
-
