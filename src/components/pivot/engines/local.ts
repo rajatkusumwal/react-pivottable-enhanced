@@ -361,12 +361,16 @@ export function buildLocalResult(rows: PivotRow[], query: PivotQuery): PivotResu
               grand: num(grandTotals[mi] ?? null),
               rowTotal: num(rowTotalsByMeasure[rowIndex]?.[mi] ?? null),
               colTotal: num(colTotals[leafIndex] ?? null),
-              parentRowTotal: needsParent
-                ? num(cellValue(rows, parentRowIndexes[rowIndex] ?? null, base.indexes, m))
-                : null,
-              parentColTotal: needsParent
-                ? num(cellValue(rows, r.indexes, parentColIndexes[baseIndex] ?? null, m))
-                : null,
+              // Left undefined without a parent level so the transform falls
+              // back to the plain row / column total.
+              parentRowTotal:
+                needsParent && parentRowIndexes[rowIndex]
+                  ? num(cellValue(rows, parentRowIndexes[rowIndex] as number[], base.indexes, m))
+                  : undefined,
+              parentColTotal:
+                needsParent && parentColIndexes[baseIndex]
+                  ? num(cellValue(rows, r.indexes, parentColIndexes[baseIndex] as Set<number>, m))
+                  : undefined,
               running: running[mi] as number,
               runningColumn: runningColumn[leafIndex] as number,
               prevInRow: baseIndex > 0 ? num(rawCells[rowIndex]?.[leafIndex - measureCount] ?? null) : null,
