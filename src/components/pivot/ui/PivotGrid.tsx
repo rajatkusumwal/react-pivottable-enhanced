@@ -398,9 +398,13 @@ export function PivotGrid({
                     className="pivot-corner sticky left-0 z-20 text-left"
                   >
                     {showSortingControls && onSortChange ? (
-                      <button type="button" onClick={() => toggleSort("rows")} className="font-medium">
+                      <button
+                        type="button"
+                        onClick={(e) => toggleSort("rows", e.shiftKey)}
+                        className="font-medium"
+                      >
                         {result.rowFields.join(" / ") || result.measure.caption}
-                        {sort?.by === "rows" ? (sort.direction === "asc" ? " ▲" : " ▼") : ""}
+                        {sortIndexOf("rows") === -1 ? "" : ` ${sortGlyph("rows")}`}
                       </button>
                     ) : (
                       (result.rowFields.join(" / ") || result.measure.caption)
