@@ -777,3 +777,32 @@ Conventions (also documented for AI coding agents in `AGENTS.md`, `CLAUDE.md`
 and `GEMINI.md`): tests live next to the code, cover a normal case, an edge case
 and a worst case; pure logic stays out of components; every engine returns the
 same `PivotResult` so the browser engine and a REST backend stay swappable.
+
+## Moving the pivot table into another React app
+
+`src/components/pivot/` is self-contained: it imports nothing from the demo app
+(no router, no shadcn/ui, no `@/lib` helpers), so it can be lifted out as-is.
+The `standalone/` folder packages exactly that.
+
+```bash
+node standalone/scripts/sync-from-app.mjs   # copies the folder, drops the tests
+```
+
+Dependencies the target project must install:
+
+```bash
+npm i react react-dom @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities lucide-react recharts
+```
+
+Plus, at build time: TypeScript with `"jsx": "react-jsx"`, and Tailwind CSS
+(v4 or v3) configured to scan the copied folder. Import
+`standalone/src/pivot-theme.css` once so the semantic colour tokens the classes
+use (`bg-card`, `text-muted-foreground`, `border-border`, `bg-surface`, …)
+exist.
+
+Then either copy `standalone/src/pivot/` into your app and
+`import { PivotStudio } from "./pivot"`, or build a real package with
+`cd standalone && npm install && npm run sync && npm run build`.
+
+Full instructions, including a Tailwind v3 colour map, Next.js SSR notes and the
+backend-engine wiring, are in [`standalone/README.md`](./standalone/README.md).
