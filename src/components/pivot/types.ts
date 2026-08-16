@@ -157,6 +157,8 @@ export interface PivotConfig {
   /** Collapsed row member paths (joined with \u0000). */
   collapsed: string[];
   sort?: PivotSort | undefined;
+  /** Multi-column sort used by the flat layout (shift-click a sort control). */
+  sorts?: PivotSort[] | undefined;
   showFieldCaptions: boolean;
   showSpreadsheetHeaders: boolean;
   repeatMemberLabels: boolean;
