@@ -109,28 +109,46 @@ export function buildLocalResult(rows: PivotRow[], query: PivotQuery): PivotResu
   const colTree = buildTree(rows, query.cols);
 
   // ---- columns -------------------------------------------------------------
-  const colLeafNodes = query.cols.length ? flattenLeaves(colTree) : [];
-  const colLevels = levelNodes(colTree, 0);
-  const colHeaderRows: HeaderNode[][] = colLevels.map((level, depth) =>
-    level.map((node) => ({
-      key: node.path,
-      label: node.label,
-      depth,
-      kind: "member" as const,
-      expandable: false,
-      expanded: true,
-      span: leafCount(node),
-    })),
-  );
-  const colLeaves: HeaderNode[] = colLeafNodes.map((node) => ({
-    key: node.path,
-    label: node.label,
-    depth: node.path.length - 1,
-    kind: "member" as const,
-    expandable: false,
-    expanded: true,
-    span: 1,
-  }));
+  // Column members drill down the same way rows do: a collapsed member keeps a
+  // single aggregated leaf column and hides its descendants.
+  const collapsedCols = new Set(query.collapsedCols ?? []);
+  const isColCollapsed = (node: TreeNode) =>
+    node.children.length > 0 && collapsedCols.has(keyOf(node.path));
+  const visibleLeafCount = (node: TreeNode): number =>
+    !node.children.length || isColCollapsed(node)
+      ? 1
+      : node.children.reduce((n, c) => n + visibleLeafCount(c), 0);
+
+  const colDepth = query.cols.length;
+  const colHeaderRows: HeaderNode[][] = [];
+  const colLeafNodes: TreeNode[] = [];
+  const colLeaves: HeaderNode[] = [];
+
+  const walkCols = (node: TreeNode, depth: number) => {
+    for (const child of node.children) {
+      const collapsedHere = isColCollapsed(child);
+      const stopsHere = !child.children.length || collapsedHere;
+      const header: HeaderNode = {
+        key: child.path,
+        label: child.label,
+        depth,
+        kind: "member",
+        expandable: child.children.length > 0,
+        expanded: !collapsedHere,
+        span: visibleLeafCount(child),
+        rowSpan: stopsHere ? Math.max(colDepth - depth, 1) : 1,
+      };
+      (colHeaderRows[depth] ??= []).push(header);
+      if (stopsHere) {
+        colLeafNodes.push(child);
+        colLeaves.push({ ...header, span: 1 });
+      } else {
+        walkCols(child, depth + 1);
+      }
+    }
+  };
+  if (query.cols.length) walkCols(colTree, 0);
+  for (let d = 0; d < colHeaderRows.length; d++) colHeaderRows[d] ??= [];
   const colIndexSets = colLeafNodes.map((n) => new Set(n.rowIndexes));
 
   // ---- rows ----------------------------------------------------------------
