@@ -1,16 +1,69 @@
 import { aggregate } from "./aggregators";
-import type { ConditionOperator, FilterDef, PivotRow, PivotValue } from "./types";
+import type {
+  ConditionOperator,
+  ConditionValueType,
+  FilterDef,
+  PivotRow,
+  PivotValue,
+} from "./types";
+
+const DAY = 86_400_000;
+const isoLike = /^\d{4}-\d{2}-\d{2}([T ].*)?$/;
+
+/**
+ * Parses ISO strings ("2024-03-01", full ISO timestamps), epoch numbers and Date
+ * instances into a UTC-midnight timestamp so comparisons happen at day granularity.
+ * Returns NaN when the value is not a date.
+ */
+export function parseDate(value: unknown): number {
+  if (value instanceof Date) return Math.floor(value.getTime() / DAY) * DAY;
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return Math.floor(value / DAY) * DAY;
+  }
+  if (typeof value === "string") {
+    const text = value.trim();
+    if (!isoLike.test(text)) return Number.NaN;
+    const ms = Date.parse(text.length === 10 ? `${text}T00:00:00Z` : text);
+    return Number.isNaN(ms) ? Number.NaN : Math.floor(ms / DAY) * DAY;
+  }
+  return Number.NaN;
+}
+
+const dateOperators: ConditionOperator[] = ["gt", "gte", "lt", "lte", "eq", "neq", "between"];
+
+/** True when the condition should be evaluated on the date timeline. */
+function useDates(
+  valueType: ConditionValueType | undefined,
+  operator: ConditionOperator,
+  raw: PivotValue,
+  value: string | number,
+): boolean {
+  if (!dateOperators.includes(operator)) return false;
+  if (valueType === "date") return true;
+  if (valueType && valueType !== "auto") return false;
+  return !Number.isNaN(parseDate(raw)) && !Number.isNaN(parseDate(value));
+}
 
 export function matchesCondition(
   raw: PivotValue,
   operator: ConditionOperator,
   value: string | number,
   value2?: string | number,
+  valueType?: ConditionValueType,
 ): boolean {
   const text = String(raw ?? "").toLowerCase();
   const needle = String(value ?? "").toLowerCase();
-  const num = Number(raw);
-  const target = Number(value);
+  const asDates = useDates(valueType, operator, raw, value);
+  const num = asDates ? parseDate(raw) : Number(raw);
+  const target = asDates ? parseDate(value) : Number(value);
+  if (asDates && (Number.isNaN(num) || Number.isNaN(target))) return false;
+  if (asDates && (operator === "eq" || operator === "neq")) {
+    return operator === "eq" ? num === target : num !== target;
+  }
+  if (asDates && operator === "between") {
+    const upper = parseDate(value2 as string | number);
+    return !Number.isNaN(upper) && num >= target && num <= upper;
+  }
   switch (operator) {
     case "gt":
       return num > target;
