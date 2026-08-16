@@ -495,10 +495,12 @@ export function PivotStudio({
           {...(onUploadToBackend ? { onUploadToBackend } : {})}
           onReset={() => {
             setUploaded(null);
+            saveSessionDataset(null);
             update(createDefaultConfig(initialConfig));
           }}
           onLoad={(dataset) => {
             setUploaded(dataset);
+            saveSessionDataset(dataset);
             update({ ...createDefaultConfig(), ...suggestConfig(dataset.fields), locale: config.locale });
             setStatus(`Loaded ${dataset.name}`);
           }}
