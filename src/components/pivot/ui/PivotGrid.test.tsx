@@ -93,6 +93,15 @@ describe("totals", () => {
     expect(without.rowHeaders.some((h) => h.kind === "grand")).toBe(false);
   });
 
+  it("places the grand total row at the top or the bottom", () => {
+    const bottom = buildLocalResult(data, query({ grandTotalsPosition: "bottom" }));
+    expect(bottom.rowHeaders.at(-1)?.kind).toBe("grand");
+
+    const top = buildLocalResult(data, query({ layout: "flat", grandTotalsPosition: "top" }));
+    expect(top.rowHeaders[0]?.kind).toBe("grand");
+    expect(top.rowTotals[0]).toBe(bottom.rowTotals.at(-1));
+  });
+
   it("can hide the row totals column", () => {
     renderGrid({}, { showRowTotals: false });
     const grid = screen.getByTestId("pivot-grid");
