@@ -73,8 +73,10 @@ other than Tailwind tokens (`--color-border`, `--color-card`, …) and `@/lib/ut
   double-click a value cell, type a number, press Enter; the change is written back to the
   underlying records, spread proportionally for `sum` measures, and `onDataChange` fires with
   the updated rows).
-* **Filters** — member checkbox filters with search, conditional filters (number/text),
-  top/bottom N, report-filter chips above the grid.
+* **Filters** — member checkbox filters with search, conditional filters (number/text/date),
+  top/bottom N, report-filter chips above the grid. Picking a field typed `date` in the
+  filter editor switches it to a date picker with date wording ("is before", "is on or
+  after", "is between", …) and sets `valueType: "date"` on the filter.
 * **Field list** — drag-and-drop between Filters / Columns / Rows / Measures (`@dnd-kit`).
   Drag & drop can be switched off with `config.dragAndDrop: false` (or the toolbar
   checkbox); the select menus keep every action available without dragging.
