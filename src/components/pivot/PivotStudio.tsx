@@ -290,6 +290,9 @@ export function PivotStudio({
             onSortChange={(sort) => update({ sort, sorts: sort ? [sort] : [] })}
             onSortsChange={(sorts) => update({ sorts, sort: sorts[0] })}
             onToggleCollapse={toggleCollapse}
+            onToggleColumnCollapse={toggleColumnCollapse}
+            onExpandAll={expandAll}
+            onCollapseAll={collapseAll}
             conditionalFormats={config.conditionalFormats}
             allowDrillThrough={allowDrillThrough}
             onDrill={(rowKey, colKey, label) => void openDrill(rowKey, colKey, label)}
