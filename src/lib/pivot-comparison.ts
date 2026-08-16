@@ -534,7 +534,16 @@ const gridStudioOverrides: Record<string, Cell> = {
   "Sort multiple columns in flat table": y("Shift-click sort controls"),
   "Enable/disable drag and drop": y("Toolbar switch (config.dragAndDrop)"),
   "Editing cells inline": y("\u201cEdit cells\u201d switch, double-click a value"),
+  "Percent of parent column total": y("\u201cShow values as\u201d menu"),
+  "Percent of parent row total": y("\u201cShow values as\u201d menu"),
+  Index: y("\u201cShow values as\u201d menu"),
+  "Difference of column / row": y("\u201cShow values as\u201d menu"),
+  "% difference of column / row": y("\u201cShow values as\u201d menu"),
+  "Running totals of column / row": y("Down a column or across a row"),
+  "Restrict available aggregations per field": y("field.aggregators allow-list"),
+  "Show/hide the aggregation (sigma) icon": y("Toolbar \u201c\u03a3 icon\u201d switch"),
 };
+
 
 function studioCell(row: RawRow, base: Cell): Cell {
   const override = gridStudioOverrides[row.feature] ?? sharedStudioOverrides[row.feature];
