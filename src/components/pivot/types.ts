@@ -156,6 +156,8 @@ export interface PivotConfig {
   layout: PivotLayout;
   /** Collapsed row member paths (joined with \u0000). */
   collapsed: string[];
+  /** Collapsed column member paths (joined with \u0000). */
+  collapsedCols: string[];
   sort?: PivotSort | undefined;
   /** Multi-column sort used by the flat layout (shift-click a sort control). */
   sorts?: PivotSort[] | undefined;
@@ -192,6 +194,7 @@ export function createDefaultConfig(partial: Partial<PivotConfig> = {}): PivotCo
     expandAll: true,
     layout: "compact",
     collapsed: [],
+    collapsedCols: [],
     showFieldCaptions: true,
     showSpreadsheetHeaders: false,
     repeatMemberLabels: false,

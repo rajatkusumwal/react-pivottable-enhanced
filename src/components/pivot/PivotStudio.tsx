@@ -119,6 +119,7 @@ export function PivotStudio({
       grandTotalsPosition: config.grandTotalsPosition,
       layout: config.layout,
       collapsed: config.collapsed,
+      collapsedCols: config.collapsedCols,
       sort: config.sort,
       sorts: config.layout === "flat" ? config.sorts : undefined,
       locale: config.locale,
@@ -178,6 +179,27 @@ export function PivotStudio({
       : [...config.collapsed, id];
     update({ collapsed: next });
   };
+
+  const toggleColumnCollapse = (key: string[]) => {
+    const id = keyOf(key);
+    const current = config.collapsedCols ?? [];
+    update({
+      collapsedCols: current.includes(id) ? current.filter((k) => k !== id) : [...current, id],
+    });
+  };
+
+  /** Drill up: collapse every top-level member on both axes. */
+  const collapseAll = () => {
+    const topRow = new Set(derivedRows.map((r) => String(r[config.rows[0] ?? ""] ?? "")));
+    const topCol = new Set(derivedRows.map((r) => String(r[config.cols[0] ?? ""] ?? "")));
+    update({
+      collapsed: config.rows.length > 1 ? [...topRow].map((m) => keyOf([m])) : [],
+      collapsedCols: config.cols.length > 1 ? [...topCol].map((m) => keyOf([m])) : [],
+    });
+  };
+
+  /** Drill down: expand everything again. */
+  const expandAll = () => update({ collapsed: [], collapsedCols: [] });
 
   return (
     <section className={`flex flex-col gap-3 ${className}`} aria-label={title}>
