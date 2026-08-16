@@ -1,4 +1,10 @@
 import "@testing-library/jest-dom/vitest";
+import { beforeEach } from "vitest";
+
+// Each test starts with no imported dataset cached in sessionStorage.
+beforeEach(() => {
+  if (typeof window !== "undefined") window.sessionStorage.clear();
+});
 
 if (typeof window !== "undefined") {
   // Recharts needs a size in jsdom.
