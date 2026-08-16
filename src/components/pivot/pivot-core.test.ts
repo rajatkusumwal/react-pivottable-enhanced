@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { areaOfField, moveField, removeField, reorderField } from "./dnd";
 import { aggregate, registerAggregator } from "./aggregators";
-import { applyFilters, describeFilter, matchesCondition, uniqueMembers } from "./filters";
+import {
+  applyFilters,
+  describeFilter,
+  matchesCondition,
+  parseTime,
+  uniqueMembers,
+} from "./filters";
 import { applyCalculatedFields, evaluateFormula, validateFormula } from "./calculated";
 import { buildChartData, drillThroughRows, applyDisplayMode } from "./analysis";
 import { matrixFromTable, toCsv, toHtml, toTsv } from "./export";
