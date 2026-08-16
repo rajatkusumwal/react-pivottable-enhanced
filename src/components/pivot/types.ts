@@ -167,6 +167,8 @@ export interface PivotConfig {
   showSortingControls: boolean;
   /** Allow dragging fields between areas; when false only the menus work. */
   dragAndDrop: boolean;
+  /** Allow typing a new value straight into a grid cell (writes back to data). */
+  editing: boolean;
   locale: string;
   theme: PivotTheme;
   chart: { visible: boolean; type: ChartType };
@@ -202,6 +204,7 @@ export function createDefaultConfig(partial: Partial<PivotConfig> = {}): PivotCo
     repeatMemberLabels: false,
     showSortingControls: true,
     dragAndDrop: true,
+    editing: false,
     locale: "en",
     theme: defaultTheme,
     chart: { visible: false, type: "bar" },
