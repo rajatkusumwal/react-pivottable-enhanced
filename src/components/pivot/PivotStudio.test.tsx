@@ -637,3 +637,33 @@ describe("aggregation menu restrictions and the Σ icon", () => {
     await waitFor(() => expect(screen.queryAllByTestId("sigma-icon")).toHaveLength(0));
   });
 });
+
+describe("Clear returns to the sample data", () => {
+  const upload = async (user: ReturnType<typeof userEvent.setup>) => {
+    const file = new File(["city,amount\nOslo,10\nRome,20\n"], "tiny.csv", { type: "text/csv" });
+    await user.upload(screen.getByLabelText("Upload a CSV or JSON file"), file);
+    await waitFor(() => expect(screen.getByText("tiny.csv")).toBeInTheDocument());
+  };
+
+  it("drops the imported file when Clear is pressed", async () => {
+    const user = userEvent.setup();
+    setup({ allowFileUpload: true });
+    await upload(user);
+
+    await user.click(screen.getByRole("button", { name: /clear/i }));
+
+    await waitFor(() => expect(screen.getByText("Sample data")).toBeInTheDocument());
+    expect(screen.queryByText("tiny.csv")).not.toBeInTheDocument();
+  });
+
+  it("drops the imported file when 'Use sample data' is pressed", async () => {
+    const user = userEvent.setup();
+    setup({ allowFileUpload: true });
+    await upload(user);
+
+    await user.click(screen.getByRole("button", { name: /use sample data/i }));
+
+    await waitFor(() => expect(screen.getByText("Sample data")).toBeInTheDocument());
+    expect(window.sessionStorage.length).toBe(0);
+  });
+});
