@@ -56,6 +56,11 @@ export interface PivotGridProps {
   onCellEdit?: (rowKey: string[], colKey: string[], value: number, measureIndex: number) => void;
 
   onDrill?: (rowKey: string[], colKey: string[], label: string) => void;
+  /** Right-click on a value cell; the host renders the context menu. */
+  onCellContextMenu?: (
+    payload: { x: number; y: number; rowKey: string[]; colKey: string[]; label: string; value: PivotCellValue },
+  ) => void;
+
   onSelectionChange?: (stats: SelectionStats | null) => void;
   emptyLabel?: string;
 }
@@ -107,6 +112,8 @@ export function PivotGrid({
   editable = false,
   onCellEdit,
   onDrill,
+  onCellContextMenu,
+
   onSelectionChange,
   emptyLabel = "No data to show",
 }: PivotGridProps) {
@@ -597,6 +604,22 @@ export function PivotGrid({
                       }}
                       onMouseEnter={() => setHover({ row: rowIndex, col: colIndex })}
                       onMouseLeave={() => setHover(null)}
+                      onContextMenu={(e) => {
+                        if (!onCellContextMenu) return;
+                        e.preventDefault();
+                        const pos = { row: rowIndex, col: colIndex };
+                        setAnchor(pos);
+                        setFocus(pos);
+                        onCellContextMenu({
+                          x: e.clientX,
+                          y: e.clientY,
+                          rowKey: header.kind === "grand" ? [] : header.key,
+                          colKey: leaf.key,
+                          label: [...header.key, ...leaf.key].join(" · ") || "All records",
+                          value,
+                        });
+                      }}
+
                       onMouseDown={(e) => {
                         const pos = { row: rowIndex, col: colIndex };
                         setFocus(pos);

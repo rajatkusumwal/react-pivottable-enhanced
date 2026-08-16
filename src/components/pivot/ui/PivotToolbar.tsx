@@ -2,8 +2,12 @@ import {
   BarChart3,
   Copy,
   Download,
+  Maximize2,
+  Minimize2,
+  Paintbrush,
   Printer,
   RotateCcw,
+  Share2,
   SlidersHorizontal,
   Table2,
 } from "lucide-react";
@@ -24,7 +28,14 @@ export interface PivotToolbarProps {
   onReset: () => void;
   /** Opens the Flexmonster-style field list dialog. */
   onOpenFields?: (() => void) | undefined;
+  /** Opens the number / conditional formatting dialog. */
+  onOpenFormat?: (() => void) | undefined;
+  /** Copies a shareable report link to the clipboard. */
+  onShare?: (() => void) | undefined;
+  onToggleFullscreen?: (() => void) | undefined;
+  isFullscreen?: boolean;
 }
+
 
 const btn =
   "inline-flex items-center gap-1.5 rounded border border-border bg-card px-2.5 py-1 text-xs text-foreground hover:bg-accent disabled:opacity-50";
@@ -42,6 +53,10 @@ export function PivotToolbar({
   onCopy,
   onReset,
   onOpenFields,
+  onOpenFormat,
+  onShare,
+  onToggleFullscreen,
+  isFullscreen = false,
 }: PivotToolbarProps) {
   return (
     <div className="flex flex-wrap items-center gap-1.5 rounded-md border border-border bg-surface px-2 py-1.5">
@@ -51,6 +66,34 @@ export function PivotToolbar({
           {strings.fields}
         </button>
       )}
+      {onOpenFormat && (
+        <button type="button" className={btn} onClick={onOpenFormat}>
+          <Paintbrush className="h-3.5 w-3.5" aria-hidden="true" />
+          Format
+        </button>
+      )}
+      {onShare && (
+        <button type="button" className={btn} onClick={onShare}>
+          <Share2 className="h-3.5 w-3.5" aria-hidden="true" />
+          Share link
+        </button>
+      )}
+      {onToggleFullscreen && (
+        <button
+          type="button"
+          className={btn}
+          aria-pressed={isFullscreen}
+          onClick={onToggleFullscreen}
+        >
+          {isFullscreen ? (
+            <Minimize2 className="h-3.5 w-3.5" aria-hidden="true" />
+          ) : (
+            <Maximize2 className="h-3.5 w-3.5" aria-hidden="true" />
+          )}
+          {isFullscreen ? "Exit full screen" : "Full screen"}
+        </button>
+      )}
+
       <span className="mx-1 h-5 w-px bg-border" aria-hidden="true" />
 
       <div className="inline-flex overflow-hidden rounded border border-border">
