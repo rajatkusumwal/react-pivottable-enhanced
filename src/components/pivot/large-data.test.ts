@@ -60,7 +60,7 @@ describe("custom data source API", () => {
   it("falls back to raw records plus browser aggregation", async () => {
     const engine = createCustomEngine({ fetchRows: async () => rows });
     const result = await engine.query(query(), []);
-    expect(result.rowLeaves.length).toBe(2);
+    expect(result.rows.length).toBe(2);
   });
 
   it("drills through with the source implementation, or locally", async () => {
