@@ -222,11 +222,11 @@ describe("File upload", () => {
     await waitFor(() => expect(grid.textContent).toContain("Oslo"));
   });
 
-  it("rejects an unsupported file type", async () => {
+  it("explains when the file has no rows", async () => {
     const user = userEvent.setup();
     setup({ allowFileUpload: true });
-    const file = new File(["nope"], "notes.txt", { type: "text/plain" });
+    const file = new File(["city,units\n"], "empty.csv", { type: "text/csv" });
     await user.upload(screen.getByLabelText(/upload a csv or json file/i), file);
-    expect(await screen.findByRole("alert")).toHaveTextContent(/csv or .json/i);
+    expect(await screen.findByRole("alert")).toHaveTextContent(/no rows/i);
   });
 });
