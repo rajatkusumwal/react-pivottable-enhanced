@@ -212,7 +212,33 @@ export interface PivotTheme {
   fontSize: number;
 }
 
-export type ChartType = "bar" | "stackedBar" | "line" | "area" | "pie";
+export type ChartType =
+  | "bar"
+  /** Stacked column chart — series stack on top of each other per category. */
+  | "stackedBar"
+  | "line"
+  | "area"
+  | "pie"
+  /** Combined chart: columns for most series plus a line overlay. */
+  | "columnLine";
+
+/** Where the chart sits relative to the grid. "right" is the split view. */
+export type ChartPosition = "bottom" | "right";
+
+export interface ChartConfig {
+  visible: boolean;
+  type: ChartType;
+  /** "bottom" (default) stacks chart under the grid, "right" shows them side by side. */
+  position?: ChartPosition;
+  /** Row members already drilled into on the category axis. */
+  drillRows?: string[];
+  /** Column members already drilled into on the legend. */
+  drillCols?: string[];
+  /** Series hidden by clicking the legend (chart-only filtering). */
+  hiddenSeries?: string[];
+  /** Series rendered as lines in the "columnLine" combined chart. Defaults to the last series. */
+  lineSeries?: string[];
+}
 
 export interface Permissions {
   /** Only these fields may be used (when provided). */
@@ -274,7 +300,7 @@ export interface PivotConfig {
   exportFooter?: string;
   locale: string;
   theme: PivotTheme;
-  chart: { visible: boolean; type: ChartType };
+  chart: ChartConfig;
 }
 
 
@@ -316,7 +342,14 @@ export function createDefaultConfig(partial: Partial<PivotConfig> = {}): PivotCo
     editing: false,
     locale: "en",
     theme: defaultTheme,
-    chart: { visible: false, type: "bar" },
+    chart: {
+      visible: false,
+      type: "bar",
+      position: "bottom",
+      drillRows: [],
+      drillCols: [],
+      hiddenSeries: [],
+    },
     ...partial,
   };
 }

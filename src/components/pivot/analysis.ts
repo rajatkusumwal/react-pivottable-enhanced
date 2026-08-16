@@ -6,30 +6,78 @@ export interface ChartPoint {
   [series: string]: string | number;
 }
 
-/**
- * Builds chart series from the same rows the grid uses:
- * first row field = category axis, first column field = series split.
- */
-export function buildChartData(rows: PivotRow[], config: PivotConfig): {
+export interface ChartData {
   data: ChartPoint[];
+  /** Series actually plotted (hidden ones removed). */
   series: string[];
-} {
+  /** Every series available at this drill level, including hidden ones. */
+  allSeries: string[];
+  /** Field currently on the category axis (undefined when there are no row fields). */
+  categoryField?: string | undefined;
+  /** Field currently splitting the series (undefined when there are no column fields). */
+  seriesField?: string | undefined;
+  /** True when the axis can be expanded one level deeper. */
+  canDrillCategory: boolean;
+  /** True when the legend can be expanded one level deeper. */
+  canDrillSeries: boolean;
+  /** Members already drilled into on the axis. */
+  categoryPath: string[];
+  /** Members already drilled into on the legend. */
+  seriesPath: string[];
+}
+
+/**
+ * Builds chart series from the same rows the grid uses.
+ *
+ * The axis walks `config.rows` and the legend walks `config.cols`, one level at
+ * a time: `config.chart.drillRows` / `drillCols` hold the members already
+ * expanded, so `["West"]` on the axis means "show the second row field, filtered
+ * to West" — the Flexmonster drillable axis/legend behaviour.
+ * `config.chart.hiddenSeries` removes series from the plot (legend filtering)
+ * without changing the report.
+ */
+export function buildChartData(rows: PivotRow[], config: PivotConfig): ChartData {
   const value: ValueDef | undefined = config.values[0];
-  if (!value) return { data: [], series: [] };
-  const rowField = config.rows[0];
-  const colField = config.cols[0];
+  const categoryPath = config.chart.drillRows ?? [];
+  const seriesPath = config.chart.drillCols ?? [];
+  const hidden = config.chart.hiddenSeries ?? [];
+  const empty: ChartData = {
+    data: [],
+    series: [],
+    allSeries: [],
+    canDrillCategory: false,
+    canDrillSeries: false,
+    categoryPath,
+    seriesPath,
+  };
+  if (!value) return empty;
+
+  // Restrict the rows to the drill path on both axes.
+  let scoped = rows;
+  categoryPath.forEach((member, level) => {
+    const field = config.rows[level];
+    if (field) scoped = scoped.filter((r) => String(r[field] ?? "") === member);
+  });
+  seriesPath.forEach((member, level) => {
+    const field = config.cols[level];
+    if (field) scoped = scoped.filter((r) => String(r[field] ?? "") === member);
+  });
+
+  const rowField = config.rows[Math.min(categoryPath.length, Math.max(config.rows.length - 1, 0))];
+  const colField = config.cols[Math.min(seriesPath.length, Math.max(config.cols.length - 1, 0))];
 
   const categories = rowField
-    ? [...new Set(rows.map((r) => String(r[rowField] ?? "")))].sort()
+    ? [...new Set(scoped.map((r) => String(r[rowField] ?? "")))].sort()
     : ["All"];
-  const series = colField
-    ? [...new Set(rows.map((r) => String(r[colField] ?? "")))].sort()
+  const allSeries = colField
+    ? [...new Set(scoped.map((r) => String(r[colField] ?? "")))].sort()
     : [value.caption ?? value.field];
+  const series = allSeries.filter((s) => !hidden.includes(s));
 
   const data = categories.map((category) => {
     const inCategory = rowField
-      ? rows.filter((r) => String(r[rowField] ?? "") === category)
-      : rows;
+      ? scoped.filter((r) => String(r[rowField] ?? "") === category)
+      : scoped;
     const point: ChartPoint = { name: category };
     for (const s of series) {
       const subset = colField ? inCategory.filter((r) => String(r[colField] ?? "") === s) : inCategory;
@@ -38,8 +86,19 @@ export function buildChartData(rows: PivotRow[], config: PivotConfig): {
     return point;
   });
 
-  return { data, series };
+  return {
+    data,
+    series,
+    allSeries,
+    categoryField: rowField,
+    seriesField: colField,
+    canDrillCategory: categoryPath.length < config.rows.length - 1,
+    canDrillSeries: seriesPath.length < config.cols.length - 1,
+    categoryPath,
+    seriesPath,
+  };
 }
+
 
 export interface DrillSelection {
   rowField?: string | undefined;

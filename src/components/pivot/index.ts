@@ -53,6 +53,7 @@ export {
 export { areaOfField, moveField, removeField, reorderField, pivotAreas } from "./dnd";
 export type { PivotArea } from "./dnd";
 export { PivotChart } from "./ui/PivotChart";
+export { ChartDrillBar } from "./ui/ChartDrillBar";
 export { DrillThroughDialog } from "./ui/DrillThroughDialog";
 export { FormatDialog } from "./ui/FormatDialog";
 export type { FormatTab } from "./ui/FormatDialog";
@@ -83,7 +84,7 @@ export {
 export type { FormulaContext, TotalScope } from "./calculated";
 export { computeKpiStatus, kpisFromFields, KPI_LABELS, KPI_ICONS } from "./kpi";
 export { buildChartData, drillThroughRows, applyDisplayMode, grandTotal } from "./analysis";
-export type { ChartPoint, DrillSelection } from "./analysis";
+export type { ChartPoint, ChartData, DrillSelection } from "./analysis";
 export {
   exportMatrix,
   matrixFromTable,
@@ -132,4 +133,6 @@ export type {
   Permissions,
   PivotTheme,
   ChartType,
+  ChartConfig,
+  ChartPosition,
 } from "./types";
