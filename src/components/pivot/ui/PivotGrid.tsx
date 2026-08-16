@@ -38,7 +38,12 @@ export interface PivotGridProps {
   showSortingControls?: boolean;
   showRowTotals?: boolean;
   sort?: PivotSort | undefined;
+  /** Active multi-column sort (flat layout). */
+  sorts?: PivotSort[] | undefined;
+  /** Enables shift-click to add a column to the sort. */
+  multiSort?: boolean;
   onSortChange?: (sort: PivotSort | undefined) => void;
+  onSortsChange?: (sorts: PivotSort[]) => void;
   onToggleCollapse?: (key: string[]) => void;
   conditionalFormats?: ConditionalFormatRule[];
   allowDrillThrough?: boolean;
@@ -83,7 +88,10 @@ export function PivotGrid({
   showSortingControls = true,
   showRowTotals = true,
   sort,
+  sorts,
+  multiSort = false,
   onSortChange,
+  onSortsChange,
   onToggleCollapse,
   conditionalFormats = [],
   allowDrillThrough = true,
