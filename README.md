@@ -591,7 +591,7 @@ report filtering and the grid + chart split view.
 tokens) and `reporting-ui.test.tsx` covers the reporting UX end to end: export headers and
 footers in CSV/TSV/HTML, the drill-through export controls (including the read-only case),
 copying and restoring a share link, the number and conditional formatting dialogs, fullscreen
-and the grid context menu. 201 tests in total.
+and the grid context menu. 250 tests in total.
 
 ### Backend integration tests (no server required)
 
