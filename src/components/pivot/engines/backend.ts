@@ -4,6 +4,7 @@
  * The service owns grouping, subtotals, filtering and paging; the browser only
  * renders the returned `PivotResult`. See README.md for the full API contract.
  */
+import type { CellEditRequest } from "../editing";
 import type { FieldDef, PivotRow } from "../types";
 import type {
   DrillThroughQuery,
@@ -21,7 +22,9 @@ export interface BackendEngineOptions {
   /** Extra headers, typically Authorization. */
   headers?: Record<string, string>;
   fetchImpl?: typeof fetch;
-  paths?: Partial<Record<"query" | "drillthrough" | "fields" | "members" | "datasets", string>>;
+  paths?: Partial<
+    Record<"query" | "drillthrough" | "fields" | "members" | "datasets" | "edit", string>
+  >;
 }
 
 const defaultPaths = {
@@ -30,6 +33,7 @@ const defaultPaths = {
   fields: "/api/pivot/fields",
   members: "/api/pivot/members",
   datasets: "/api/pivot/datasets",
+  edit: "/api/pivot/edit",
 };
 
 export class PivotBackendError extends Error {
@@ -87,6 +91,12 @@ export function createBackendClient(options: BackendEngineOptions) {
       call<{ members: string[]; total: number }>(paths.members, {
         method: "POST",
         body: JSON.stringify({ field, search, limit, datasetId }),
+      }),
+    /** Writes an inline cell edit back to the server-side dataset. */
+    applyEdit: (request: CellEditRequest & { datasetId?: string }) =>
+      call<{ changed: boolean; rowCount?: number; reason?: string }>(paths.edit, {
+        method: "POST",
+        body: JSON.stringify({ ...request, datasetId: request.datasetId ?? options.datasetId }),
       }),
     /** Uploads a CSV/JSON file and returns the dataset handle to query against. */
     upload: async (file: File) => {
