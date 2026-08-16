@@ -270,7 +270,12 @@ export function FieldListPanel({
         <FieldChip
           key={`${v.field}-${i}`}
           id={chipId("values", v.field, i)}
-          label={`${config.showAggregationIcon ? "\u03a3 " : ""}${v.caption ?? labelOf(v.field)}`}
+          label={v.caption ?? labelOf(v.field)}
+          icon={
+            config.showAggregationIcon ? (
+              <Sigma data-testid="sigma-icon" className="h-3 w-3 shrink-0 text-primary" aria-hidden="true" />
+            ) : undefined
+          }
           hint={aggregatorLabels[v.aggregator] ?? v.aggregator}
           disabled={readOnly}
           dragDisabled={dragDisabled}

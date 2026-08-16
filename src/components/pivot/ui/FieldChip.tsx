@@ -14,6 +14,8 @@ export interface FieldChipProps {
   active?: boolean | undefined;
   onRemove?: (() => void) | undefined;
   onFilter?: (() => void) | undefined;
+  /** Small leading glyph, e.g. the Σ aggregation icon. */
+  icon?: ReactNode;
   /** Extra controls (e.g. the aggregation menu) rendered under the label. */
   children?: ReactNode;
 }
@@ -29,6 +31,7 @@ export function FieldChip({
   disabled,
   dragDisabled,
   active,
+  icon,
   onRemove,
   onFilter,
   children,
@@ -60,6 +63,7 @@ export function FieldChip({
             <GripVertical className="h-3.5 w-3.5" aria-hidden="true" />
           </button>
         )}
+        {icon}
         <span className="min-w-0 flex-1 truncate font-medium text-foreground">{label}</span>
         {hint && <span className="shrink-0 text-[10px] uppercase text-muted-foreground">{hint}</span>}
         {onFilter && (
