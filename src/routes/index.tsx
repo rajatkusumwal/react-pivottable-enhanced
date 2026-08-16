@@ -35,7 +35,8 @@ const plainNames: Record<ProductKey, { name: string; price: string }> = {
   flexmonster: { name: "Flexmonster", price: "Paid" },
   reactPivottable: { name: "react-pivottable", price: "Free" },
   orb: { name: "Orb.js", price: "Free" },
-  studio: { name: "Pivot Studio (this demo)", price: "Free" },
+  studioRpt: { name: "Demo — react-pivottable tab", price: "Free" },
+  studioOrb: { name: "Demo — Orb.js tab", price: "Free" },
 };
 
 const statusMeta = {
@@ -94,7 +95,7 @@ function ComparisonPage() {
             return false;
           }
           if (diffOnly) {
-            const s = new Set([r.flexmonster.s, r.reactPivottable.s, r.orb.s, r.studio.s]);
+            const s = new Set([r.flexmonster.s, r.reactPivottable.s, r.orb.s, r.studioRpt.s, r.studioOrb.s]);
             if (s.size === 1) return false;
           }
           return true;
@@ -134,7 +135,7 @@ function ComparisonPage() {
           <h2 id="glance" className="text-xl font-semibold text-foreground">
             The short answer
           </h2>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             {products.map((p) => {
               const key = p.key as ProductKey;
               const score = scoreFor(key);
@@ -160,7 +161,7 @@ function ComparisonPage() {
                   <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
                     {verdicts[key]}
                   </p>
-                  {key === "studio" ? (
+                  {key === "studioRpt" || key === "studioOrb" ? (
                     <Link
                       to="/demos"
                       className="mt-4 inline-block text-sm font-medium text-primary underline underline-offset-4"
@@ -268,13 +269,13 @@ function ComparisonPage() {
           <div className="mt-6 hidden overflow-hidden rounded-xl border border-border md:block">
             <table className="w-full border-collapse text-sm">
               <caption className="sr-only">
-                Feature support comparison between Flexmonster, react-pivottable, Orb.js and the Pivot Studio demo
+                Feature support comparison between Flexmonster, react-pivottable, Orb.js and the two Pivot Studio demo tabs
               </caption>
               <thead>
                 <tr className="bg-surface-2">
                   <th
                     scope="col"
-                    className="w-[34%] px-4 py-3 text-left font-semibold text-foreground"
+                    className="w-[26%] px-4 py-3 text-left font-semibold text-foreground"
                   >
                     Feature
                   </th>
