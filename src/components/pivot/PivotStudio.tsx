@@ -119,6 +119,7 @@ export function PivotStudio({
       grandTotalsPosition: config.grandTotalsPosition,
       layout: config.layout,
       collapsed: config.collapsed,
+      collapsedCols: config.collapsedCols,
       sort: config.sort,
       sorts: config.layout === "flat" ? config.sorts : undefined,
       locale: config.locale,
@@ -178,6 +179,27 @@ export function PivotStudio({
       : [...config.collapsed, id];
     update({ collapsed: next });
   };
+
+  const toggleColumnCollapse = (key: string[]) => {
+    const id = keyOf(key);
+    const current = config.collapsedCols ?? [];
+    update({
+      collapsedCols: current.includes(id) ? current.filter((k) => k !== id) : [...current, id],
+    });
+  };
+
+  /** Drill up: collapse every top-level member on both axes. */
+  const collapseAll = () => {
+    const topRow = new Set(derivedRows.map((r) => String(r[config.rows[0] ?? ""] ?? "")));
+    const topCol = new Set(derivedRows.map((r) => String(r[config.cols[0] ?? ""] ?? "")));
+    update({
+      collapsed: config.rows.length > 1 ? [...topRow].map((m) => keyOf([m])) : [],
+      collapsedCols: config.cols.length > 1 ? [...topCol].map((m) => keyOf([m])) : [],
+    });
+  };
+
+  /** Drill down: expand everything again. */
+  const expandAll = () => update({ collapsed: [], collapsedCols: [] });
 
   return (
     <section className={`flex flex-col gap-3 ${className}`} aria-label={title}>
@@ -239,6 +261,27 @@ export function PivotStudio({
               onOpenFields={() => setFieldsOpen(true)}
             />
           )}
+          {(config.rows.length > 1 || config.cols.length > 1) && config.layout !== "flat" && (
+            <div className="flex flex-wrap items-center gap-1.5 px-1 pt-1">
+              <button
+                type="button"
+                className="rounded border border-border bg-card px-2 py-1 text-xs hover:bg-accent"
+                onClick={expandAll}
+              >
+                Drill down all levels
+              </button>
+              <button
+                type="button"
+                className="rounded border border-border bg-card px-2 py-1 text-xs hover:bg-accent"
+                onClick={collapseAll}
+              >
+                Drill up to top level
+              </button>
+              <span className="text-xs text-muted-foreground">
+                or use the arrows in row and column headers
+              </span>
+            </div>
+          )}
           <p className="px-1 py-2 text-xs text-muted-foreground">
             {derivedRows.length} {strings.records}
             {result.meta.source === "backend" && " · aggregated by your analytics service"}
@@ -268,6 +311,7 @@ export function PivotStudio({
             onSortChange={(sort) => update({ sort, sorts: sort ? [sort] : [] })}
             onSortsChange={(sorts) => update({ sorts, sort: sorts[0] })}
             onToggleCollapse={toggleCollapse}
+            onToggleColumnCollapse={toggleColumnCollapse}
             conditionalFormats={config.conditionalFormats}
             allowDrillThrough={allowDrillThrough}
             onDrill={(rowKey, colKey, label) => void openDrill(rowKey, colKey, label)}

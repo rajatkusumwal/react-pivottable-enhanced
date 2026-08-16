@@ -514,7 +514,7 @@ const gridStudioOverrides: Record<string, Cell> = {
   "Show/hide spreadsheet headers": y("Option"),
   "Repeat member labels in classic form": y("Option"),
   "Show/hide field captions": y("Option"),
-  "Drill up/down multilevel hierarchies": p("Expand/collapse row levels"),
+  "Drill up/down multilevel hierarchies": y("Row and column levels, plus drill all"),
   "Grand totals top or bottom (flat table)": y("Toolbar position selector"),
   "Sort multiple columns in flat table": y("Shift-click sort controls"),
 };
