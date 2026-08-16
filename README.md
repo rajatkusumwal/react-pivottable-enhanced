@@ -119,6 +119,7 @@ All endpoints are JSON over POST.
   ],
   "showSubTotals": true,
   "showGrandTotals": true,
+  "grandTotalsPosition": "bottom",
   "layout": "compact",
   "collapsed": ["North"],
   "sort": { "by": 0, "direction": "desc" },
