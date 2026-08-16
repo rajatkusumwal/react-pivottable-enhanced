@@ -76,6 +76,7 @@ describe("PivotStudio — Orb.js engine", () => {
     setup();
     await user.click(screen.getByRole("button", { name: /^add$/i }));
     await waitFor(() => expect(screen.getAllByText("profit").length).toBeGreaterThan(0));
+    await user.click(screen.getByRole("button", { name: "Remove revenue" }));
     await user.selectOptions(screen.getByLabelText("Place profit"), "values");
     const grid = await screen.findByTestId("orb-panel");
     await waitFor(() => expect(grid.textContent).toContain("460.00"));
