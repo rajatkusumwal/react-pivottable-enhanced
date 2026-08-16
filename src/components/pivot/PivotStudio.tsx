@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { applyCalculatedFields } from "./calculated";
+import { renameMeasurePatch, renameResultFields } from "./captions";
 import { kpisFromFields } from "./kpi";
 import { applyFilters } from "./filters";
 import { applyCellEdit } from "./editing";
@@ -214,9 +215,15 @@ export function PivotStudio({
     [config.exportHeader, config.exportFooter],
   );
 
+  /** Result with custom field labels applied (renames live in the config). */
+  const displayResult = useMemo(
+    () => renameResultFields(result, safeFields, config.fieldCaptions ?? {}),
+    [result, safeFields, config.fieldCaptions],
+  );
+
   const getMatrix = useCallback(
-    () => matrixFromResult(result, config.locale, title, decoration),
-    [result, config.locale, title, decoration],
+    () => matrixFromResult(displayResult, config.locale, title, decoration),
+    [displayResult, config.locale, title, decoration],
   );
 
   const handleExport = (format: ExportFormat) => {
@@ -363,6 +370,23 @@ export function PivotStudio({
           setFormatOpen(true);
         },
       },
+      {
+        id: "rename-measure",
+        label: "Rename measure…",
+        disabled: readOnly || !config.values.length,
+        onSelect: () => {
+          const index = Math.max(
+            0,
+            config.values.findIndex((v, i) =>
+              payload.colKey.includes(v.caption ?? result.measures?.[i]?.caption ?? v.field),
+            ),
+          );
+          const value = config.values[index];
+          if (!value) return;
+          const next = window.prompt("New label for this measure", value.caption ?? value.field);
+          if (next !== null) update(renameMeasurePatch(config, index, next));
+        },
+      },
       { id: "expand-all", label: "Drill down all levels", onSelect: expandAll },
       { id: "collapse-all", label: "Drill up to top level", onSelect: collapseAll },
     ];
@@ -440,6 +464,7 @@ export function PivotStudio({
             <GridFieldBar
               strings={strings}
               config={config}
+              fields={safeFields}
               rows={baseRows}
               readOnly={readOnly}
               onChange={update}
@@ -481,7 +506,7 @@ export function PivotStudio({
           )}
 
           <PivotGrid
-            result={result}
+            result={displayResult}
             layout={config.layout}
             locale={config.locale}
             theme={config.theme}

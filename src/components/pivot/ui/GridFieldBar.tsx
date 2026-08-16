@@ -1,14 +1,17 @@
-import { Filter, Sigma, SlidersHorizontal, X } from "lucide-react";
+import { Filter, Pencil, Sigma, SlidersHorizontal, X } from "lucide-react";
 import { useState } from "react";
 import { aggregatorLabels } from "../aggregators";
+import { fieldCaption, renameFieldPatch, renameMeasurePatch } from "../captions";
 import { moveField } from "../dnd";
 import type { PivotStrings } from "../locales";
-import type { FilterDef, PivotConfig, PivotRow } from "../types";
+import type { FieldDef, FilterDef, PivotConfig, PivotRow } from "../types";
 import { MemberFilterPopover } from "./MemberFilterPopover";
 
 export interface GridFieldBarProps {
   strings: PivotStrings;
   config: PivotConfig;
+  /** Field metadata, used for default labels. */
+  fields?: FieldDef[];
   rows: PivotRow[];
   readOnly: boolean;
   onChange: (patch: Partial<PivotConfig>) => void;
@@ -22,12 +25,57 @@ const chip =
 export function GridFieldBar({
   strings,
   config,
+  fields = [],
   rows,
   readOnly,
   onChange,
   onOpenFields,
 }: GridFieldBarProps) {
   const [openFilter, setOpenFilter] = useState<string | null>(null);
+  /** Chip currently being renamed: "field:<name>" or "measure:<index>". */
+  const [renaming, setRenaming] = useState<string | null>(null);
+  const [draft, setDraft] = useState("");
+
+  const captions = config.fieldCaptions ?? {};
+  const labelOf = (name: string) => fieldCaption(name, fields, captions);
+
+  const startRename = (id: string, current: string) => {
+    if (readOnly) return;
+    setRenaming(id);
+    setDraft(current);
+  };
+
+  const commit = (apply: (caption: string) => void) => {
+    apply(draft);
+    setRenaming(null);
+  };
+
+  /** Inline editor shown in place of the chip label while renaming. */
+  const renameInput = (label: string, apply: (caption: string) => void) => (
+    <input
+      autoFocus
+      aria-label={`Rename ${label}`}
+      className="w-28 rounded border border-border bg-background px-1 text-xs"
+      value={draft}
+      onChange={(e) => setDraft(e.target.value)}
+      onBlur={() => commit(apply)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") commit(apply);
+        if (e.key === "Escape") setRenaming(null);
+      }}
+    />
+  );
+
+  const renameButton = (id: string, label: string, current: string) => (
+    <button
+      type="button"
+      aria-label={`Rename ${label}`}
+      disabled={readOnly}
+      onClick={() => startRename(id, current)}
+    >
+      <Pencil className="h-3 w-3" aria-hidden="true" />
+    </button>
+  );
 
   const group = (label: string, children: React.ReactNode, testId?: string) => (
     <div className="flex items-center gap-1.5" {...(testId ? { "data-testid": testId } : {})}>
@@ -97,8 +145,15 @@ export function GridFieldBar({
         group(
           strings.columns,
           config.cols.map((name) => (
-            <span key={name} className={chip}>
-              <span className="truncate">{name}</span>
+            <span key={name} className={chip} onDoubleClick={() => startRename(`field:${name}`, labelOf(name))}>
+              {renaming === `field:${name}` ? (
+                renameInput(name, (c) => onChange(renameFieldPatch(config, name, c)))
+              ) : (
+                <>
+                  <span className="truncate">{labelOf(name)}</span>
+                  {renameButton(`field:${name}`, name, labelOf(name))}
+                </>
+              )}
               <button type="button" aria-label={`Remove ${name}`} disabled={readOnly} onClick={() => remove(name)}>
                 <X className="h-3 w-3" aria-hidden="true" />
               </button>
@@ -110,8 +165,15 @@ export function GridFieldBar({
         group(
           strings.rows,
           config.rows.map((name) => (
-            <span key={name} className={chip}>
-              <span className="truncate">{name}</span>
+            <span key={name} className={chip} onDoubleClick={() => startRename(`field:${name}`, labelOf(name))}>
+              {renaming === `field:${name}` ? (
+                renameInput(name, (c) => onChange(renameFieldPatch(config, name, c)))
+              ) : (
+                <>
+                  <span className="truncate">{labelOf(name)}</span>
+                  {renameButton(`field:${name}`, name, labelOf(name))}
+                </>
+              )}
               <button type="button" aria-label={`Remove ${name}`} disabled={readOnly} onClick={() => remove(name)}>
                 <X className="h-3 w-3" aria-hidden="true" />
               </button>
@@ -123,13 +185,26 @@ export function GridFieldBar({
         group(
           "Measures",
           config.values.map((v, i) => (
-            <span key={`${v.field}-${i}`} className={chip}>
+            <span
+              key={`${v.field}-${i}`}
+              className={chip}
+              onDoubleClick={() => startRename(`measure:${i}`, v.caption ?? labelOf(v.field))}
+            >
               {config.showAggregationIcon && (
                 <Sigma data-testid="sigma-icon" className="h-3 w-3 shrink-0 text-primary" aria-hidden="true" />
               )}
-              <span className="truncate">
-                {aggregatorLabels[v.aggregator] ?? v.aggregator} of {v.caption ?? v.field}
-              </span>
+              {renaming === `measure:${i}` ? (
+                renameInput(v.field, (c) => onChange(renameMeasurePatch(config, i, c)))
+              ) : (
+                <>
+                  <span className="truncate">
+                    {v.caption
+                      ? v.caption
+                      : `${aggregatorLabels[v.aggregator] ?? v.aggregator} of ${labelOf(v.field)}`}
+                  </span>
+                  {renameButton(`measure:${i}`, v.field, v.caption ?? labelOf(v.field))}
+                </>
+              )}
               <button
                 type="button"
                 aria-label={`Remove ${v.field}`}

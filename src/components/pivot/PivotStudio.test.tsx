@@ -334,9 +334,9 @@ describe("Flexmonster-style field list", () => {
     const user = userEvent.setup();
     setup({ fieldsUi: "dialog" });
     const bar = await screen.findByTestId("grid-field-bar");
-    expect(within(bar).getByText("region")).toBeInTheDocument();
+    expect(within(bar).getByText("Region")).toBeInTheDocument();
     await user.click(within(bar).getByRole("button", { name: "Remove category" }));
-    await waitFor(() => expect(within(bar).queryByText("category")).not.toBeInTheDocument());
+    await waitFor(() => expect(within(bar).queryByText("Category")).not.toBeInTheDocument());
   });
 
   it("filters members from a report filter chip", async () => {

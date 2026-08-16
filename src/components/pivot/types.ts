@@ -252,6 +252,8 @@ export interface PivotConfig {
   /** Multi-column sort used by the flat layout (shift-click a sort control). */
   sorts?: PivotSort[] | undefined;
   showFieldCaptions: boolean;
+  /** Per-report renames for row/column fields, keyed by field name. */
+  fieldCaptions?: Record<string, string>;
   showSpreadsheetHeaders: boolean;
   repeatMemberLabels: boolean;
   showSortingControls: boolean;
@@ -302,6 +304,7 @@ export function createDefaultConfig(partial: Partial<PivotConfig> = {}): PivotCo
     collapsed: [],
     collapsedCols: [],
     showFieldCaptions: true,
+    fieldCaptions: {},
     showSpreadsheetHeaders: false,
     repeatMemberLabels: false,
     showSortingControls: true,

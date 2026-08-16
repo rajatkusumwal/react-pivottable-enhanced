@@ -142,6 +142,7 @@ const rawCategories: RawCategory[] = [
       { feature: "Grid title", flexmonster: y(), reactPivottable: n() },
       { feature: "Show/hide spreadsheet headers", flexmonster: y(), reactPivottable: n() },
       { feature: "Show/hide field captions", flexmonster: y(), reactPivottable: n() },
+      { feature: "Rename fields and measures (custom captions)", flexmonster: y(), reactPivottable: n() },
     ],
   },
   {
@@ -537,6 +538,7 @@ const gridStudioOverrides: Record<string, Cell> = {
   "Show/hide spreadsheet headers": y("Option"),
   "Repeat member labels in classic form": y("Option"),
   "Show/hide field captions": y("Option"),
+  "Rename fields and measures (custom captions)": y("Double-click a chip, or right-click \u2192 Rename measure"),
   "Drill up/down multilevel hierarchies": y("Row and column levels, plus drill all"),
   "Grand totals top or bottom (flat table)": y("Toolbar position selector"),
   "Sort multiple columns in flat table": y("Shift-click sort controls"),
