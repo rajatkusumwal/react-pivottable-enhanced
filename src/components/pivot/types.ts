@@ -147,6 +147,8 @@ export interface PivotConfig {
   calculated: CalculatedField[];
   conditionalFormats: ConditionalFormatRule[];
   showGrandTotals: boolean;
+  /** Grand total row above or below the members. */
+  grandTotalsPosition: "top" | "bottom";
   /** Grand total column on the right of every row. */
   showRowTotals: boolean;
   showSubTotals: boolean;
@@ -182,6 +184,7 @@ export function createDefaultConfig(partial: Partial<PivotConfig> = {}): PivotCo
     calculated: [],
     conditionalFormats: [],
     showGrandTotals: true,
+    grandTotalsPosition: "bottom",
     showRowTotals: true,
     showSubTotals: true,
     expandAll: true,

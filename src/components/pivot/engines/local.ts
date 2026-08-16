@@ -215,18 +215,20 @@ export function buildLocalResult(rows: PivotRow[], query: PivotQuery): PivotResu
   }
 
   if (query.showGrandTotals) {
-    rowNodes.push({
+    const grandNode = {
       header: {
-        key: [],
+        key: [] as string[],
         label: "Grand total",
         depth: 0,
-        kind: "grand",
+        kind: "grand" as const,
         expandable: false,
         expanded: true,
         span: 1,
       },
       indexes: null,
-    });
+    };
+    if (query.grandTotalsPosition === "top") rowNodes.unshift(grandNode);
+    else rowNodes.push(grandNode);
   }
 
   // ---- cells ---------------------------------------------------------------

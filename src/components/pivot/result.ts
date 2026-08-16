@@ -73,6 +73,8 @@ export interface PivotQuery {
   filters: FilterDef[];
   showSubTotals: boolean;
   showGrandTotals: boolean;
+  /** Where the grand total row sits. Defaults to "bottom". */
+  grandTotalsPosition?: "top" | "bottom";
   layout: PivotLayout;
   /** Collapsed row member paths, joined with "\u0000". */
   collapsed: string[];
