@@ -497,13 +497,13 @@ const sharedStudioOverrides: Record<string, Cell> = {
 /** Grid features the custom PivotGrid renderer adds on top of the free engine. */
 const gridStudioOverrides: Record<string, Cell> = {
   "Virtual grid rendering thousands of rows": y("Windowed rendering"),
-  "Compact pivot form": y("Indented hierarchy"),
+  "Compact pivot table form": y("Indented hierarchy"),
   "Classic (tabular) pivot form": y("Layout switch"),
   "Flat table form": y("Layout switch"),
   "Show/hide subtotals": y("Toolbar option"),
   "Expand and collapse values": y("Click a row member"),
   "Show/hide sorting controls": y("Option"),
-  "Sort by values in a column": y("Header sort control"),
+  "Sort values on the pivot table": y("Header sort control"),
   "Resize columns and rows": y("Column resize handles"),
   "Select cells": y("Click and shift-click"),
   "Copy selected cells": y("Copy button"),
@@ -511,9 +511,10 @@ const gridStudioOverrides: Record<string, Cell> = {
   "Highlight rows and columns": y("Hover highlight"),
   "Auto-calculation bar for selection": y("Sum/avg/min/max bar"),
   "Grid title": y("title prop"),
-  "Spreadsheet-style headers": y("Option"),
-  "Repeat row member labels": y("Option"),
+  "Show/hide spreadsheet headers": y("Option"),
+  "Repeat member labels in classic form": y("Option"),
   "Show/hide field captions": y("Option"),
+  "Drill up/down multilevel hierarchies": p("Expand/collapse row levels"),
 };
 
 function studioCell(row: RawRow, base: Cell): Cell {
