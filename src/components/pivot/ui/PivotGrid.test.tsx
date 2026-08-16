@@ -7,11 +7,11 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { PivotGrid } from "./ui/PivotGrid";
-import { buildLocalResult } from "./engines/local";
-import { defaultTheme } from "./types";
-import type { PivotRow } from "./types";
-import type { PivotLayout, PivotQuery } from "./result";
+import { PivotGrid } from "./PivotGrid";
+import { buildLocalResult } from "../engines/local";
+import { defaultTheme } from "../types";
+import type { PivotRow } from "../types";
+import type { PivotLayout, PivotQuery } from "../result";
 
 const data: PivotRow[] = [
   { region: "North", city: "Oslo", category: "Bikes", revenue: 100 },
