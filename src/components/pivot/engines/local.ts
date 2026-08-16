@@ -208,7 +208,8 @@ export function buildLocalResult(rows: PivotRow[], query: PivotQuery): PivotResu
   };
 
   if (flat) {
-    for (const leaf of query.rows.length ? flattenLeaves(rowTree) : []) {
+    const leaves = query.rows.length ? flattenLeaves(rowTree) : [];
+    for (const leaf of sortNodes(leaves, activeSorts, (n) => n.path.join(" / "))) {
       rowNodes.push({
         header: {
           key: leaf.path,
