@@ -1,11 +1,14 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { PivotStudio, sampleData, sampleFields, createDefaultConfig } from "@/components/pivot";
+import type { PivotEngine } from "@/components/pivot";
 
-const TITLE = "Try the Free Pivot Tables: react-pivottable and Orb.js Demos";
+const TITLE = "Free Pivot Table Demos: react-pivottable and Orb.js in Action";
 const DESCRIPTION =
-  "Play with the live demos of the two free pivot table tools, react-pivottable and Orb.js, side by side in one place.";
+  "Interactive demos of the two free pivot tables, react-pivottable and Orb.js, with filters, calculated values, charts, drill-through, export and languages.";
 
 export const Route = createFileRoute("/demos")({
   head: () => ({
@@ -21,30 +24,45 @@ export const Route = createFileRoute("/demos")({
   component: DemosPage,
 });
 
-const tabs = [
+const tabs: {
+  id: PivotEngine;
+  name: string;
+  blurb: string;
+  officialUrl: string;
+}[] = [
   {
     id: "react-pivottable",
     name: "react-pivottable",
-    url: "https://react-pivottable.js.org/",
     blurb:
-      "Drag the grey field names into the row and column areas to build a summary. Change the dropdown on the left to switch between table and chart.",
+      "The react-pivottable grid, wrapped with a field list, filters, calculated values, charts, drill-through and export.",
+    officialUrl: "https://react-pivottable.js.org/",
   },
   {
     id: "orb",
     name: "Orb.js",
-    url: "https://nnajm.github.io/orb/index.html",
     blurb:
-      "Drag field names between the row, column and data areas. Click the small arrows to expand or collapse groups and see subtotals.",
+      "The Orb.js engine doing the grouping, rendered with a modern React table that adds the same feature set.",
+    officialUrl: "https://nnajm.github.io/orb/index.html",
   },
-] as const;
+];
+
+const startConfig = createDefaultConfig({
+  rows: ["region"],
+  cols: ["category"],
+  values: [{ field: "revenue", aggregator: "sum", caption: "Revenue", format: { decimals: 0, currency: "USD" } }],
+  chart: { visible: true, type: "bar" },
+});
 
 function DemosPage() {
-  const [active, setActive] = useState<string>(tabs[0].id);
-  const current = tabs.find((t) => t.id === active) ?? tabs[0];
+  const [active, setActive] = useState<PivotEngine>("react-pivottable");
+  const [mounted, setMounted] = useState(false);
+  const current = tabs.find((t) => t.id === active) ?? tabs[0]!;
+
+  useEffect(() => setMounted(true), []);
 
   return (
     <main className="min-h-screen bg-background">
-      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
         <Link
           to="/"
           className="inline-flex items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
@@ -56,9 +74,9 @@ function DemosPage() {
         <h1 className="mt-6 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
           Try the free tools yourself
         </h1>
-        <p className="mt-3 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-          These are the official live demos of the two free pivot tables. Pick a tab and click
-          around — nothing you do here is saved.
+        <p className="mt-3 max-w-3xl text-lg leading-relaxed text-muted-foreground">
+          Both tabs run on the same sample sales data and the same controls, so you can feel the
+          difference between the two engines. Nothing you do here is saved.
         </p>
 
         <div
@@ -94,31 +112,33 @@ function DemosPage() {
           className="mt-4"
         >
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <p className="max-w-2xl text-sm text-muted-foreground">{current.blurb}</p>
+            <p className="max-w-3xl text-sm text-muted-foreground">{current.blurb}</p>
             <a
-              href={current.url}
+              href={current.officialUrl}
               target="_blank"
               rel="noreferrer noopener"
               className="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
             >
-              Open in a new tab
+              Official demo
               <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
             </a>
           </div>
 
-          <div className="mt-3 overflow-hidden rounded-xl border border-border bg-card">
-            <iframe
-              key={current.id}
-              src={current.url}
-              title={`${current.name} live demo`}
-              className="h-[75vh] min-h-[560px] w-full border-0 bg-white"
-              loading="lazy"
-            />
+          <div className="mt-3">
+            {mounted ? (
+              <PivotStudio
+                key={current.id}
+                engine={current.id}
+                data={sampleData}
+                fields={sampleFields}
+                initialConfig={startConfig}
+                title={`${current.name} demo`}
+                permissions={{ maskedFields: [], allowExport: true, allowDrillThrough: true }}
+              />
+            ) : (
+              <div className="h-96 animate-pulse rounded-xl border border-border bg-card" />
+            )}
           </div>
-          <p className="mt-2 text-xs text-muted-foreground">
-            The demo is loaded from the project&rsquo;s own website. If it does not appear, use
-            &ldquo;Open in a new tab&rdquo;.
-          </p>
         </section>
       </div>
     </main>
