@@ -23,9 +23,19 @@ const insert = <T,>(list: T[], item: T, index?: number): T[] => {
   return next;
 };
 
+/** Default aggregation offered when a field lands in Measures. */
+export function defaultAggregatorFor(type: FieldDef["type"] = "string") {
+  if (type === "number") return "sum";
+  if (type === "date" || type === "time") return "min";
+  return "count";
+}
+
 /**
  * Moves a field into an area and returns the config patch.
  * Dropping onto "fields" removes the field from the report.
+ *
+ * Measures are additive: dropping the same field again adds a second measure,
+ * so one field can be shown with several aggregations at once.
  */
 export function moveField(
   config: PivotConfig,
@@ -34,7 +44,6 @@ export function moveField(
   index?: number,
   fieldType: FieldDef["type"] = "string",
 ): Partial<PivotConfig> {
-  const existingValue = config.values.find((v) => v.field === name);
   const existingFilter = config.filters.find((f) => f.field === name);
 
   const patch: Partial<PivotConfig> = {
@@ -47,9 +56,10 @@ export function moveField(
   if (target === "rows") patch.rows = insert(patch.rows ?? [], name, index);
   if (target === "cols") patch.cols = insert(patch.cols ?? [], name, index);
   if (target === "values") {
+    // Keep the measures already there (including other aggregations of this field).
     patch.values = insert(
-      patch.values ?? [],
-      existingValue ?? { field: name, aggregator: fieldType === "number" ? "sum" : "count" },
+      config.values,
+      { field: name, aggregator: defaultAggregatorFor(fieldType), type: fieldType },
       index,
     );
   }
@@ -64,6 +74,7 @@ export function moveField(
   }
   return patch;
 }
+
 
 /** Removes a field from every area of the report. */
 export function removeField(config: PivotConfig, name: string): Partial<PivotConfig> {

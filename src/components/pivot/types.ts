@@ -18,7 +18,12 @@ export interface FieldDef {
   type: FieldType;
   /** Optional grouping in the field list. */
   folder?: string;
+  /** Hierarchy this field is a level of, e.g. "Geography". */
+  hierarchy?: string;
+  /** 1-based level inside `hierarchy` (Region = 1, Country = 2, …). */
+  level?: number;
 }
+
 
 export type AggregatorName =
   | "sum"
@@ -58,7 +63,13 @@ export interface ValueDef {
   caption?: string;
   format?: NumberFormat;
   displayMode?: ValueDisplayMode;
+  /**
+   * Field type of the measure. String, date and time measures only support
+   * count / distinct count / min / max / first / last and render as text.
+   */
+  type?: FieldType;
 }
+
 
 export type ConditionOperator =
   | "gt"

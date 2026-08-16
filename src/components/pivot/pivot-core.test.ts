@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { areaOfField, moveField, removeField, reorderField } from "./dnd";
-import { aggregate, registerAggregator } from "./aggregators";
+import { areaOfField, defaultAggregatorFor, moveField, removeField, reorderField } from "./dnd";
+import { aggregate, aggregatorsForType, registerAggregator } from "./aggregators";
 import {
   applyFilters,
   describeFilter,
@@ -16,7 +16,15 @@ import { inferFields, parseCsv } from "./data-sources";
 import { formatNumber } from "./format";
 import { getLocale, locales } from "./locales";
 import { createDefaultConfig } from "./types";
-import { sampleCsv, sampleData, sampleFields, generateSalesData } from "./sample-data";
+import { buildLocalResult } from "./engines/local";
+import {
+  sampleCsv,
+  sampleData,
+  sampleFields,
+  sampleHierarchies,
+  generateSalesData,
+} from "./sample-data";
+
 import type { PivotRow } from "./types";
 
 const rows: PivotRow[] = [
@@ -50,7 +58,52 @@ describe("aggregations", () => {
     }, "Margin %");
     expect(aggregate("margin", rows, "revenue")).toBeCloseTo(46, 0);
   });
+
+  it("aggregates string, date and time measures", () => {
+    const textRows: PivotRow[] = [
+      { name: "Bea", orderDate: "2024-03-01", orderTime: "12:30" },
+      { name: "Al", orderDate: "2024-01-15", orderTime: "08:05" },
+      { name: "Bea", orderDate: "2024-02-20", orderTime: "19:45" },
+    ];
+    expect(aggregate("distinctCount", textRows, "name", "string")).toBe(2);
+    expect(aggregate("min", textRows, "orderDate", "date")).toBe("2024-01-15");
+    expect(aggregate("max", textRows, "orderTime", "time")).toBe("19:45");
+    expect(aggregate("first", textRows, "name", "string")).toBe("Bea");
+    expect(aggregate("last", textRows, "name", "string")).toBe("Bea");
+    // Numeric-only aggregations fall back to count instead of returning NaN.
+    expect(aggregate("sum", textRows, "name", "string")).toBe(3);
+  });
+
+  it("offers only type-appropriate aggregations in the measure menus", () => {
+    expect(aggregatorsForType("number")).toEqual(expect.arrayContaining(["sum", "average", "median"]));
+    expect(aggregatorsForType("string")).toEqual([
+      "count",
+      "distinctCount",
+      "min",
+      "max",
+      "first",
+      "last",
+    ]);
+    expect(aggregatorsForType("date")).not.toContain("sum");
+  });
 });
+
+describe("field list metadata", () => {
+  it("tags sample fields with their hierarchy and level", () => {
+    const region = sampleFields.find((f) => f.name === "region");
+    const city = sampleFields.find((f) => f.name === "city");
+    expect(region).toMatchObject({ hierarchy: "Geography", level: 1 });
+    expect(city).toMatchObject({ hierarchy: "Geography", level: 4 });
+    expect(sampleHierarchies.map((h) => h.caption)).toEqual(
+      expect.arrayContaining(["Geography", "Product", "Time"]),
+    );
+  });
+
+  it("groups fields into folders", () => {
+    expect(new Set(sampleFields.map((f) => f.folder)).size).toBeGreaterThan(1);
+  });
+});
+
 
 describe("filters", () => {
   it("keeps or excludes chosen values", () => {
@@ -418,5 +471,43 @@ describe("field drag & drop helpers", () => {
     expect(
       applyFilters(rows, [{ kind: "values", field: "region", mode: "include", members: [] }]),
     ).toHaveLength(2);
+  });
+});
+
+describe("multiple measures", () => {
+  it("adds a second aggregation of the same field instead of replacing it", () => {
+    const cfg = createDefaultConfig({ values: [{ field: "revenue", aggregator: "sum" }] });
+    const patch = moveField(cfg, "revenue", "values", undefined, "number");
+    expect(patch.values).toHaveLength(2);
+    expect(patch.values?.map((v) => v.field)).toEqual(["revenue", "revenue"]);
+  });
+
+  it("defaults each field type to a sensible aggregation", () => {
+    expect(defaultAggregatorFor("number")).toBe("sum");
+    expect(defaultAggregatorFor("date")).toBe("min");
+    expect(defaultAggregatorFor("time")).toBe("min");
+    expect(defaultAggregatorFor("string")).toBe("count");
+  });
+
+  it("renders every measure side by side under each column", () => {
+    const result = buildLocalResult(rows, {
+      ...createDefaultConfig({
+        rows: ["region"],
+        cols: ["category"],
+        values: [
+          { field: "revenue", aggregator: "sum", type: "number" },
+          { field: "revenue", aggregator: "average", type: "number" },
+          { field: "category", aggregator: "distinctCount", type: "string" },
+        ],
+      }),
+    });
+    expect(result.measures).toHaveLength(3);
+    // 2 categories x 3 measures
+    expect(result.colLeaves).toHaveLength(6);
+    expect(result.measureIndexByLeaf).toEqual([0, 1, 2, 0, 1, 2]);
+    const north = result.rowHeaders.findIndex((h) => h.label === "North");
+    expect(result.cells[north]?.[0]).toBe(100); // sum of Bikes
+    expect(result.cells[north]?.[1]).toBe(100); // average of Bikes
+    expect(result.cells[north]?.[2]).toBe(1); // distinct categories
   });
 });

@@ -10,7 +10,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { formatNumber } from "../format";
 import { keyOf } from "../result";
-import type { HeaderNode, PivotLayout, PivotResult, PivotSort } from "../result";
+import type { HeaderNode, PivotCellValue, PivotLayout, PivotResult, PivotSort } from "../result";
 import type { ConditionalFormatRule, PivotTheme } from "../types";
 import { matchesCondition } from "../filters";
 
@@ -51,8 +51,9 @@ export interface PivotGridProps {
   allowDrillThrough?: boolean;
   /** Enables inline cell editing (double-click a value to type a new one). */
   editable?: boolean;
-  /** Called with the edited cell's coordinates and the typed number. */
-  onCellEdit?: (rowKey: string[], colKey: string[], value: number) => void;
+  /** Called with the edited cell's coordinates, the typed number and the measure index. */
+  onCellEdit?: (rowKey: string[], colKey: string[], value: number, measureIndex: number) => void;
+
   onDrill?: (rowKey: string[], colKey: string[], label: string) => void;
   onSelectionChange?: (stats: SelectionStats | null) => void;
   emptyLabel?: string;
@@ -120,7 +121,14 @@ export function PivotGrid({
 
   const rowHeaders = result.rowHeaders;
   const colLeaves = result.colLeaves;
-  const totalColumns = colLeaves.length + (showRowTotals ? 1 : 0);
+  const measures = result.measures?.length ? result.measures : [result.measure];
+  const measureCount = measures.length;
+  /** Measure behind a leaf column (leaves repeat once per measure). */
+  const measureIndexAt = useCallback(
+    (col: number) => result.measureIndexByLeaf?.[col] ?? col % measureCount,
+    [result.measureIndexByLeaf, measureCount],
+  );
+  const totalColumns = colLeaves.length + (showRowTotals ? measureCount : 0);
   const windowed = rowHeaders.length > WINDOW_THRESHOLD;
 
   useEffect(() => {
@@ -134,12 +142,18 @@ export function PivotGrid({
     ? Math.min(rowHeaders.length, Math.ceil((scrollTop + viewport) / ROW_HEIGHT) + OVERSCAN)
     : rowHeaders.length;
 
+  const totalAt = useCallback(
+    (row: number, measureIndex: number): PivotCellValue =>
+      result.rowTotalsByMeasure?.[row]?.[measureIndex] ?? result.rowTotals[row] ?? null,
+    [result],
+  );
+
   const valueAt = useCallback(
-    (row: number, col: number): number | null =>
+    (row: number, col: number): PivotCellValue =>
       col < colLeaves.length
         ? (result.cells[row]?.[col] ?? null)
-        : (result.rowTotals[row] ?? null),
-    [result, colLeaves.length],
+        : totalAt(row, col - colLeaves.length),
+    [result, colLeaves.length, totalAt],
   );
 
   const selection = useMemo(() => {
@@ -148,7 +162,7 @@ export function PivotGrid({
     for (let r = Math.min(anchor.row, focus.row); r <= Math.max(anchor.row, focus.row); r++) {
       for (let c = Math.min(anchor.col, focus.col); c <= Math.max(anchor.col, focus.col); c++) {
         const v = valueAt(r, c);
-        if (v !== null && Number.isFinite(v)) values.push(v);
+        if (typeof v === "number" && Number.isFinite(v)) values.push(v);
       }
     }
     if (!values.length) return { count: 0, sum: 0, average: null, min: null, max: null };
@@ -162,6 +176,7 @@ export function PivotGrid({
     } satisfies SelectionStats;
   }, [anchor, focus, valueAt]);
 
+
   useEffect(() => {
     onSelectionChange?.(selection);
   }, [selection, onSelectionChange]);
@@ -172,7 +187,12 @@ export function PivotGrid({
     for (let r = Math.min(anchor.row, focus.row); r <= Math.max(anchor.row, focus.row); r++) {
       const cells: string[] = [];
       for (let c = Math.min(anchor.col, focus.col); c <= Math.max(anchor.col, focus.col); c++) {
-        cells.push(formatNumber(valueAt(r, c), result.measure.format, locale));
+        const v = valueAt(r, c);
+        cells.push(
+          typeof v === "string"
+            ? v
+            : formatNumber(v, measures[measureIndexAt(c)]?.format ?? result.measure.format, locale),
+        );
       }
       lines.push(cells.join("\t"));
     }
@@ -181,7 +201,8 @@ export function PivotGrid({
     } catch {
       /* clipboard unavailable (e.g. tests) */
     }
-  }, [anchor, focus, valueAt, result.measure.format, locale]);
+  }, [anchor, focus, valueAt, measures, measureIndexAt, result.measure.format, locale]);
+
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "c") {
@@ -267,25 +288,31 @@ export function PivotGrid({
   const canEdit = editable && Boolean(onCellEdit);
   const isEditing = (row: number, col: number) => editing?.row === row && editing?.col === col;
 
-  const commitEdit = (rowKey: string[], colKey: string[]) => {
+  const commitEdit = (rowKey: string[], colKey: string[], measureIndex: number) => {
     const parsed = Number(draft);
-    if (draft.trim() !== "" && Number.isFinite(parsed)) onCellEdit?.(rowKey, colKey, parsed);
+    if (draft.trim() !== "" && Number.isFinite(parsed))
+      onCellEdit?.(rowKey, colKey, parsed, measureIndex);
     setEditing(null);
   };
 
-  const formatCell = (value: number | null) =>
-    value === null ? "" : formatNumber(value, result.measure.format, locale);
+  const formatCell = (value: PivotCellValue, measureIndex = 0) => {
+    if (value === null || value === undefined) return "";
+    if (typeof value === "string") return value;
+    return formatNumber(value, measures[measureIndex]?.format ?? result.measure.format, locale);
+  };
 
-  const cellStyle = (value: number | null): React.CSSProperties => {
-    if (value === null) return {};
+  const cellStyle = (value: PivotCellValue, measureIndex = 0): React.CSSProperties => {
+    if (typeof value !== "number") return {};
+    const field = measures[measureIndex]?.field ?? result.measure.field;
     for (const rule of conditionalFormats) {
-      if (rule.field && rule.field !== result.measure.field) continue;
+      if (rule.field && rule.field !== field) continue;
       if (matchesCondition(value, rule.operator, rule.value)) {
         return { color: rule.color, background: rule.background };
       }
     }
     return {};
   };
+
 
   // Row header columns: compact collapses everything into one column.
   const headerCols =
@@ -456,8 +483,14 @@ export function PivotGrid({
                   </th>
                 ))}
                 {levelIndex === 0 && showRowTotals && (
-                  <th rowSpan={result.colHeaderRows.length} scope="col" className="pivot-total-header">
+                  <th
+                    rowSpan={result.colHeaderRows.length}
+                    colSpan={measureCount}
+                    scope="col"
+                    className="pivot-total-header"
+                  >
                     Grand total
+                    {measureCount > 1 ? ` (${measures.map((m) => m.caption).join(", ")})` : ""}
                   </th>
                 )}
               </tr>
@@ -467,13 +500,15 @@ export function PivotGrid({
               <th colSpan={headerCols} scope="col" className="pivot-corner sticky left-0 z-20 text-left">
                 {result.rowFields.join(" / ") || " "}
               </th>
-              {showRowTotals && (
-                <th scope="col" className="pivot-total-header">
-                  {result.measure.caption}
-                </th>
-              )}
+              {showRowTotals &&
+                measures.map((m, mi) => (
+                  <th key={`${m.field}-${mi}`} scope="col" className="pivot-total-header">
+                    {m.caption}
+                  </th>
+                ))}
             </tr>
           )}
+
           {showSortingControls && onSortChange && colLeaves.length > 0 && (
             <tr className="pivot-sort-row">
               <th
@@ -491,7 +526,11 @@ export function PivotGrid({
                 )}
               </th>
               {colLeaves.map((leaf, i) => (
-                <th key={keyOf(leaf.key)} scope="col" style={widths[i] ? { width: widths[i] } : undefined}>
+                <th
+                  key={`${keyOf(leaf.key)}-${i}`}
+                  scope="col"
+                  style={widths[i] ? { width: widths[i] } : undefined}
+                >
                   <span className="flex items-center justify-end gap-1">
                     <button
                       type="button"
@@ -512,7 +551,8 @@ export function PivotGrid({
                   </span>
                 </th>
               ))}
-              {showRowTotals && <th aria-hidden="true" />}
+              {showRowTotals && <th aria-hidden="true" colSpan={measureCount} />}
+
             </tr>
           )}
         </thead>
@@ -535,6 +575,8 @@ export function PivotGrid({
                 {rowLabelCells(header, rowIndex)}
                 {colLeaves.map((leaf, colIndex) => {
                   const value = result.cells[rowIndex]?.[colIndex] ?? null;
+                  const mi = measureIndexAt(colIndex);
+                  const numericMeasure = (measures[mi]?.type ?? "number") === "number";
                   const selected =
                     anchor && focus && inRange({ row: rowIndex, col: colIndex }, anchor, focus);
                   return (
@@ -544,7 +586,10 @@ export function PivotGrid({
                       className={`pivot-value ${selected ? "pivot-selected" : ""} ${
                         hover?.col === colIndex ? "pivot-col-hover" : ""
                       }`}
-                      style={{ ...cellStyle(value), ...(widths[colIndex] ? { width: widths[colIndex] } : {}) }}
+                      style={{
+                        ...cellStyle(value, mi),
+                        ...(widths[colIndex] ? { width: widths[colIndex] } : {}),
+                      }}
                       onMouseEnter={() => setHover({ row: rowIndex, col: colIndex })}
                       onMouseLeave={() => setHover(null)}
                       onMouseDown={(e) => {
@@ -553,7 +598,7 @@ export function PivotGrid({
                         if (!e.shiftKey) setAnchor(pos);
                       }}
                       onDoubleClick={() => {
-                        if (canEdit && header.kind === "member") {
+                        if (canEdit && numericMeasure && header.kind === "member") {
                           setEditing({ row: rowIndex, col: colIndex });
                           setDraft(value === null ? "" : String(value));
                           return;
@@ -566,7 +611,7 @@ export function PivotGrid({
                           );
                       }}
                       onClick={() => {
-                        if (canEdit) return;
+                        if (canEdit && numericMeasure) return;
                         if (allowDrillThrough)
                           onDrill?.(
                             header.kind === "grand" ? [] : header.key,
@@ -585,32 +630,35 @@ export function PivotGrid({
                           onChange={(e) => setDraft(e.target.value)}
                           onClick={(e) => e.stopPropagation()}
                           onMouseDown={(e) => e.stopPropagation()}
-                          onBlur={() => commitEdit(header.key, leaf.key)}
+                          onBlur={() => commitEdit(header.key, leaf.key, mi)}
                           onKeyDown={(e) => {
                             e.stopPropagation();
-                            if (e.key === "Enter") commitEdit(header.key, leaf.key);
+                            if (e.key === "Enter") commitEdit(header.key, leaf.key, mi);
                             if (e.key === "Escape") setEditing(null);
                           }}
                         />
                       ) : (
-                        formatCell(value)
+                        formatCell(value, mi)
                       )}
                     </td>
                   );
                 })}
-                {showRowTotals && (
-                  <td
-                    className="pivot-value pivot-total"
-                    data-testid={`total-${rowIndex}`}
-                    onMouseDown={() => {
-                      const pos = { row: rowIndex, col: colLeaves.length };
-                      setFocus(pos);
-                      setAnchor(pos);
-                    }}
-                  >
-                    {formatCell(result.rowTotals[rowIndex] ?? null)}
-                  </td>
-                )}
+                {showRowTotals &&
+                  measures.map((_, mi) => (
+                    <td
+                      key={`total-${mi}`}
+                      className="pivot-value pivot-total"
+                      data-testid={mi === 0 ? `total-${rowIndex}` : `total-${rowIndex}-${mi}`}
+                      onMouseDown={() => {
+                        const pos = { row: rowIndex, col: colLeaves.length + mi };
+                        setFocus(pos);
+                        setAnchor(pos);
+                      }}
+                    >
+                      {formatCell(totalAt(rowIndex, mi), mi)}
+                    </td>
+                  ))}
+
               </tr>
             );
           })}

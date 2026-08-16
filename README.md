@@ -54,7 +54,7 @@ other than Tailwind tokens (`--color-border`, `--color-card`, …) and `@/lib/ut
 | Prop | Type | Purpose |
 | --- | --- | --- |
 | `data` | `PivotRow[]` | Records for the local engine |
-| `fields` | `FieldDef[]` | Captions, types, hidden flags (`inferFields()` helps) |
+| `fields` | `FieldDef[]` | Captions, types, folders, hierarchy metadata (`inferFields()` helps) |
 | `engine` | `PivotEngineAdapter` | Aggregation engine; defaults to the local one |
 | `initialConfig` / `config` + `onConfigChange` | `PivotConfig` | Uncontrolled or controlled state |
 | `permissions` | `Permissions` | `readOnly`, `allowExport`, `allowDrillThrough`, `deniedFields`, `maskedFields`, `rowFilter` |
@@ -89,8 +89,20 @@ other than Tailwind tokens (`--color-border`, `--color-card`, …) and `@/lib/ut
 * **Field list** — drag-and-drop between Filters / Columns / Rows / Measures (`@dnd-kit`).
   Drag & drop can be switched off with `config.dragAndDrop: false` (or the toolbar
   checkbox); the select menus keep every action available without dragging.
+  Fields are grouped by `FieldDef.folder`, and fields sharing a `FieldDef.hierarchy` are
+  nested under it and badged with their `FieldDef.level` (L1, L2 …). You can add a single
+  sublevel or use **Add all levels** to add the whole drill path to Rows. The panel also has
+  a search box (matching field, folder and hierarchy names), **Expand all** / **Collapse all**
+  and a sort selector (data order, A → Z, Z → A).
+* **Multiple measures** — `config.values` accepts any number of measures and the grid renders
+  one leaf column per (column member x measure). The same field can appear several times with
+  different aggregations (drop it on Measures again). Measures carry `type`, so string, date
+  and time fields work as values too: they offer count, distinct count, min, max, first and
+  last, and render as text (ISO dates and `HH:mm` times compare correctly).
 * **Aggregations** — sum, count, distinct count, average, median, min, max, product,
   population/sample stdev, percent-of-total; add your own with `registerAggregator()`.
+  `aggregatorsForType(type)` returns the aggregations valid for a field type and drives the
+  measure menus.
 * **Calculated values** — safe formula parser (no `eval`), e.g. `revenue - cost`.
 * **Charts** — Recharts bar / stacked / line / area / pie with click-to-drill.
 * **Drill-through** — click any number to inspect the source records.
@@ -129,7 +141,13 @@ All endpoints are JSON over POST.
 {
   "rows": ["region", "category"],
   "cols": ["quarter"],
-  "values": [{ "field": "revenue", "aggregator": "sum", "caption": "Revenue" }],
+  "values": [
+    { "field": "revenue", "aggregator": "sum", "caption": "Revenue", "type": "number" },
+    { "field": "revenue", "aggregator": "average", "caption": "Avg revenue", "type": "number" },
+    { "field": "customerName", "aggregator": "distinctCount", "type": "string" },
+    { "field": "orderDate", "aggregator": "min", "type": "date" },
+    { "field": "orderTime", "aggregator": "max", "type": "time" }
+  ],
   "filters": [
     { "kind": "values", "field": "region", "mode": "include", "members": ["North"] },
     { "kind": "condition", "field": "revenue", "operator": "gt", "value": 1000 },
@@ -180,6 +198,14 @@ Response (`PivotResult`):
   "rowFields": ["region", "category"],
   "colFields": ["quarter"],
   "measure": { "field": "revenue", "caption": "Revenue", "aggregator": "sum" },
+  "measures": [
+    { "field": "revenue", "caption": "Revenue", "aggregator": "sum", "type": "number" },
+    { "field": "revenue", "caption": "Avg revenue", "aggregator": "average", "type": "number" }
+  ],
+  // One leaf column per (column member x measure); this maps leaf -> measure index.
+  "measureIndexByLeaf": [0, 1],
+  "rowTotalsByMeasure": [[576158, 1200]],
+  "grandTotals": [2583335, 1345],
   "rowHeaders": [
     { "key": ["North"], "label": "North", "depth": 0, "kind": "member",
       "expandable": true, "expanded": true, "span": 1 },

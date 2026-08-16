@@ -213,7 +213,7 @@ export function applyFilters(rows: PivotRow[], filters: FilterDef[]): PivotRow[]
       }
       const scored = [...groups.entries()].map(([key, group]) => ({
         key,
-        score: aggregate(filter.aggregator, group, filter.measure) ?? 0,
+        score: Number(aggregate(filter.aggregator, group, filter.measure) ?? 0),
       }));
       scored.sort((a, b) => (filter.direction === "top" ? b.score - a.score : a.score - b.score));
       const keep = new Set(scored.slice(0, Math.max(0, filter.count)).map((s) => s.key));

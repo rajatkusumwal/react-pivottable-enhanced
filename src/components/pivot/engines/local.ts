@@ -6,7 +6,7 @@
  * consistent with what the backend engine returns.
  */
 import { naturalSort } from "react-pivottable/Utilities";
-import { aggregate } from "../aggregators";
+import { aggregate, type PivotCellValue } from "../aggregators";
 import { applyDisplayMode } from "../analysis";
 import type { PivotRow, ValueDef } from "../types";
 import {
@@ -29,6 +29,9 @@ interface TreeNode {
 }
 
 const sortMembers = (a: string, b: string) => naturalSort(a, b);
+
+/** Numeric view of a cell — text measures never take part in maths. */
+const num = (v: PivotCellValue): number | null => (typeof v === "number" ? v : null);
 
 function buildTree(rows: PivotRow[], fields: string[]): TreeNode {
   const root: TreeNode = { path: [], label: "", children: [], rowIndexes: [] };
@@ -63,14 +66,24 @@ function flattenLeaves(node: TreeNode, out: TreeNode[] = []): TreeNode[] {
   return out;
 }
 
+const measureFromValue = (value: ValueDef): PivotMeasure => ({
+  field: value.field,
+  caption: value.caption ?? value.field,
+  aggregator: value.aggregator,
+  format: value.format,
+  type: value.type,
+});
+
+/** Every measure in report order; the same field may appear with several aggregations. */
+export function measuresOf(values: ValueDef[]): PivotMeasure[] {
+  if (!values.length) {
+    return [{ field: "", caption: "Count", aggregator: "count", type: "number" }];
+  }
+  return values.map(measureFromValue);
+}
+
 export function measureOf(values: ValueDef[]): PivotMeasure {
-  const value = values[0];
-  return {
-    field: value?.field ?? "",
-    caption: value?.caption ?? value?.field ?? "Count",
-    aggregator: value?.aggregator ?? "count",
-    format: value?.format,
-  };
+  return measuresOf(values)[0] as PivotMeasure;
 }
 
 /** Aggregates the intersection of a row node and a column node. */
@@ -79,25 +92,28 @@ function cellValue(
   rowIdx: number[] | null,
   colIdx: Set<number> | null,
   measure: PivotMeasure,
-): number | null {
+): PivotCellValue {
   let subset: PivotRow[];
   if (!rowIdx && !colIdx) subset = rows;
   else if (!rowIdx) subset = rows.filter((_, i) => colIdx!.has(i));
   else if (!colIdx) subset = rowIdx.map((i) => rows[i]!) as PivotRow[];
   else subset = rowIdx.filter((i) => colIdx.has(i)).map((i) => rows[i]!) as PivotRow[];
   if (!subset.length) return null;
-  return aggregate(measure.aggregator, subset, measure.field);
+  return aggregate(measure.aggregator, subset, measure.field, measure.type);
 }
 
 export function buildLocalResult(rows: PivotRow[], query: PivotQuery): PivotResult {
-  const measure = measureOf(query.values);
+  const measures = measuresOf(query.values);
+  const measureCount = measures.length;
+  const measure = measures[0] as PivotMeasure;
   const flat = query.layout === "flat";
   const rowTree = buildTree(rows, query.rows);
   const colTree = buildTree(rows, query.cols);
 
   // ---- columns -------------------------------------------------------------
   // Column members drill down the same way rows do: a collapsed member keeps a
-  // single aggregated leaf column and hides its descendants.
+  // single aggregated leaf column and hides its descendants. Every leaf is then
+  // repeated once per measure, so several measures can be shown side by side.
   const collapsedCols = new Set(query.collapsedCols ?? []);
   const isColCollapsed = (node: TreeNode) =>
     node.children.length > 0 && collapsedCols.has(keyOf(node.path));
@@ -109,7 +125,7 @@ export function buildLocalResult(rows: PivotRow[], query: PivotQuery): PivotResu
   const colDepth = query.cols.length;
   const colHeaderRows: HeaderNode[][] = [];
   const colLeafNodes: TreeNode[] = [];
-  const colLeaves: HeaderNode[] = [];
+  const baseLeaves: HeaderNode[] = [];
 
   const walkCols = (node: TreeNode, depth: number) => {
     for (const child of node.children) {
@@ -122,13 +138,13 @@ export function buildLocalResult(rows: PivotRow[], query: PivotQuery): PivotResu
         kind: "member",
         expandable: child.children.length > 0,
         expanded: !collapsedHere,
-        span: visibleLeafCount(child),
+        span: visibleLeafCount(child) * measureCount,
         rowSpan: stopsHere ? Math.max(colDepth - depth, 1) : 1,
       };
       (colHeaderRows[depth] ??= []).push(header);
       if (stopsHere) {
         colLeafNodes.push(child);
-        colLeaves.push({ ...header, span: 1 });
+        baseLeaves.push({ ...header, span: measureCount });
       } else {
         walkCols(child, depth + 1);
       }
@@ -136,16 +152,43 @@ export function buildLocalResult(rows: PivotRow[], query: PivotQuery): PivotResu
   };
   if (query.cols.length) walkCols(colTree, 0);
   for (let d = 0; d < colHeaderRows.length; d++) colHeaderRows[d] ??= [];
-  const colIndexSets = colLeafNodes.map((n) => new Set(n.rowIndexes));
+
+  /** Base columns before the measures are multiplied in. */
+  const baseColumns: { key: string[]; indexes: Set<number> | null }[] = query.cols.length
+    ? colLeafNodes.map((n, i) => ({ key: baseLeaves[i]?.key ?? n.path, indexes: new Set(n.rowIndexes) }))
+    : measureCount > 1
+      ? [{ key: [], indexes: null }]
+      : [];
+
+  const colLeaves: HeaderNode[] = [];
+  const measureIndexByLeaf: number[] = [];
+  for (const base of baseColumns) {
+    measures.forEach((m, mi) => {
+      colLeaves.push({
+        key: measureCount > 1 ? [...base.key, m.caption] : base.key,
+        label: measureCount > 1 ? m.caption : (base.key.at(-1) ?? m.caption),
+        depth: colDepth,
+        kind: "member",
+        expandable: false,
+        expanded: true,
+        span: 1,
+      });
+      measureIndexByLeaf.push(mi);
+    });
+  }
+  // A dedicated header row naming the measure under every column member.
+  if (measureCount > 1) colHeaderRows.push(colLeaves.map((leaf) => ({ ...leaf })));
 
   // ---- rows ----------------------------------------------------------------
   const collapsed = new Set(query.collapsed);
   const rowNodes: { header: HeaderNode; indexes: number[] | null }[] = [];
 
-  const columnValue = (indexes: number[] | null, colIndex: number | "total") =>
-    colIndex === "total"
-      ? cellValue(rows, indexes, null, measure)
-      : cellValue(rows, indexes, colIndexSets[colIndex] ?? null, measure);
+  const columnValue = (indexes: number[] | null, colIndex: number | "total"): number | null => {
+    if (colIndex === "total") return num(cellValue(rows, indexes, null, measure));
+    const base = baseColumns[Math.floor(colIndex / measureCount)];
+    const m = measures[measureIndexByLeaf[colIndex] ?? 0] ?? measure;
+    return num(cellValue(rows, indexes, base?.indexes ?? null, m));
+  };
 
   /** Multi-column sort: `sorts` wins, otherwise the single `sort`. */
   const activeSorts = query.sorts?.length ? query.sorts : query.sort ? [query.sort] : [];
@@ -250,46 +293,66 @@ export function buildLocalResult(rows: PivotRow[], query: PivotQuery): PivotResu
   }
 
   // ---- cells ---------------------------------------------------------------
-  const grandTotal = cellValue(rows, null, null, measure);
-  const colTotals = colIndexSets.map((set) => cellValue(rows, null, set, measure));
-  const rowTotals = rowNodes.map((r) => cellValue(rows, r.indexes, null, measure));
-  const displayMode = query.values[0]?.displayMode ?? "raw";
+  const grandTotals = measures.map((m) => cellValue(rows, null, null, m));
+  const colTotals = colLeaves.map((_, i) => {
+    const base = baseColumns[Math.floor(i / measureCount)];
+    const m = measures[measureIndexByLeaf[i] ?? 0] as PivotMeasure;
+    return cellValue(rows, null, base?.indexes ?? null, m);
+  });
+  const rowTotalsByMeasure = rowNodes.map((r) =>
+    measures.map((m) => cellValue(rows, r.indexes, null, m)),
+  );
+  const rowTotals = rowTotalsByMeasure.map((t) => num(t[0] ?? null));
 
-  const cells = rowNodes.map((r, rowIndex) => {
-    let running = 0;
-    return colIndexSets.length
-      ? colIndexSets.map((set, colIndex) => {
-          const raw = cellValue(rows, r.indexes, set, measure);
-          running += raw ?? 0;
-          return applyDisplayMode(
+  const cells: PivotCellValue[][] = rowNodes.map((r, rowIndex) => {
+    const running = measures.map(() => 0);
+    const out: PivotCellValue[] = [];
+    baseColumns.forEach((base, baseIndex) => {
+      measures.forEach((m, mi) => {
+        const raw = cellValue(rows, r.indexes, base.indexes, m);
+        const leafIndex = baseIndex * measureCount + mi;
+        if (typeof raw !== "number") {
+          out.push(raw);
+          return;
+        }
+        running[mi] = (running[mi] ?? 0) + raw;
+        out.push(
+          applyDisplayMode(
             raw,
             {
-              grand: grandTotal,
-              rowTotal: rowTotals[rowIndex] ?? null,
-              colTotal: colTotals[colIndex] ?? null,
-              running,
+              grand: num(grandTotals[mi] ?? null),
+              rowTotal: num(rowTotalsByMeasure[rowIndex]?.[mi] ?? null),
+              colTotal: num(colTotals[leafIndex] ?? null),
+              running: running[mi] as number,
             },
-            displayMode,
-          );
-        })
-      : [];
+            query.values[mi]?.displayMode ?? "raw",
+          ),
+        );
+      });
+    });
+    return out;
   });
 
   return {
     rowFields: query.rows,
     colFields: query.cols,
     measure,
+    measures,
     rowHeaders: rowNodes.map((r) => r.header),
     colHeaderRows,
     colLeaves,
+    measureIndexByLeaf,
     cells,
     rowTotals,
+    rowTotalsByMeasure,
     colTotals,
-    grandTotal,
+    grandTotal: num(grandTotals[0] ?? null),
+    grandTotals,
     sourceCount: rows.length,
     meta: { source: "local" },
   };
 }
+
 
 export function localDrillThrough(rows: PivotRow[], request: DrillThroughQuery): PivotRow[] {
   const { rowKey, colKey, query } = request;

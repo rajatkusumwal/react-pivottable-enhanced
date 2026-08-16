@@ -241,7 +241,7 @@ export function generateSalesData(count = 600, seed = 42): PivotRow[] {
   return rows;
 }
 
-export const sampleFields: FieldDef[] = [
+const baseFields: FieldDef[] = [
   { name: "id", caption: "Record id", type: "number", folder: "Order" },
   { name: "orderId", caption: "Order id", type: "string", folder: "Order" },
   { name: "orderDate", caption: "Order date", type: "date", folder: "Time" },
@@ -308,6 +308,21 @@ export const sampleHierarchies: { caption: string; levels: string[] }[] = [
   { caption: "Customer", levels: ["customerSegment", "customerType", "loyaltyTier", "customerName"] },
   { caption: "Sales org", levels: ["channel", "salesTeam", "salesperson"] },
 ];
+
+/**
+ * Field metadata with hierarchy membership attached, so the field list can show
+ * "Geography > Region > Country > …" and let users pick a single sublevel.
+ */
+export const sampleFields: FieldDef[] = baseFields.map((field) => {
+  const hierarchy = sampleHierarchies.find((h) => h.levels.includes(field.name));
+  if (!hierarchy) return field;
+  return {
+    ...field,
+    hierarchy: hierarchy.caption,
+    level: hierarchy.levels.indexOf(field.name) + 1,
+  };
+});
+
 
 export const sampleData = generateSalesData();
 

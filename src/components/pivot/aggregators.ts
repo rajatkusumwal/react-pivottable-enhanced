@@ -1,9 +1,19 @@
-import type { AggregatorName, PivotRow, PivotValue } from "./types";
+import type { AggregatorName, FieldType, PivotRow, PivotValue } from "./types";
 
-export type AggregatorFn = (rows: PivotRow[], field: string) => number | null;
+/** A cell can hold a number (numeric measures) or text (string/date/time measures). */
+export type PivotCellValue = number | string | null;
+
+export type AggregatorFn = (rows: PivotRow[], field: string) => PivotCellValue;
 
 const nums = (rows: PivotRow[], field: string): number[] =>
   rows.map((r) => Number(r[field])).filter((n) => Number.isFinite(n));
+
+/** Non-empty raw values as text, used by string / date / time measures. */
+const texts = (rows: PivotRow[], field: string): string[] =>
+  rows
+    .map((r) => r[field])
+    .filter((v: PivotValue) => v !== null && v !== undefined && v !== "")
+    .map((v) => String(v));
 
 function toNumberish(v: PivotValue): number | null {
   const n = Number(v);
@@ -53,6 +63,25 @@ export const aggregators: Record<string, AggregatorFn> = {
   last: (rows, f) => (rows.length ? toNumberish(rows[rows.length - 1]?.[f]) : null),
 };
 
+/**
+ * Aggregations that also make sense for string, date and time measures.
+ * ISO dates ("2024-03-01") and clock times ("09:30") compare correctly as text.
+ */
+export const textAggregators: Record<string, AggregatorFn> = {
+  count: (rows) => rows.length,
+  distinctCount: (rows, f) => new Set(rows.map((r) => String(r[f]))).size,
+  min: (rows, f) => {
+    const v = texts(rows, f).sort();
+    return v.length ? (v[0] as string) : null;
+  },
+  max: (rows, f) => {
+    const v = texts(rows, f).sort();
+    return v.length ? (v[v.length - 1] as string) : null;
+  },
+  first: (rows, f) => texts(rows, f)[0] ?? null,
+  last: (rows, f) => texts(rows, f).at(-1) ?? null,
+};
+
 export const aggregatorLabels: Record<string, string> = {
   sum: "Sum",
   count: "Count",
@@ -68,18 +97,36 @@ export const aggregatorLabels: Record<string, string> = {
   last: "Last",
 };
 
+/** Aggregations offered for a field of the given type (drives the measure menus). */
+export function aggregatorsForType(type: FieldType | undefined): AggregatorName[] {
+  if (!type || type === "number") return Object.keys(aggregators);
+  return Object.keys(textAggregators);
+}
+
 /** Register a custom aggregation function usable by both engines. */
 export function registerAggregator(name: string, fn: AggregatorFn, label = name) {
   aggregators[name] = fn;
   aggregatorLabels[name] = label;
 }
 
+/**
+ * Aggregates `field` over `rows`.
+ *
+ * `type` makes string / date / time measures work: those only support
+ * count, distinct count, min, max, first and last, and return text.
+ */
 export function aggregate(
   name: AggregatorName,
   rows: PivotRow[],
   field: string,
-): number | null {
+  type: FieldType | undefined = "number",
+): PivotCellValue {
+  if (!rows.length) return null;
+  if (type && type !== "number") {
+    const custom = aggregators[name];
+    const fn = textAggregators[name] ?? (custom && !(name in aggregators) ? custom : undefined);
+    return fn ? fn(rows, field) : (textAggregators["count"] as AggregatorFn)(rows, field);
+  }
   const fn = aggregators[name] ?? aggregators["sum"];
-  if (!rows.length || !fn) return null;
-  return fn(rows, field);
+  return fn ? fn(rows, field) : null;
 }
