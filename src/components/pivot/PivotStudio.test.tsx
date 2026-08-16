@@ -33,6 +33,7 @@ const setup = (props: Partial<React.ComponentProps<typeof PivotStudio>> = {}) =>
       fields={fields}
       initialConfig={baseConfig}
       title="Test pivot"
+      fieldsUi="sidebar"
       {...props}
     />,
   );
@@ -76,7 +77,7 @@ describe("PivotStudio — Orb.js engine", () => {
     setup();
     await user.click(screen.getByRole("button", { name: /^add$/i }));
     await waitFor(() => expect(screen.getAllByText("profit").length).toBeGreaterThan(0));
-    await user.click(screen.getByRole("button", { name: "Remove revenue" }));
+    await user.click(screen.getByRole("button", { name: "Remove Revenue" }));
     await user.selectOptions(screen.getByLabelText("Place profit"), "values");
     const grid = await screen.findByTestId("orb-panel");
     await waitFor(() => expect(grid.textContent).toContain("460.00"));
@@ -154,5 +155,46 @@ describe("PivotStudio — react-pivottable engine", () => {
     const cell = panel.querySelector("td.pvtVal") as HTMLElement;
     await user.click(cell);
     expect(await screen.findByRole("dialog")).toBeInTheDocument();
+  });
+});
+
+describe("Flexmonster-style field list", () => {
+  it("opens the field list dialog from the toolbar and shows the four areas", async () => {
+    const user = userEvent.setup();
+    setup({ fieldsUi: "dialog" });
+    await user.click(screen.getAllByRole("button", { name: /^fields$/i })[0]!);
+    const dialog = await screen.findByTestId("field-list-dialog");
+    for (const area of ["filters", "cols", "rows", "values"]) {
+      expect(within(dialog).getByTestId(`drop-area-${area}`)).toBeInTheDocument();
+    }
+    expect(within(dialog).getByTestId("field-chip-chip:rows:region")).toBeInTheDocument();
+    await user.click(within(dialog).getByRole("button", { name: /close/i }));
+    expect(screen.queryByTestId("field-list-dialog")).not.toBeInTheDocument();
+  });
+
+  it("shows the in-grid field bar and removes a field from it", async () => {
+    const user = userEvent.setup();
+    setup({ fieldsUi: "dialog" });
+    const bar = await screen.findByTestId("grid-field-bar");
+    expect(within(bar).getByText("region")).toBeInTheDocument();
+    await user.click(within(bar).getByRole("button", { name: "Remove category" }));
+    await waitFor(() => expect(within(bar).queryByText("category")).not.toBeInTheDocument());
+  });
+
+  it("filters members from a report filter chip", async () => {
+    const user = userEvent.setup();
+    setup({
+      fieldsUi: "dialog",
+      initialConfig: {
+        ...baseConfig,
+        filters: [{ kind: "values", field: "region", mode: "include", members: [] }],
+      },
+    });
+    const bar = await screen.findByTestId("grid-field-bar");
+    await user.click(within(bar).getByRole("button", { name: "Filter region" }));
+    const popover = await screen.findByTestId("member-filter-region");
+    await user.click(within(popover).getByLabelText("South"));
+    await user.click(within(popover).getByRole("button", { name: "OK" }));
+    await waitFor(() => expect(screen.getByText(/2 records/)).toBeInTheDocument());
   });
 });

@@ -165,3 +165,53 @@
   }
 }
 
+
+/* Flexmonster-like grid skin shared by both engines. */
+@layer components {
+  .pivot-fm table {
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .pivot-fm th,
+  .pivot-fm td,
+  .pivot-fm .pvtTotal,
+  .pivot-fm .pvtGrandTotal {
+    border: 1px solid var(--color-border);
+    padding: var(--pivot-cell-padding, 0.25rem 0.5rem);
+  }
+
+  .pivot-fm th,
+  .pivot-fm .pvtAxisLabel,
+  .pivot-fm .pvtColLabel,
+  .pivot-fm .pvtRowLabel {
+    background: var(--pivot-header-bg, oklch(0.96 0.006 250));
+    color: var(--color-foreground);
+    font-weight: 600;
+    text-align: left;
+  }
+
+  .pivot-fm .pvtVal,
+  .pivot-fm td.pvtTotal,
+  .pivot-fm td.pvtGrandTotal {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pivot-fm .pvtTotalLabel,
+  .pivot-fm .pvtGrandTotal {
+    background: var(--pivot-total-bg, oklch(0.98 0.004 250));
+    font-weight: 600;
+  }
+
+  .pivot-fm .pvtUi,
+  .pivot-fm .pvtAxisContainer,
+  .pivot-fm .pvtRenderers,
+  .pivot-fm .pvtVals {
+    display: none;
+  }
+
+  .pivot-fm .pvtVal:hover {
+    background: color-mix(in oklab, var(--pivot-accent, var(--color-primary)) 12%, transparent);
+  }
+}

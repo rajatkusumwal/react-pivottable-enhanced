@@ -44,6 +44,8 @@ export function applyFilters(rows: PivotRow[], filters: FilterDef[]): PivotRow[]
   let out = rows;
   for (const filter of filters) {
     if (filter.kind === "values") {
+      // An empty include list means "all members" (Flexmonster behaviour).
+      if (filter.mode === "include" && filter.members.length === 0) continue;
       const set = new Set(filter.members.map(String));
       out = out.filter((r) => {
         const hit = set.has(String(r[filter.field]));

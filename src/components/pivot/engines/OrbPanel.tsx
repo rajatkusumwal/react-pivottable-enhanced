@@ -99,7 +99,7 @@ export function OrbPanel({ rows, config, strings, allowDrillThrough, onDrill }: 
   );
 
   return (
-    <div className="overflow-auto" data-testid="orb-panel">
+    <div className="pivot-fm overflow-auto" data-testid="orb-panel">
       <table
         className="min-w-full border-collapse text-left"
         style={{ fontSize: config.theme.fontSize }}

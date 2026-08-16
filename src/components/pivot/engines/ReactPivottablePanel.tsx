@@ -83,7 +83,7 @@ export function ReactPivottablePanel({
 
   return (
     <div
-      className="pivot-engine-surface overflow-auto"
+      className="pivot-engine-surface pivot-fm overflow-auto"
       data-testid="react-pivottable-panel"
       style={
         {

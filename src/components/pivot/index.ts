@@ -12,6 +12,15 @@ export { OrbPanel, buildOrbGrid, collectLeaves } from "./engines/OrbPanel";
 
 export { PivotToolbar } from "./ui/PivotToolbar";
 export { PivotSidebar } from "./ui/PivotSidebar";
+export { FieldListPanel } from "./ui/FieldListPanel";
+export { FieldListDialog } from "./ui/FieldListDialog";
+export { GridFieldBar } from "./ui/GridFieldBar";
+export { FieldChip } from "./ui/FieldChip";
+export { DropArea } from "./ui/DropArea";
+export { MemberFilterPopover } from "./ui/MemberFilterPopover";
+export { FilterEditor } from "./ui/FilterEditor";
+export { areaOfField, moveField, removeField, reorderField, pivotAreas } from "./dnd";
+export type { PivotArea } from "./dnd";
 export { PivotChart } from "./ui/PivotChart";
 export { DrillThroughDialog } from "./ui/DrillThroughDialog";
 
