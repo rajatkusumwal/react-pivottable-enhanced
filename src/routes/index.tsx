@@ -12,9 +12,9 @@ import {
 } from "@/lib/pivot-comparison";
 import { cn } from "@/lib/utils";
 
-const TITLE = "Flexmonster vs react-pivottable vs Orb.js — Pivot Feature Matrix";
+const TITLE = "Pivot Table Tools Compared: Flexmonster vs Free Options";
 const DESCRIPTION =
-  "A 150-row feature-by-feature comparison of Flexmonster Pivot Table with the open-source react-pivottable and Orb.js libraries: grid, filters, charts, exports, data sources and licensing.";
+  "A plain-English comparison of the paid Flexmonster pivot table against two free options, react-pivottable and Orb.js — what each one can and cannot do.";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -30,23 +30,26 @@ export const Route = createFileRoute("/")({
   component: ComparisonPage,
 });
 
+const plainNames: Record<ProductKey, { name: string; price: string }> = {
+  flexmonster: { name: "Flexmonster", price: "Paid" },
+  reactPivottable: { name: "react-pivottable", price: "Free" },
+  orb: { name: "Orb.js", price: "Free" },
+};
+
 const statusMeta = {
   yes: {
-    label: "Supported",
+    label: "Yes",
     Icon: Check,
-    text: "text-support-yes",
     chip: "bg-support-yes-soft text-support-yes",
   },
   partial: {
-    label: "Partial",
+    label: "Partly",
     Icon: Minus,
-    text: "text-support-partial",
     chip: "bg-support-partial-soft text-support-partial",
   },
   no: {
-    label: "Not supported",
+    label: "No",
     Icon: X,
-    text: "text-support-no",
     chip: "bg-support-no-soft text-support-no",
   },
 } as const;
@@ -58,12 +61,13 @@ function SupportCell({ cell, product }: { cell: Cell; product: string }) {
     <div className="flex flex-col items-center gap-1 text-center">
       <span
         className={cn(
-          "flex h-6 w-6 items-center justify-center rounded-full",
+          "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium",
           meta.chip,
         )}
       >
         <Icon className="h-3.5 w-3.5" strokeWidth={3} aria-hidden="true" />
-        <span className="sr-only">{`${product}: ${meta.label}`}</span>
+        {meta.label}
+        <span className="sr-only">{` — ${product}`}</span>
       </span>
       {cell.note && (
         <span className="text-[11px] leading-tight text-muted-foreground">{cell.note}</span>
@@ -101,92 +105,96 @@ function ComparisonPage() {
 
   return (
     <main className="min-h-screen bg-background">
-      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
-        <header className="border-b border-border pb-10">
-          <p className="font-mono text-xs uppercase tracking-[0.25em] text-primary">
-            Pivot table libraries · feature matrix
-          </p>
-          <h1 className="mt-4 text-3xl font-bold leading-tight tracking-tight text-foreground sm:text-5xl">
-            Flexmonster vs react-pivottable vs Orb.js
+      <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
+        <header>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+            Which pivot table tool should you use?
           </h1>
-          <p className="mt-4 max-w-3xl text-base text-muted-foreground sm:text-lg">
-            Every capability listed in Flexmonster&rsquo;s commercial technical specification, checked
-            row by row against the two most common open-source JavaScript pivot grids.
+          <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">
+            A pivot table lets people slice and summarise data on a screen, like in Excel.
+            Below we take everything the paid tool <strong className="font-medium text-foreground">Flexmonster</strong>{" "}
+            can do — {totalFeatures} things in total — and check whether the two most popular
+            free tools can do the same.
           </p>
-          <p className="mt-3 font-mono text-xs text-muted-foreground">
-            {totalFeatures} features compared · compiled 16 Aug 2026
-          </p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            {products.map((p) => (
-              <a
-                key={p.key}
-                href={p.url}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="rounded-full border border-border bg-surface px-4 py-1.5 font-mono text-xs text-foreground transition-colors hover:border-primary hover:text-primary"
-              >
-                {p.name} ↗
-              </a>
-            ))}
-          </div>
         </header>
 
-        <section aria-labelledby="summary" className="py-10">
-          <h2 id="summary" className="sr-only">
-            Summary
+        {/* At a glance */}
+        <section aria-labelledby="glance" className="mt-10">
+          <h2 id="glance" className="text-xl font-semibold text-foreground">
+            The short answer
           </h2>
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="mt-4 grid gap-4 md:grid-cols-3">
             {products.map((p) => {
-              const score = scoreFor(p.key);
+              const key = p.key as ProductKey;
+              const score = scoreFor(key);
               const pct = Math.round(((score.full + score.partial * 0.5) / totalFeatures) * 100);
               return (
-                <article
-                  key={p.key}
-                  className="rounded-xl border border-border bg-surface p-5"
-                >
-                  <div className="flex items-baseline justify-between gap-2">
-                    <h3 className="text-lg font-semibold text-foreground">{p.name}</h3>
-                    <span className="font-mono text-2xl font-bold text-primary">{pct}%</span>
+                <article key={p.key} className="rounded-xl border border-border bg-card p-5">
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="text-base font-semibold text-foreground">
+                      {plainNames[key].name}
+                    </h3>
+                    <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                      {plainNames[key].price}
+                    </span>
                   </div>
-                  <p className="mt-1 font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-                    {p.subtitle}
-                  </p>
-                  <div className="mt-4 flex h-1.5 overflow-hidden rounded-full bg-surface-2">
+                  <p className="mt-4 text-3xl font-semibold text-primary">{pct}%</p>
+                  <p className="text-sm text-muted-foreground">of the {totalFeatures} features</p>
+                  <div className="mt-3 h-2 overflow-hidden rounded-full bg-secondary">
                     <span
-                      className="bg-support-yes"
-                      style={{ width: `${(score.full / totalFeatures) * 100}%` }}
-                    />
-                    <span
-                      className="bg-support-partial"
-                      style={{ width: `${(score.partial / totalFeatures) * 100}%` }}
+                      className="block h-full rounded-full bg-primary"
+                      style={{ width: `${pct}%` }}
                     />
                   </div>
-                  <dl className="mt-3 flex gap-4 font-mono text-xs">
-                    <div className="text-support-yes">
-                      <dt className="inline">Full </dt>
-                      <dd className="inline font-bold">{score.full}</dd>
-                    </div>
-                    <div className="text-support-partial">
-                      <dt className="inline">Partial </dt>
-                      <dd className="inline font-bold">{score.partial}</dd>
-                    </div>
-                    <div className="text-support-no">
-                      <dt className="inline">None </dt>
-                      <dd className="inline font-bold">{score.none}</dd>
-                    </div>
-                  </dl>
                   <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-                    {verdicts[p.key]}
+                    {verdicts[key]}
                   </p>
+                  <a
+                    href={p.url}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="mt-4 inline-block text-sm font-medium text-primary underline underline-offset-4"
+                  >
+                    Visit website
+                  </a>
                 </article>
               );
             })}
           </div>
         </section>
 
-        <section aria-labelledby="matrix">
+        {/* How to read */}
+        <section
+          aria-label="How to read this page"
+          className="mt-10 rounded-xl border border-border bg-surface p-5"
+        >
+          <h2 className="text-sm font-semibold text-foreground">How to read the table</h2>
+          <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+            <li className="flex items-center gap-2">
+              <span className={cn("rounded-full px-2 py-0.5 text-xs font-medium", statusMeta.yes.chip)}>
+                Yes
+              </span>
+              Works out of the box.
+            </li>
+            <li className="flex items-center gap-2">
+              <span className={cn("rounded-full px-2 py-0.5 text-xs font-medium", statusMeta.partial.chip)}>
+                Partly
+              </span>
+              Possible, but needs extra work, a plugin, or is limited.
+            </li>
+            <li className="flex items-center gap-2">
+              <span className={cn("rounded-full px-2 py-0.5 text-xs font-medium", statusMeta.no.chip)}>
+                No
+              </span>
+              Not available at all.
+            </li>
+          </ul>
+        </section>
+
+        {/* Table */}
+        <section aria-labelledby="matrix" className="mt-10">
           <h2 id="matrix" className="text-xl font-semibold text-foreground">
-            Feature matrix
+            Feature by feature
           </h2>
 
           <div className="sticky top-0 z-30 -mx-4 mt-4 border-b border-border bg-background/95 px-4 py-4 backdrop-blur sm:-mx-6 sm:px-6">
@@ -200,47 +208,44 @@ function ComparisonPage() {
                   type="search"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search features…"
+                  placeholder="Search a feature, e.g. “export to Excel”"
                   aria-label="Search features"
-                  className="w-full rounded-md border border-input bg-surface py-2 pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-ring"
+                  className="w-full rounded-lg border border-input bg-card py-2.5 pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/30"
                 />
               </div>
-              <label className="flex cursor-pointer items-center gap-2 font-mono text-xs text-muted-foreground">
+              <label htmlFor="cat" className="sr-only">
+                Filter by topic
+              </label>
+              <select
+                id="cat"
+                value={activeCategory}
+                onChange={(e) => setActiveCategory(e.target.value)}
+                className="rounded-lg border border-input bg-card px-3 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/30"
+              >
+                <option value="all">All topics</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+              <label className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground">
                 <input
                   type="checkbox"
                   checked={diffOnly}
                   onChange={(e) => setDiffOnly(e.target.checked)}
                   className="h-4 w-4 accent-primary"
                 />
-                Differences only
+                Only show where they differ
               </label>
-              <span className="font-mono text-xs text-muted-foreground">
-                {visibleCount}/{totalFeatures} rows
-              </span>
             </div>
-
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {[{ id: "all", name: "All" }, ...categories].map((c) => (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() => setActiveCategory(c.id)}
-                  aria-pressed={activeCategory === c.id}
-                  className={cn(
-                    "rounded-full border px-3 py-1 font-mono text-[11px] transition-colors",
-                    activeCategory === c.id
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border bg-surface text-muted-foreground hover:text-foreground",
-                  )}
-                >
-                  {c.name}
-                </button>
-              ))}
-            </div>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Showing {visibleCount} of {totalFeatures} features
+            </p>
           </div>
 
-          {/* Desktop matrix */}
-          <div className="mt-6 hidden overflow-x-auto rounded-xl border border-border md:block">
+          {/* Desktop table */}
+          <div className="mt-6 hidden overflow-hidden rounded-xl border border-border md:block">
             <table className="w-full border-collapse text-sm">
               <caption className="sr-only">
                 Feature support comparison between Flexmonster, react-pivottable and Orb.js
@@ -249,7 +254,7 @@ function ComparisonPage() {
                 <tr className="bg-surface-2">
                   <th
                     scope="col"
-                    className="sticky left-0 z-10 w-[40%] bg-surface-2 px-4 py-3 text-left font-semibold text-foreground"
+                    className="w-[46%] px-4 py-3 text-left font-semibold text-foreground"
                   >
                     Feature
                   </th>
@@ -259,9 +264,9 @@ function ComparisonPage() {
                       scope="col"
                       className="px-3 py-3 text-center font-semibold text-foreground"
                     >
-                      {p.name}
-                      <span className="block font-mono text-[10px] font-normal uppercase tracking-wider text-muted-foreground">
-                        {p.subtitle}
+                      {plainNames[p.key as ProductKey].name}
+                      <span className="block text-xs font-normal text-muted-foreground">
+                        {plainNames[p.key as ProductKey].price}
                       </span>
                     </th>
                   ))}
@@ -273,22 +278,25 @@ function ComparisonPage() {
                     <th
                       scope="colgroup"
                       colSpan={4}
-                      className="border-y border-border bg-surface px-4 py-2 text-left font-mono text-[11px] uppercase tracking-[0.18em] text-primary"
+                      className="border-y border-border bg-surface px-4 py-2.5 text-left text-sm font-semibold text-foreground"
                     >
                       {cat.name}
                     </th>
                   </tr>
                   {cat.rows.map((row) => (
-                    <tr key={row.feature} className="border-b border-border/60 hover:bg-surface/60">
+                    <tr key={row.feature} className="border-b border-border/60 hover:bg-surface/70">
                       <th
                         scope="row"
-                        className="sticky left-0 z-10 bg-background px-4 py-2.5 text-left font-normal text-foreground"
+                        className="px-4 py-3 text-left font-normal text-foreground"
                       >
                         {row.feature}
                       </th>
                       {products.map((p) => (
-                        <td key={p.key} className="px-3 py-2.5 align-top">
-                          <SupportCell cell={row[p.key as ProductKey]} product={p.name} />
+                        <td key={p.key} className="px-3 py-3 align-top">
+                          <SupportCell
+                            cell={row[p.key as ProductKey]}
+                            product={plainNames[p.key as ProductKey].name}
+                          />
                         </td>
                       ))}
                     </tr>
@@ -299,26 +307,27 @@ function ComparisonPage() {
           </div>
 
           {/* Mobile cards */}
-          <div className="mt-6 space-y-6 md:hidden">
+          <div className="mt-6 space-y-8 md:hidden">
             {filtered.map((cat) => (
               <div key={cat.id}>
-                <h3 className="font-mono text-[11px] uppercase tracking-[0.18em] text-primary">
-                  {cat.name}
-                </h3>
+                <h3 className="text-sm font-semibold text-foreground">{cat.name}</h3>
                 <ul className="mt-2 space-y-2">
                   {cat.rows.map((row) => (
-                    <li
-                      key={row.feature}
-                      className="rounded-lg border border-border bg-surface p-3"
-                    >
+                    <li key={row.feature} className="rounded-xl border border-border bg-card p-4">
                       <p className="text-sm font-medium text-foreground">{row.feature}</p>
-                      <div className="mt-3 grid grid-cols-3 gap-2">
+                      <div className="mt-3 space-y-2">
                         {products.map((p) => (
-                          <div key={p.key} className="text-center">
-                            <p className="font-mono text-[10px] text-muted-foreground">{p.name}</p>
-                            <div className="mt-1 flex justify-center">
-                              <SupportCell cell={row[p.key as ProductKey]} product={p.name} />
-                            </div>
+                          <div
+                            key={p.key}
+                            className="flex items-center justify-between gap-3 text-sm"
+                          >
+                            <span className="text-muted-foreground">
+                              {plainNames[p.key as ProductKey].name}
+                            </span>
+                            <SupportCell
+                              cell={row[p.key as ProductKey]}
+                              product={plainNames[p.key as ProductKey].name}
+                            />
                           </div>
                         ))}
                       </div>
@@ -331,33 +340,16 @@ function ComparisonPage() {
 
           {visibleCount === 0 && (
             <p className="mt-8 text-center text-sm text-muted-foreground">
-              No features match your filters.
+              Nothing matches your search. Try a different word.
             </p>
           )}
         </section>
 
-        <section className="mt-10 flex flex-wrap gap-4 border-t border-border pt-6 font-mono text-xs text-muted-foreground">
-          {(["yes", "partial", "no"] as const).map((s) => {
-            const meta = statusMeta[s];
-            const { Icon } = meta;
-            return (
-              <span key={s} className="flex items-center gap-2">
-                <span className={cn("flex h-5 w-5 items-center justify-center rounded-full", meta.chip)}>
-                  <Icon className="h-3 w-3" strokeWidth={3} aria-hidden="true" />
-                </span>
-                {meta.label}
-              </span>
-            );
-          })}
-        </section>
-
-        <footer className="mt-6 text-xs leading-relaxed text-muted-foreground">
+        <footer className="mt-12 border-t border-border pt-6 text-sm leading-relaxed text-muted-foreground">
           <p>
-            Sources: Flexmonster technical specifications and pricing pages, the react-pivottable
-            documentation site, and the Orb.js demo and repository. Open-source entries reflect the
-            latest published releases; &ldquo;partial&rdquo; means the capability exists only through
-            custom code, a plugin, or a reduced form. Compiled 16 August 2026 — verify against vendor
-            docs before making a purchasing decision.
+            Based on the official Flexmonster documentation and pricing pages, the react-pivottable
+            docs, and the Orb.js demo and code repository. Last checked 16 August 2026 — always
+            double-check with the vendor before buying.
           </p>
         </footer>
       </div>

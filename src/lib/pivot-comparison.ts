@@ -47,10 +47,10 @@ export type ProductKey = (typeof products)[number]["key"];
 
 export const verdicts: Record<ProductKey, string> = {
   flexmonster:
-    "Enterprise-grade component with the widest surface area: server-side data sources, OLAP, exports, drill-through, accessibility and a ~100-method API, backed by paid support and regular releases.",
+    "Does everything on this list. You get exports, charts, big-data handling and paid support — but you pay a yearly licence fee.",
   reactPivottable:
-    "Lightweight React drag-and-drop pivot UI with solid aggregators and Plotly chart renderers. No exports, toolbar, server-side sources or enterprise features — ideal for internal dashboards and prototypes.",
-  orb: "Standalone JS pivot grid with drag-and-drop, subtotals, expand/collapse and a themeable grid. No charts and no calculated-field UI; the repository has seen no meaningful activity in years.",
+    "Free and quick to drop into a React app. Good for simple internal dashboards, but there is no Excel/PDF export, no toolbar and no help desk if you get stuck.",
+  orb: "Free grid with drag-and-drop and subtotals, but no charts and no exports. The project has not been updated in years, so nobody is fixing bugs.",
 };
 
 export const categories: FeatureCategory[] = [
