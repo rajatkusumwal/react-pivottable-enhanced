@@ -43,6 +43,13 @@ export { FieldChip } from "./ui/FieldChip";
 export { DropArea } from "./ui/DropArea";
 export { MemberFilterPopover } from "./ui/MemberFilterPopover";
 export { FilterEditor } from "./ui/FilterEditor";
+export {
+  fieldCaption,
+  measureCaption,
+  renameFieldPatch,
+  renameMeasurePatch,
+  renameResultFields,
+} from "./captions";
 export { areaOfField, moveField, removeField, reorderField, pivotAreas } from "./dnd";
 export type { PivotArea } from "./dnd";
 export { PivotChart } from "./ui/PivotChart";

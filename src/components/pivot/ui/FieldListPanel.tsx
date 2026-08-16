@@ -134,7 +134,8 @@ export function FieldListPanel({
     () => new Map(allFields.map((f) => [f.name, f])),
     [allFields],
   );
-  const labelOf = (name: string) => fieldByName.get(name)?.caption ?? name;
+  const labelOf = (name: string) =>
+    config.fieldCaptions?.[name] ?? fieldByName.get(name)?.caption ?? name;
 
   /**
    * Field list tree: folder → hierarchies (with their levels in order) → loose
