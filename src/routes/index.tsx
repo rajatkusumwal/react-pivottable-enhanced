@@ -35,6 +35,7 @@ const plainNames: Record<ProductKey, { name: string; price: string }> = {
   flexmonster: { name: "Flexmonster", price: "Paid" },
   reactPivottable: { name: "react-pivottable", price: "Free" },
   orb: { name: "Orb.js", price: "Free" },
+  studio: { name: "Pivot Studio (this demo)", price: "Free" },
 };
 
 const statusMeta = {
@@ -93,7 +94,7 @@ function ComparisonPage() {
             return false;
           }
           if (diffOnly) {
-            const s = new Set([r.flexmonster.s, r.reactPivottable.s, r.orb.s]);
+            const s = new Set([r.flexmonster.s, r.reactPivottable.s, r.orb.s, r.studio.s]);
             if (s.size === 1) return false;
           }
           return true;
@@ -115,7 +116,9 @@ function ComparisonPage() {
             A pivot table lets people slice and summarise data on a screen, like in Excel.
             Below we take everything the paid tool <strong className="font-medium text-foreground">Flexmonster</strong>{" "}
             can do — {totalFeatures} things in total — and check whether the two most popular
-            free tools can do the same.
+            free tools can do the same — plus the ready-made{" "}
+            <strong className="font-medium text-foreground">Pivot Studio</strong> setup you can
+            try on the demos page, which wraps those free tools with extra features.
           </p>
           <Link
             to="/demos"
@@ -131,7 +134,7 @@ function ComparisonPage() {
           <h2 id="glance" className="text-xl font-semibold text-foreground">
             The short answer
           </h2>
-          <div className="mt-4 grid gap-4 md:grid-cols-3">
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {products.map((p) => {
               const key = p.key as ProductKey;
               const score = scoreFor(key);
@@ -157,14 +160,23 @@ function ComparisonPage() {
                   <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
                     {verdicts[key]}
                   </p>
-                  <a
-                    href={p.url}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    className="mt-4 inline-block text-sm font-medium text-primary underline underline-offset-4"
-                  >
-                    Visit website
-                  </a>
+                  {key === "studio" ? (
+                    <Link
+                      to="/demos"
+                      className="mt-4 inline-block text-sm font-medium text-primary underline underline-offset-4"
+                    >
+                      Open the demo
+                    </Link>
+                  ) : (
+                    <a
+                      href={p.url}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      className="mt-4 inline-block text-sm font-medium text-primary underline underline-offset-4"
+                    >
+                      Visit website
+                    </a>
+                  )}
                 </article>
               );
             })}
@@ -256,13 +268,13 @@ function ComparisonPage() {
           <div className="mt-6 hidden overflow-hidden rounded-xl border border-border md:block">
             <table className="w-full border-collapse text-sm">
               <caption className="sr-only">
-                Feature support comparison between Flexmonster, react-pivottable and Orb.js
+                Feature support comparison between Flexmonster, react-pivottable, Orb.js and the Pivot Studio demo
               </caption>
               <thead>
                 <tr className="bg-surface-2">
                   <th
                     scope="col"
-                    className="w-[46%] px-4 py-3 text-left font-semibold text-foreground"
+                    className="w-[34%] px-4 py-3 text-left font-semibold text-foreground"
                   >
                     Feature
                   </th>
@@ -285,7 +297,7 @@ function ComparisonPage() {
                   <tr>
                     <th
                       scope="colgroup"
-                      colSpan={4}
+                      colSpan={products.length + 1}
                       className="border-y border-border bg-surface px-4 py-2.5 text-left text-sm font-semibold text-foreground"
                     >
                       {cat.name}

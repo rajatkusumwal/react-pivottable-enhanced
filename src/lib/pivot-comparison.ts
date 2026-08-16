@@ -10,6 +10,8 @@ export type FeatureRow = {
   flexmonster: Cell;
   reactPivottable: Cell;
   orb: Cell;
+  /** What the Pivot Studio demo on the /demos page actually delivers. */
+  studio: Cell;
 };
 
 export type FeatureCategory = {
@@ -41,6 +43,12 @@ export const products = [
     subtitle: "Open source • MIT, unmaintained",
     url: "https://nnajm.github.io/orb/index.html",
   },
+  {
+    key: "studio" as const,
+    name: "Pivot Studio (this demo)",
+    subtitle: "Free • built on the two free engines",
+    url: "/demos",
+  },
 ];
 
 export type ProductKey = (typeof products)[number]["key"];
@@ -51,9 +59,14 @@ export const verdicts: Record<ProductKey, string> = {
   reactPivottable:
     "Free and quick to drop into a React app. Good for simple internal dashboards, but there is no Excel/PDF export, no toolbar and no help desk if you get stuck.",
   orb: "Free grid with drag-and-drop and subtotals, but no charts and no exports. The project has not been updated in years, so nobody is fixing bugs.",
+  studio:
+    "The ready-made setup you can try on the demos page: the two free engines wrapped with a toolbar, charts, exports, filters, calculated values and language packs. Closes most of the gap for free, but you maintain the code and there is no help desk.",
 };
 
-export const categories: FeatureCategory[] = [
+type RawRow = Omit<FeatureRow, "studio">;
+type RawCategory = { id: string; name: string; rows: RawRow[] };
+
+const rawCategories: RawCategory[] = [
   {
     id: "grid",
     name: "Grid",
@@ -416,6 +429,110 @@ export const categories: FeatureCategory[] = [
     ],
   },
 ];
+
+/**
+ * What the Pivot Studio demo (see /demos) actually ships, feature by feature.
+ * Anything not listed falls back to the best of the two underlying free engines.
+ */
+const studioOverrides: Record<string, Cell> = {
+  // Grid
+  "Classic (tabular) pivot form": y("Layout switch"),
+  "Flat table form": y("Layout switch"),
+  "Show/hide subtotals": y("Toolbar option"),
+  "Show/hide grand totals per rows/columns": y("Toolbar option"),
+  "Grid title": y("title prop"),
+  "Highlight rows and columns": y("Hover highlight"),
+  // Filters
+  "Value filters (top/bottom N)": y("Top-N filter"),
+  "Conditional filter for number fields": y(),
+  "Conditional filter for string fields": y(),
+  "Conditional filter for date fields": p("Text/number conditions only"),
+  "Selection (member checkbox) filter": y(),
+  "Search box inside the filter": y(),
+  "Report filter (page) area": y("Filters area in the sidebar"),
+  "Show/hide filter controls on the grid": y(),
+  // Field list
+  "Dedicated Field List panel": y("Sidebar panel"),
+  "Multiple measures": p("One measure rendered at a time"),
+  "UI for adding calculated values": y("Formula box"),
+  "Open/close the Field List from the API": y("showSidebar prop"),
+  // Aggregations
+  "Distinct count": y(),
+  Median: y(),
+  Product: y(),
+  "Population standard deviation": y(),
+  "Sample standard deviation": y(),
+  "Percent of total": y("Display mode"),
+  "Custom aggregation functions": y("registerAggregator()"),
+  // Calculated values
+  "Calculated measures via API": y(),
+  "Formula editor in the UI": y("Safe formula parser"),
+  "Formulas across multiple measures": y(),
+  // Charts
+  "Built-in charts (no extra library)": y("Bundled Recharts view"),
+  "Column / bar charts": y(),
+  "Line charts": y(),
+  "Scatter charts": y(),
+  "Pie charts": y(),
+  "Stacked column charts": p("Grouped columns"),
+  Tooltips: y(),
+  "Chart title and legend options": y(),
+  // Drill-through
+  "Drill-through view for grid cells": y("Click a cell"),
+  "Enable/disable drill-through": y("Permission flag"),
+  "Configure the drill-through slice": p("Shows all source columns"),
+  // Toolbar
+  "Built-in toolbar": y(),
+  "Save the report": y("Report JSON"),
+  "Open a saved report": y("Report JSON"),
+  "Switch between grid and charts": y(),
+  "Show/hide and customise the toolbar": y("showToolbar prop"),
+  // Export & print
+  "Export to Excel": y(".xls export"),
+  "Export to CSV": y(),
+  "Export to HTML": y(),
+  "Export to PDF": p("Through the print dialog"),
+  "Printing with the OS print manager": y("Print view"),
+  // Options & localisation
+  "Save/restore full report state as JSON": y(),
+  "Multilingual localisation packs": y("Bundled locales"),
+  "Read-only mode": y("Permission flag"),
+  "Number formatting per measure": y("Locale-aware formats"),
+  "Conditional formatting rules": y("Rule-based cell colours"),
+  // Data sources
+  "CSV files": y("Built-in CSV loader"),
+  "CSV separator / decimal / thousands options": p("Separator only"),
+  "Field captions, types and hidden fields mapping": y("Field metadata + inference"),
+  "Update data without resetting the report": y("Controlled config"),
+  // Styling
+  "Prebuilt CSS themes": p("Theme tokens you can override"),
+  "Customise individual grid cells": y("Conditional formatting hooks"),
+  "Customise the toolbar": y("Sub-components exported"),
+  "Fully custom renderers": y("Compose your own shell"),
+  // Security
+  "Role-based data access": y("Row-level security + field masking"),
+  "Custom authorization hooks": y("secureRows() predicates"),
+  // Integrations & support
+  "TypeScript typings": y("Typed source"),
+  "Actively maintained releases": p("You own and maintain the code"),
+  "Vendor technical support": n("No vendor"),
+  "SLA / guaranteed response time": n(),
+};
+
+const rank: Record<Support, number> = { no: 0, partial: 1, yes: 2 };
+
+function studioCell(row: RawRow): Cell {
+  const override = studioOverrides[row.feature];
+  if (override) return override;
+  // Otherwise the demo inherits whichever free engine does it best.
+  const best = rank[row.reactPivottable.s] >= rank[row.orb.s] ? row.reactPivottable : row.orb;
+  return { s: best.s, ...(best.note ? { note: best.note } : {}) };
+}
+
+export const categories: FeatureCategory[] = rawCategories.map((c) => ({
+  ...c,
+  rows: c.rows.map((r) => ({ ...r, studio: studioCell(r) })),
+}));
 
 export const totalFeatures = categories.reduce((acc, c) => acc + c.rows.length, 0);
 
