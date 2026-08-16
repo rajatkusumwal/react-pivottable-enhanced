@@ -122,6 +122,7 @@ All endpoints are JSON over POST.
   "grandTotalsPosition": "bottom",
   "layout": "compact",
   "collapsed": ["North"],
+  "collapsedCols": ["Bikes"],
   "sort": { "by": 0, "direction": "desc" },
   "locale": "en",
   "datasetId": "sales-2026"
@@ -161,6 +162,11 @@ Rules the server must respect:
 * `cells[i][j]` aligns with `rowHeaders[i]` and `colLeaves[j]`; use `null` for empty cells.
 * Emit subtotal rows only when `showSubTotals` is true, and skip children of any path in
   `collapsed`.
+* Multilevel drill: `collapsed` holds row member paths, `collapsedCols` holds column member
+  paths (levels joined with `\u0000`). A collapsed column member becomes a single aggregated
+  leaf: keep it in `colHeaderRows` with `expandable: true`, `expanded: false` and
+  `rowSpan` covering the remaining column levels, and drop its descendants from `colLeaves`.
+  Parent members that still have visible children carry `expandable: true, expanded: true`.
 * `layout: "flat"` means one row per source record combination, no subtotals.
 
 #### `POST /api/pivot/drillthrough`
