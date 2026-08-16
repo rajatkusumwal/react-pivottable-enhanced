@@ -101,8 +101,17 @@ other than Tailwind tokens (`--color-border`, `--color-card`, …) and `@/lib/ut
   last, and render as text (ISO dates and `HH:mm` times compare correctly).
 * **Aggregations** — sum, count, distinct count, average, median, min, max, product,
   population/sample stdev, percent-of-total; add your own with `registerAggregator()`.
-  `aggregatorsForType(type)` returns the aggregations valid for a field type and drives the
-  measure menus.
+  `aggregatorsForType(type, allowed?)` returns the aggregations valid for a field type and
+  drives the measure menus. Restrict them per field with `FieldDef.aggregators`, e.g.
+  `{ name: "unitPrice", type: "number", aggregators: ["average", "min", "max"] }` hides Sum.
+  The Σ icon on measure chips can be hidden with `config.showAggregationIcon: false`
+  (toolbar "Σ icon").
+* **Show values as** — every measure takes a `displayMode`: `percentOfGrandTotal`,
+  `percentOfRowTotal`, `percentOfColumnTotal`, `percentOfParentRowTotal`,
+  `percentOfParentColumnTotal`, `index`, `differenceOfRow` / `differenceOfColumn`,
+  `percentDifferenceOfRow` / `percentDifferenceOfColumn`, `runningTotalOfRow` /
+  `runningTotalOfColumn`. Pick it from the measure menu in the field list.
+
 * **Calculated values** — safe formula parser (no `eval`), e.g. `revenue - cost`.
 * **Charts** — Recharts bar / stacked / line / area / pie with click-to-drill.
 * **Drill-through** — click any number to inspect the source records.
