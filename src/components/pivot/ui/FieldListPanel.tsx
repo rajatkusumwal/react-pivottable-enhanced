@@ -38,26 +38,38 @@ const heading = "mb-2 text-xs font-semibold uppercase tracking-wide text-muted-f
 const control = "w-full rounded-md border border-border bg-background px-2 py-1.5 text-sm";
 const small = "rounded-md border border-border bg-background px-1.5 py-1 text-[11px]";
 
-function SourceField({ field, label, disabled }: { field: string; label: string; disabled: boolean }) {
+function SourceField({
+  field,
+  label,
+  disabled,
+  dragDisabled,
+}: {
+  field: string;
+  label: string;
+  disabled: boolean;
+  dragDisabled: boolean;
+}) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `src:${field}`,
-    disabled,
+    disabled: disabled || dragDisabled,
   });
   return (
     <span
       ref={setNodeRef}
       className={`inline-flex items-center gap-1 ${isDragging ? "opacity-50" : ""}`}
     >
-      <button
-        type="button"
-        className="cursor-grab touch-none text-muted-foreground disabled:cursor-not-allowed"
-        aria-label={`Drag ${label}`}
-        disabled={disabled}
-        {...attributes}
-        {...listeners}
-      >
-        <GripVertical className="h-3.5 w-3.5" aria-hidden="true" />
-      </button>
+      {!dragDisabled && (
+        <button
+          type="button"
+          className="cursor-grab touch-none text-muted-foreground disabled:cursor-not-allowed"
+          aria-label={`Drag ${label}`}
+          disabled={disabled}
+          {...attributes}
+          {...listeners}
+        >
+          <GripVertical className="h-3.5 w-3.5" aria-hidden="true" />
+        </button>
+      )}
       <span className="truncate text-sm">{label}</span>
     </span>
   );
@@ -82,6 +94,7 @@ export function FieldListPanel({
   const [calcName, setCalcName] = useState("profit");
   const [formulaError, setFormulaError] = useState<string | null>(null);
   const [memberFilter, setMemberFilter] = useState<string | null>(null);
+  const dragDisabled = readOnly || config.dragAndDrop === false;
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
@@ -154,7 +167,7 @@ export function FieldListPanel({
             : [];
 
   const handleDragEnd = ({ active, over }: DragEndEvent) => {
-    if (readOnly || !over) return;
+    if (dragDisabled || !over) return;
     const from = parse(String(active.id));
     const to = parse(String(over.id));
     if (!from || !to) return;
@@ -181,6 +194,7 @@ export function FieldListPanel({
           label={v.caption ?? labelOf(v.field)}
           hint={aggregatorLabels[v.aggregator] ?? v.aggregator}
           disabled={readOnly}
+          dragDisabled={dragDisabled}
           active
           onRemove={() => onChange({ values: config.values.filter((_, j) => j !== i) })}
         >
@@ -224,6 +238,7 @@ export function FieldListPanel({
             label={labelOf(f.field)}
             hint={f.kind === "values" ? "members" : f.kind}
             disabled={readOnly}
+            dragDisabled={dragDisabled}
             active
             onFilter={
               f.kind === "values"
@@ -259,6 +274,7 @@ export function FieldListPanel({
         id={chipId(area, name)}
         label={labelOf(name)}
         disabled={readOnly}
+        dragDisabled={dragDisabled}
         active
         onRemove={() => onChange(moveField(config, name, "fields"))}
       />
@@ -320,7 +336,12 @@ export function FieldListPanel({
               {list.map((f) => (
                 <li key={f.name} className="flex items-center gap-2">
                   <span className="min-w-0 flex-1">
-                    <SourceField field={f.name} label={f.caption ?? f.name} disabled={readOnly} />
+                    <SourceField
+                      field={f.name}
+                      label={f.caption ?? f.name}
+                      disabled={readOnly}
+                      dragDisabled={dragDisabled}
+                    />
                   </span>
                   <select
                     className={small}
