@@ -59,7 +59,9 @@ export interface PivotStudioProps {
   /** Notified when inline editing writes new values back into the records. */
   onDataChange?: (rows: PivotRow[]) => void;
   /** Backend uploader; when given, uploads go to the service instead of memory. */
-  onUploadToBackend?: (file: File) => Promise<{ datasetId: string; rowCount: number; fields: FieldDef[] }>;
+  onUploadToBackend?: (
+    file: File,
+  ) => Promise<{ datasetId: string; rowCount: number; fields: FieldDef[] }>;
   /** Dataset handle for backend queries. */
   datasetId?: string;
   /**
@@ -143,7 +145,10 @@ export function PivotStudio({
     update(createDefaultConfig(initialConfig));
   }, [update, initialConfig]);
 
-  const safeFields = useMemo(() => visibleFields(activeFields, permissions), [activeFields, permissions]);
+  const safeFields = useMemo(
+    () => visibleFields(activeFields, permissions),
+    [activeFields, permissions],
+  );
   const baseRows = useMemo(() => secureRows(activeData, permissions), [activeData, permissions]);
   const derivedRows = useMemo(
     () => applyFilters(applyCalculatedFields(baseRows, config.calculated), config.filters),
@@ -171,7 +176,6 @@ export function PivotStudio({
     }),
     [config, safeFields, activeDatasetId],
   );
-
 
   useEffect(() => {
     const id = ++requestId.current;
@@ -220,7 +224,6 @@ export function PivotStudio({
     [activeData, config.values, config.rows, config.cols, onDataChange],
   );
 
-
   const chart = useMemo(() => buildChartData(derivedRows, config), [derivedRows, config]);
 
   const patchChart = useCallback(
@@ -262,7 +265,6 @@ export function PivotStudio({
     },
     [chart, config.chart.hiddenSeries, patchChart],
   );
-
 
   useEffect(() => {
     if (!status) return;
@@ -356,7 +358,6 @@ export function PivotStudio({
     );
     setDrill({ title: label, rows, total: all.length });
   };
-
 
   const toggleCollapse = (key: string[]) => {
     const id = keyOf(key);
@@ -501,7 +502,6 @@ export function PivotStudio({
         />
       )}
 
-
       {allowFileUpload && (
         <DataSourceBar
           csv={config.csv}
@@ -514,7 +514,11 @@ export function PivotStudio({
           onLoad={(dataset) => {
             setUploaded(dataset);
             saveSessionDataset(dataset);
-            update({ ...createDefaultConfig(), ...suggestConfig(dataset.fields), locale: config.locale });
+            update({
+              ...createDefaultConfig(),
+              ...suggestConfig(dataset.fields),
+              locale: config.locale,
+            });
             setStatus(`Loaded ${dataset.name}`);
           }}
         />
@@ -546,7 +550,9 @@ export function PivotStudio({
           )}
           <div
             data-testid="pivot-panes"
-            data-split={config.chart.visible && config.chart.position === "right" ? "true" : "false"}
+            data-split={
+              config.chart.visible && config.chart.position === "right" ? "true" : "false"
+            }
             className={
               config.chart.visible && config.chart.position === "right"
                 ? "flex flex-col gap-3 xl:flex-row"
@@ -554,131 +560,137 @@ export function PivotStudio({
             }
           >
             <div className="min-w-0 flex-1">
-          {(config.rows.length > 1 || config.cols.length > 1) && config.layout !== "flat" && (
-            <div className="flex flex-wrap items-center gap-1.5 px-1 pt-1">
-              <button
-                type="button"
-                className="rounded border border-border bg-card px-2 py-1 text-xs hover:bg-accent"
-                onClick={expandAll}
-              >
-                Drill down all levels
-              </button>
-              <button
-                type="button"
-                className="rounded border border-border bg-card px-2 py-1 text-xs hover:bg-accent"
-                onClick={collapseAll}
-              >
-                Drill up to top level
-              </button>
-              <span className="text-xs text-muted-foreground">
-                or use the arrows in row and column headers
-              </span>
-            </div>
-          )}
-          <p className="px-1 py-2 text-xs text-muted-foreground">
-            {derivedRows.length} {strings.records}
-            {result.meta.source === "backend" && " · aggregated by your analytics service"}
-            {allowDrillThrough && !config.editing && " · click a number to see the records behind it"}
-            {config.editing && !readOnly && " · double-click a number to edit it"}
-          </p>
-
-          {engineError && (
-            <p role="alert" className="px-1 pb-2 text-xs text-destructive">
-              {engineError}
-            </p>
-          )}
-
-          <PivotGrid
-            result={displayResult}
-            layout={config.layout}
-            locale={config.locale}
-            theme={config.theme}
-            title={title}
-            showFieldCaptions={config.showFieldCaptions}
-            showSpreadsheetHeaders={config.showSpreadsheetHeaders}
-            repeatMemberLabels={config.repeatMemberLabels}
-            showSortingControls={config.showSortingControls}
-            showRowTotals={config.showRowTotals}
-            sort={config.sort}
-            sorts={config.layout === "flat" ? config.sorts : undefined}
-            multiSort={config.layout === "flat"}
-            onSortChange={(sort) => update({ sort, sorts: sort ? [sort] : [] })}
-            onSortsChange={(sorts) => update({ sorts, sort: sorts[0] })}
-            onToggleCollapse={toggleCollapse}
-            onToggleColumnCollapse={toggleColumnCollapse}
-            conditionalFormats={config.conditionalFormats}
-            allowDrillThrough={allowDrillThrough}
-            editable={config.editing && !readOnly}
-            onCellEdit={handleCellEdit}
-            onDrill={(rowKey, colKey, label) => void openDrill(rowKey, colKey, label)}
-            onCellContextMenu={openContextMenu}
-
-            onSelectionChange={setSelection}
-            emptyLabel={strings.noData}
-          />
-
-          {selection && selection.count > 0 && (
-            <p data-testid="selection-bar" className="mt-2 px-1 text-xs text-muted-foreground">
-              {selection.count} cells · Sum {formatNumber(selection.sum, result.measure.format, config.locale)} ·
-              Average {formatNumber(selection.average, result.measure.format, config.locale)} · Min{" "}
-              {formatNumber(selection.min, result.measure.format, config.locale)} · Max{" "}
-              {formatNumber(selection.max, result.measure.format, config.locale)}
-            </p>
-          )}
-            </div>
-
-          {config.chart.visible && (
-            <div
-              data-testid="pivot-chart-pane"
-              className={
-                config.chart.position === "right"
-                  ? "min-w-0 border-t border-border pt-3 xl:w-[45%] xl:border-l xl:border-t-0 xl:pl-3 xl:pt-0"
-                  : "mt-3 border-t border-border pt-3"
-              }
-            >
-              {config.showChartFilters && (
-                <ChartFilterBar
-                  strings={strings}
-                  config={config}
-                  rows={baseRows}
-                  readOnly={readOnly}
-                  onChange={update}
-                />
+              {(config.rows.length > 1 || config.cols.length > 1) && config.layout !== "flat" && (
+                <div className="flex flex-wrap items-center gap-1.5 px-1 pt-1">
+                  <button
+                    type="button"
+                    className="rounded border border-border bg-card px-2 py-1 text-xs hover:bg-accent"
+                    onClick={expandAll}
+                  >
+                    Drill down all levels
+                  </button>
+                  <button
+                    type="button"
+                    className="rounded border border-border bg-card px-2 py-1 text-xs hover:bg-accent"
+                    onClick={collapseAll}
+                  >
+                    Drill up to top level
+                  </button>
+                  <span className="text-xs text-muted-foreground">
+                    or use the arrows in row and column headers
+                  </span>
+                </div>
               )}
-              <ChartDrillBar
-                categoryPath={chart.categoryPath}
-                seriesPath={chart.seriesPath}
-                categoryField={chart.categoryField}
-                seriesField={chart.seriesField}
-                onCategoryUp={(level) => patchChart({ drillRows: chart.categoryPath.slice(0, level) })}
-                onSeriesUp={(level) => patchChart({ drillCols: chart.seriesPath.slice(0, level) })}
-                hint="Click an axis label to drill down · click a legend entry to expand or hide a series"
-              />
-              <PivotChart
-                data={chart.data}
-                series={chart.series}
-                allSeries={chart.allSeries}
-                hiddenSeries={config.chart.hiddenSeries ?? []}
-                lineSeries={config.chart.lineSeries ?? []}
-                type={config.chart.type}
-                accent={config.theme.accent}
+              <p className="px-1 py-2 text-xs text-muted-foreground">
+                {derivedRows.length} {strings.records}
+                {result.meta.source === "backend" && " · aggregated by your analytics service"}
+                {allowDrillThrough &&
+                  !config.editing &&
+                  " · click a number to see the records behind it"}
+                {config.editing && !readOnly && " · double-click a number to edit it"}
+              </p>
+
+              {engineError && (
+                <p role="alert" className="px-1 pb-2 text-xs text-destructive">
+                  {engineError}
+                </p>
+              )}
+
+              <PivotGrid
+                result={displayResult}
+                layout={config.layout}
+                locale={config.locale}
+                theme={config.theme}
+                title={title}
+                showFieldCaptions={config.showFieldCaptions}
+                showSpreadsheetHeaders={config.showSpreadsheetHeaders}
+                repeatMemberLabels={config.repeatMemberLabels}
+                showSortingControls={config.showSortingControls}
+                showRowTotals={config.showRowTotals}
+                sort={config.sort}
+                sorts={config.layout === "flat" ? config.sorts : undefined}
+                multiSort={config.layout === "flat"}
+                onSortChange={(sort) => update({ sort, sorts: sort ? [sort] : [] })}
+                onSortsChange={(sorts) => update({ sorts, sort: sorts[0] })}
+                onToggleCollapse={toggleCollapse}
+                onToggleColumnCollapse={toggleColumnCollapse}
+                conditionalFormats={config.conditionalFormats}
+                allowDrillThrough={allowDrillThrough}
+                editable={config.editing && !readOnly}
+                onCellEdit={handleCellEdit}
+                onDrill={(rowKey, colKey, label) => void openDrill(rowKey, colKey, label)}
+                onCellContextMenu={openContextMenu}
+
+                onSelectionChange={setSelection}
                 emptyLabel={strings.noData}
-                onCategoryClick={handleCategoryClick}
-                onSeriesClick={handleSeriesClick}
-                onPointClick={
-                  allowDrillThrough
-                    ? (point, series) => {
-                        const keys = chartDrillKeys(chart, String(point.name), series);
-                        void openDrill(keys.rowKey, keys.colKey, keys.label);
-                      }
-                    : undefined
-                }
               />
+
+              {selection && selection.count > 0 && (
+                <p data-testid="selection-bar" className="mt-2 px-1 text-xs text-muted-foreground">
+                  {selection.count} cells · Sum{" "}
+                  {formatNumber(selection.sum, result.measure.format, config.locale)} · Average{" "}
+                  {formatNumber(selection.average, result.measure.format, config.locale)} · Min{" "}
+                  {formatNumber(selection.min, result.measure.format, config.locale)} · Max{" "}
+                  {formatNumber(selection.max, result.measure.format, config.locale)}
+                </p>
+              )}
             </div>
-          )}
+
+            {config.chart.visible && (
+              <div
+                data-testid="pivot-chart-pane"
+                className={
+                  config.chart.position === "right"
+                    ? "min-w-0 border-t border-border pt-3 xl:w-[45%] xl:border-l xl:border-t-0 xl:pl-3 xl:pt-0"
+                    : "mt-3 border-t border-border pt-3"
+                }
+              >
+                {config.showChartFilters && (
+                  <ChartFilterBar
+                    strings={strings}
+                    config={config}
+                    rows={baseRows}
+                    readOnly={readOnly}
+                    onChange={update}
+                  />
+                )}
+                <ChartDrillBar
+                  categoryPath={chart.categoryPath}
+                  seriesPath={chart.seriesPath}
+                  categoryField={chart.categoryField}
+                  seriesField={chart.seriesField}
+                  onCategoryUp={(level) =>
+                    patchChart({ drillRows: chart.categoryPath.slice(0, level) })
+                  }
+                  onSeriesUp={(level) =>
+                    patchChart({ drillCols: chart.seriesPath.slice(0, level) })
+                  }
+                  hint="Click an axis label to drill down · click a legend entry to expand or hide a series"
+                />
+                <PivotChart
+                  data={chart.data}
+                  series={chart.series}
+                  allSeries={chart.allSeries}
+                  hiddenSeries={config.chart.hiddenSeries ?? []}
+                  lineSeries={config.chart.lineSeries ?? []}
+                  type={config.chart.type}
+                  accent={config.theme.accent}
+                  emptyLabel={strings.noData}
+                  onCategoryClick={handleCategoryClick}
+                  onSeriesClick={handleSeriesClick}
+                  onPointClick={
+                    allowDrillThrough
+                      ? (point, series) => {
+                          const keys = chartDrillKeys(chart, String(point.name), series);
+                          void openDrill(keys.rowKey, keys.colKey, keys.label);
+                        }
+                      : undefined
+                  }
+                />
+              </div>
+            )}
           </div>
         </div>
-
       </div>
 
       <p role="status" aria-live="polite" className="min-h-4 text-xs text-muted-foreground">
@@ -729,13 +741,10 @@ export function PivotStudio({
             ? undefined
             : (fields) => update({ drillThrough: { ...(config.drillThrough ?? {}), fields } })
         }
-        onSortChange={(sort) =>
-          update({ drillThrough: { ...(config.drillThrough ?? {}), sort } })
-        }
+        onSortChange={(sort) => update({ drillThrough: { ...(config.drillThrough ?? {}), sort } })}
         onStatus={setStatus}
         onClose={() => setDrill(null)}
       />
-
     </section>
   );
 }

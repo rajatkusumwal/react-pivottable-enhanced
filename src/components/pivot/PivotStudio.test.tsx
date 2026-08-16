@@ -146,9 +146,7 @@ describe("PivotStudio grid", () => {
     await user.selectOptions(screen.getByLabelText("Filter type"), "condition");
     await user.selectOptions(screen.getByLabelText("Filter field"), "orderDate");
     const operator = screen.getByLabelText("Operator") as HTMLSelectElement;
-    expect(
-      Array.from(operator.options).map((o) => o.textContent),
-    ).toContain("is on or after");
+    expect(Array.from(operator.options).map((o) => o.textContent)).toContain("is on or after");
     const valueInput = screen.getByLabelText("Filter value") as HTMLInputElement;
     expect(valueInput.type).toBe("date");
     await user.selectOptions(operator, "gte");
@@ -178,10 +176,7 @@ describe("PivotStudio grid", () => {
     await user.type(screen.getByLabelText("Calculated field name"), "share");
     await user.clear(screen.getByLabelText("Formula"));
     // userEvent treats "[" as a key descriptor, so it is escaped as "[[".
-    await user.type(
-      screen.getByLabelText("Formula"),
-      "[[revenue] / grandTotal([[revenue]) * 100",
-    );
+    await user.type(screen.getByLabelText("Formula"), "[[revenue] / grandTotal([[revenue]) * 100");
     await user.click(screen.getByRole("button", { name: /^add$/i }));
     await user.click(screen.getByRole("button", { name: "Remove Revenue" }));
     await user.selectOptions(await screen.findByLabelText("Place share"), "values");
@@ -212,9 +207,7 @@ describe("PivotStudio grid", () => {
     });
     const cell = await screen.findByTestId("cell-0-0");
     // North / Bikes is 100 against a goal of 150.
-    await waitFor(() =>
-      expect(within(cell).getByLabelText("Below target")).toBeInTheDocument(),
-    );
+    await waitFor(() => expect(within(cell).getByLabelText("Below target")).toBeInTheDocument());
     expect(screen.getAllByLabelText(/KPI: Revenue KPI/).length).toBeGreaterThan(0);
   });
 
@@ -261,7 +254,12 @@ describe("PivotStudio grid", () => {
     const onConfigChange = vi.fn();
     const user = userEvent.setup();
     render(
-      <PivotStudio data={data} fields={fields} config={baseConfig} onConfigChange={onConfigChange} />,
+      <PivotStudio
+        data={data}
+        fields={fields}
+        config={baseConfig}
+        onConfigChange={onConfigChange}
+      />,
     );
     await user.click(screen.getByRole("button", { name: /chart/i }));
     expect(onConfigChange).toHaveBeenCalled();
@@ -274,11 +272,27 @@ describe("PivotStudio grid", () => {
       measure: { field: "revenue", caption: "Revenue", aggregator: "sum" as const },
       measures: [{ field: "revenue", caption: "Revenue", aggregator: "sum" as const }],
       rowHeaders: [
-        { key: ["Remote"], label: "Remote", depth: 0, kind: "member" as const, expandable: false, expanded: true, span: 1 },
+        {
+          key: ["Remote"],
+          label: "Remote",
+          depth: 0,
+          kind: "member" as const,
+          expandable: false,
+          expanded: true,
+          span: 1,
+        },
       ],
       colHeaderRows: [],
       colLeaves: [
-        { key: [], label: "Revenue", depth: 0, kind: "member" as const, expandable: false, expanded: true, span: 1 },
+        {
+          key: [],
+          label: "Revenue",
+          depth: 0,
+          kind: "member" as const,
+          expandable: false,
+          expanded: true,
+          span: 1,
+        },
       ],
       measureIndexByLeaf: [0],
       cells: [[42]],
@@ -291,7 +305,6 @@ describe("PivotStudio grid", () => {
       kpiRowTotals: [[null]],
       sourceCount: 1,
       meta: { source: "backend" as const },
-
     }));
     setup({ engine: { id: "test", query, drillThrough: async () => [] } });
     const grid = await screen.findByTestId("pivot-grid");
@@ -328,7 +341,6 @@ describe("Flexmonster-style field list", () => {
     );
     expect(within(dialog).getByTestId("field-chip-chip:rows:region")).toBeInTheDocument();
   });
-
 
   it("shows the in-grid field bar and removes a field from it", async () => {
     const user = userEvent.setup();
@@ -461,8 +473,22 @@ describe("PivotStudio filter surfaces", () => {
 
 describe("PivotStudio field list and measures", () => {
   const hierFields = [
-    { name: "region", caption: "Region", type: "string" as const, folder: "Geography", hierarchy: "Geography", level: 1 },
-    { name: "city", caption: "City", type: "string" as const, folder: "Geography", hierarchy: "Geography", level: 2 },
+    {
+      name: "region",
+      caption: "Region",
+      type: "string" as const,
+      folder: "Geography",
+      hierarchy: "Geography",
+      level: 1,
+    },
+    {
+      name: "city",
+      caption: "City",
+      type: "string" as const,
+      folder: "Geography",
+      hierarchy: "Geography",
+      level: 2,
+    },
     { name: "category", caption: "Category", type: "string" as const, folder: "Product" },
     { name: "revenue", caption: "Revenue", type: "number" as const, folder: "Measures" },
   ];
@@ -606,14 +632,18 @@ describe("aggregation menu restrictions and the Σ icon", () => {
       />,
     );
     const menu = await screen.findByLabelText("Aggregation for revenue");
-    const options = within(menu).getAllByRole("option").map((o) => o.textContent);
+    const options = within(menu)
+      .getAllByRole("option")
+      .map((o) => o.textContent);
     expect(options).toEqual(["Average", "Minimum", "Maximum"]);
   });
 
   it("offers the parent-total, difference and running-total display modes", async () => {
     setup();
     const menu = await screen.findByLabelText("Show revenue as");
-    const options = within(menu).getAllByRole("option").map((o) => o.getAttribute("value"));
+    const options = within(menu)
+      .getAllByRole("option")
+      .map((o) => o.getAttribute("value"));
     expect(options).toEqual(
       expect.arrayContaining([
         "percentOfParentRowTotal",
