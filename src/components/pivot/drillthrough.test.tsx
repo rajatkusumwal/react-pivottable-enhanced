@@ -100,8 +100,9 @@ describe("engine contract", () => {
       query: query(c),
       fields: [],
     });
-    expect(out.length).toBe(1);
+    expect(out.length).toBe(2);
     expect(out[0]).toEqual({});
+    expect(out[1]).toEqual({});
   });
 
   it("includes every source field when fields are omitted", () => {
