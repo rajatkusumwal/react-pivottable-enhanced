@@ -759,6 +759,20 @@ bun run lint     # eslint + prettier rules
 bun run format   # rewrite files with prettier
 ```
 
+### Running a stable local demo (no HMR reloads)
+
+This is a server-rendered app, so `vite preview` cannot serve the build (it
+looks for a static `dist/server/server` entry and fails). Build a Node server
+bundle instead:
+
+```bash
+bun run build:local    # NITRO_PRESET=node-server vite build
+bun run preview:local  # node dist/server/index.mjs -> http://localhost:3000
+```
+
+Set `PORT=4000` before `preview:local` to change the port. The default
+`bun run build` still targets Cloudflare for deployment.
+
 Conventions (also documented for AI coding agents in `AGENTS.md`, `CLAUDE.md`
 and `GEMINI.md`): tests live next to the code, cover a normal case, an edge case
 and a worst case; pure logic stays out of components; every engine returns the
