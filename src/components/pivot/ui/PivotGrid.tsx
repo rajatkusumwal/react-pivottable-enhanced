@@ -220,11 +220,37 @@ export function PivotGrid({
     window.addEventListener("mouseup", onUp);
   };
 
-  const toggleSort = (by: PivotSort["by"]) => {
+  const activeSorts: PivotSort[] = sorts?.length ? sorts : sort ? [sort] : [];
+  const sortIndexOf = (by: PivotSort["by"]) => activeSorts.findIndex((s) => s.by === by);
+  const sortFor = (by: PivotSort["by"]) => activeSorts.find((s) => s.by === by);
+
+  const toggleSort = (by: PivotSort["by"], additive = false) => {
+    // Shift-click in the flat layout appends the column to the sort order.
+    if (additive && multiSort && onSortsChange) {
+      const index = sortIndexOf(by);
+      if (index === -1) {
+        onSortsChange([...activeSorts, { by, direction: "asc" }]);
+        return;
+      }
+      const current = activeSorts[index]!;
+      const next = [...activeSorts];
+      if (current.direction === "asc") next[index] = { by, direction: "desc" };
+      else next.splice(index, 1);
+      onSortsChange(next);
+      return;
+    }
     if (!onSortChange) return;
-    if (sort?.by === by) {
-      onSortChange(sort.direction === "asc" ? { by, direction: "desc" } : undefined);
+    const current = sortFor(by);
+    if (current && activeSorts.length === 1) {
+      onSortChange(current.direction === "asc" ? { by, direction: "desc" } : undefined);
     } else onSortChange({ by, direction: "asc" });
+  };
+
+  const sortGlyph = (by: PivotSort["by"]) => {
+    const index = sortIndexOf(by);
+    if (index === -1) return "↕";
+    const arrow = activeSorts[index]!.direction === "asc" ? "▲" : "▼";
+    return activeSorts.length > 1 ? `${arrow}${index + 1}` : arrow;
   };
 
   const formatCell = (value: number | null) =>
