@@ -20,7 +20,7 @@ export interface DrillThroughDialogProps {
   /** Columns of the configured slice; empty = every field in the records. */
   fields?: string[];
   /** Persists a change made with the drill-through field list. */
-  onFieldsChange?: (fields: string[]) => void;
+  onFieldsChange?: ((fields: string[]) => void) | undefined;
   /** Row cap applied when the records were fetched. */
   maxRows?: number;
   /** Total number of matching records before the cap (when the engine reports it). */

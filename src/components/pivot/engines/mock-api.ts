@@ -91,7 +91,8 @@ export function createMockPivotApi(options: MockPivotApiOptions): MockPivotApi {
     if (path.endsWith("/drillthrough")) {
       const request = body as DrillThroughQuery;
       const source = applyFilters(rowsFor(request.query?.datasetId), request.query?.filters ?? []);
-      const all = localDrillThrough(source, { ...request, limit: undefined });
+      const { limit: _cap, ...uncapped } = request;
+      const all = localDrillThrough(source, uncapped);
       const rows = localDrillThrough(source, request);
       return json({ rows, total: all.length });
     }
