@@ -138,7 +138,12 @@ const rawCategories: RawCategory[] = [
       { feature: "Keyboard navigation shortcuts", flexmonster: y(), reactPivottable: n() },
       { feature: "Highlight rows and columns", flexmonster: y(), reactPivottable: n() },
       { feature: "Auto-calculation bar for selection", flexmonster: y(), reactPivottable: n() },
-      { feature: "Editing cells inline", flexmonster: y(), reactPivottable: n() },
+      {
+        feature: "Editing cells inline",
+        flexmonster: y(),
+        reactPivottable: n(),
+        studio: y("Toggle \u201cEdit cells\u201d, double-click a number"),
+      },
       { feature: "Grid title", flexmonster: y(), reactPivottable: n() },
       { feature: "Show/hide spreadsheet headers", flexmonster: y(), reactPivottable: n() },
       { feature: "Show/hide field captions", flexmonster: y(), reactPivottable: n() },
