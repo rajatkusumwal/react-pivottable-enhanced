@@ -131,6 +131,63 @@ describe("sorting and filtering over the API", () => {
     expect(result.grandTotal).toBe(450);
   });
 
+  it("applies date conditional filters server-side", async () => {
+    const dated: PivotRow[] = [
+      { region: "North", category: "Bikes", orderDate: "2024-01-05", revenue: 100 },
+      { region: "North", category: "Bikes", orderDate: "2024-02-10", revenue: 200 },
+      { region: "South", category: "Bikes", orderDate: "2024-03-20", revenue: 300 },
+    ];
+    const dateApi = createMockPivotApi({ rows: dated, datasetId: "dates" });
+    const dateEngine = createBackendEngine({
+      baseUrl: "https://api.test",
+      fetchImpl: dateApi.fetch,
+      datasetId: "dates",
+    });
+    const dateClient = createBackendClient({
+      baseUrl: "https://api.test",
+      fetchImpl: dateApi.fetch,
+      datasetId: "dates",
+    });
+    const filters = [
+      {
+        kind: "condition" as const,
+        field: "orderDate",
+        operator: "gte" as const,
+        value: "2024-02-01",
+        valueType: "date" as const,
+      },
+    ];
+    const result = await dateEngine.query(query({ rows: ["region"], filters }), []);
+    expect(result.grandTotal).toBe(500);
+    expect((dateApi.requests.at(-1)?.body as PivotQuery).filters).toEqual(filters);
+
+    const range = await dateEngine.query(
+      query({
+        rows: ["region"],
+        filters: [
+          {
+            kind: "condition",
+            field: "orderDate",
+            operator: "between",
+            value: "2024-01-01",
+            value2: "2024-02-28",
+            valueType: "date",
+          },
+        ],
+      }),
+      [],
+    );
+    expect(range.grandTotal).toBe(300);
+
+    const drill = await dateClient.drillThrough({
+      query: query({ rows: ["region"], filters }),
+      rowPath: ["North"],
+      colPath: [],
+    });
+    expect(drill.rows).toHaveLength(1);
+    expect(drill.rows[0]?.["orderDate"]).toBe("2024-02-10");
+  });
+
   it("pages results with limit and offset", async () => {
     const first = await ask({ layout: "flat", rows: ["country"], limit: 2, offset: 0 });
     const second = await ask({ layout: "flat", rows: ["country"], limit: 2, offset: 3 });
