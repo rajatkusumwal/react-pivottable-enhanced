@@ -229,6 +229,21 @@ describe("Flexmonster-style field list", () => {
     expect(screen.queryByTestId("field-list-dialog")).not.toBeInTheDocument();
   });
 
+  it("turns drag and drop off from the toolbar", async () => {
+    const user = userEvent.setup();
+    setup({ fieldsUi: "dialog" });
+    await user.click(screen.getAllByRole("button", { name: /^fields$/i })[0]!);
+    const dialog = await screen.findByTestId("field-list-dialog");
+    expect(within(dialog).getAllByRole("button", { name: /^Drag / }).length).toBeGreaterThan(0);
+
+    await user.click(screen.getByRole("checkbox", { name: /drag & drop/i }));
+    await waitFor(() =>
+      expect(within(dialog).queryAllByRole("button", { name: /^Drag / })).toHaveLength(0),
+    );
+    expect(within(dialog).getByTestId("field-chip-chip:rows:region")).toBeInTheDocument();
+  });
+
+
   it("shows the in-grid field bar and removes a field from it", async () => {
     const user = userEvent.setup();
     setup({ fieldsUi: "dialog" });
