@@ -144,10 +144,12 @@ All endpoints are JSON over POST.
   "values": [
     { "field": "revenue", "aggregator": "sum", "caption": "Revenue", "type": "number" },
     { "field": "revenue", "aggregator": "average", "caption": "Avg revenue", "type": "number" },
+    { "field": "revenue", "aggregator": "sum", "displayMode": "percentOfParentRowTotal" },
     { "field": "customerName", "aggregator": "distinctCount", "type": "string" },
     { "field": "orderDate", "aggregator": "min", "type": "date" },
     { "field": "orderTime", "aggregator": "max", "type": "time" }
   ],
+
   "filters": [
     { "kind": "values", "field": "region", "mode": "include", "members": ["North"] },
     { "kind": "condition", "field": "revenue", "operator": "gt", "value": 1000 },
