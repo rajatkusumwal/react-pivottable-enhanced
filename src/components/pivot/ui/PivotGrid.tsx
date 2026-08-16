@@ -45,6 +45,12 @@ export interface PivotGridProps {
   onSortChange?: (sort: PivotSort | undefined) => void;
   onSortsChange?: (sorts: PivotSort[]) => void;
   onToggleCollapse?: (key: string[]) => void;
+  /** Drill down / up on a column member hierarchy. */
+  onToggleColumnCollapse?: (key: string[]) => void;
+  /** Expands every level on both axes. */
+  onExpandAll?: () => void;
+  /** Drills up to the top level on both axes. */
+  onCollapseAll?: () => void;
   conditionalFormats?: ConditionalFormatRule[];
   allowDrillThrough?: boolean;
   onDrill?: (rowKey: string[], colKey: string[], label: string) => void;
@@ -93,6 +99,9 @@ export function PivotGrid({
   onSortChange,
   onSortsChange,
   onToggleCollapse,
+  onToggleColumnCollapse,
+  onExpandAll,
+  onCollapseAll,
   conditionalFormats = [],
   allowDrillThrough = true,
   onDrill,
@@ -412,7 +421,26 @@ export function PivotGrid({
                   </th>
                 )}
                 {level.map((node, i) => (
-                  <th key={`${node.key.join("/")}-${i}`} colSpan={node.span} scope="col">
+                  <th
+                    key={`${node.key.join("/")}-${i}`}
+                    colSpan={node.span}
+                    rowSpan={node.rowSpan ?? 1}
+                    scope="col"
+                  >
+                    {node.expandable && onToggleColumnCollapse ? (
+                      <button
+                        type="button"
+                        className="mr-1 inline-flex align-middle text-muted-foreground hover:text-foreground"
+                        aria-label={`${node.expanded ? "Collapse" : "Expand"} ${node.label}`}
+                        onClick={() => onToggleColumnCollapse(node.key)}
+                      >
+                        {node.expanded ? (
+                          <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
+                        ) : (
+                          <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
+                        )}
+                      </button>
+                    ) : null}
                     {node.label}
                   </th>
                 ))}
