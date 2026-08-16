@@ -33,6 +33,7 @@ import { PivotGrid } from "./ui/PivotGrid";
 import type { SelectionStats } from "./ui/PivotGrid";
 import { DataSourceBar, suggestConfig } from "./ui/DataSourceBar";
 import type { UploadedDataset } from "./ui/DataSourceBar";
+import { loadSessionDataset, saveSessionDataset } from "./session-dataset";
 import { formatNumber } from "./format";
 
 export interface PivotStudioProps {
@@ -100,6 +101,11 @@ export function PivotStudio({
 
   const [selection, setSelection] = useState<SelectionStats | null>(null);
   const [uploaded, setUploaded] = useState<UploadedDataset | null>(null);
+  // Restore the file the user imported in this tab after a reload (SSR-safe: runs after hydration).
+  useEffect(() => {
+    const cached = loadSessionDataset();
+    if (cached) setUploaded(cached);
+  }, []);
   /** Records after inline edits; null while the source data is untouched. */
   const [editedRows, setEditedRows] = useState<PivotRow[] | null>(null);
   const [result, setResult] = useState<PivotResult>(() => emptyResult(measureOf(config.values)));
@@ -495,10 +501,12 @@ export function PivotStudio({
           {...(onUploadToBackend ? { onUploadToBackend } : {})}
           onReset={() => {
             setUploaded(null);
+            saveSessionDataset(null);
             update(createDefaultConfig(initialConfig));
           }}
           onLoad={(dataset) => {
             setUploaded(dataset);
+            saveSessionDataset(dataset);
             update({ ...createDefaultConfig(), ...suggestConfig(dataset.fields), locale: config.locale });
             setStatus(`Loaded ${dataset.name}`);
           }}
