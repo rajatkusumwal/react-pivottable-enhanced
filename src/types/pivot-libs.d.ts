@@ -42,12 +42,13 @@ declare module "orb/src/js/orb.pgrid.js" {
     fields: { name: string; caption?: string }[];
     dimensionsByDepth: Record<number, OrbDimension[]>;
   }
-  export class pgrid {
-    constructor(config: Record<string, unknown>);
+  export interface OrbPGrid {
     rows: OrbAxe;
     columns: OrbAxe;
     filteredDataSource: Record<string, unknown>[];
     getData(datafield: string, rowdim: OrbDimension, coldim: OrbDimension): number | null;
     getFieldValues(field: string): (string | number)[];
   }
+  const pgrid: new (config: Record<string, unknown>) => OrbPGrid;
+  export default pgrid;
 }

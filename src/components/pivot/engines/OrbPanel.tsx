@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { pgrid } from "orb/src/js/orb.pgrid.js";
+import pgrid from "orb/src/js/orb.pgrid.js";
 import type { OrbDimension } from "orb/src/js/orb.pgrid.js";
 import { aggregate } from "../aggregators";
 import { formatNumber } from "../format";
