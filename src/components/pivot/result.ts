@@ -29,6 +29,8 @@ export interface HeaderNode {
   expanded: boolean;
   /** Number of leaf columns underneath (column headers only). */
   span: number;
+  /** Vertical span for collapsed column members (column headers only). */
+  rowSpan?: number;
 }
 
 export interface PivotMeasure {
