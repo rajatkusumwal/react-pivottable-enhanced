@@ -233,6 +233,7 @@ describe("drill-through dialog", () => {
     const header = within(screen.getByTestId("drill-through-table")).getAllByRole("row")[0]!;
     expect(header.querySelectorAll("th")).toHaveLength(0);
   });
+  it("searches inside the drill-through field list", () => {
     open({ onFieldsChange: vi.fn() });
     fireEvent.click(screen.getByRole("button", { name: "Columns" }));
     fireEvent.change(screen.getByLabelText("Search drill-through fields"), {
