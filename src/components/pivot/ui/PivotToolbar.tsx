@@ -111,7 +111,7 @@ export function PivotToolbar({
             if (e.target.value) onExport(e.target.value as ExportFormat);
             e.target.value = "";
           }}
-          className="
+          className={select}
         >
           <option value="">{strings.export}…</option>
           <option value="excel">Excel (.xls)</option>
