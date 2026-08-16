@@ -1,4 +1,12 @@
-import { BarChart3, Download, Printer, Table2, Copy, RotateCcw } from "lucide-react";
+import {
+  BarChart3,
+  Copy,
+  Download,
+  Printer,
+  RotateCcw,
+  SlidersHorizontal,
+  Table2,
+} from "lucide-react";
 import type { ExportFormat } from "../export";
 import type { PivotConfig } from "../types";
 import { locales } from "../locales";
@@ -14,10 +22,14 @@ export interface PivotToolbarProps {
   onPrint: () => void;
   onCopy: () => void;
   onReset: () => void;
+  /** Opens the Flexmonster-style field list dialog. */
+  onOpenFields?: (() => void) | undefined;
 }
 
 const btn =
-  "inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-1.5 text-sm text-foreground hover:bg-secondary disabled:opacity-50";
+  "inline-flex items-center gap-1.5 rounded border border-border bg-card px-2.5 py-1 text-xs text-foreground hover:bg-accent disabled:opacity-50";
+const select =
+  "rounded border border-border bg-card px-2 py-1 text-xs disabled:opacity-50";
 
 export function PivotToolbar({
   strings,
@@ -29,36 +41,45 @@ export function PivotToolbar({
   onPrint,
   onCopy,
   onReset,
+  onOpenFields,
 }: PivotToolbarProps) {
   return (
-    <div className="flex flex-wrap items-center gap-2 rounded-xl border border-border bg-surface p-2">
-      <div className="inline-flex overflow-hidden rounded-lg border border-border">
+    <div className="flex flex-wrap items-center gap-1.5 rounded-md border border-border bg-surface px-2 py-1.5">
+      {onOpenFields && (
+        <button type="button" className={btn} onClick={onOpenFields}>
+          <SlidersHorizontal className="h-3.5 w-3.5" aria-hidden="true" />
+          {strings.fields}
+        </button>
+      )}
+      <span className="mx-1 h-5 w-px bg-border" aria-hidden="true" />
+
+      <div className="inline-flex overflow-hidden rounded border border-border">
         <button
           type="button"
           aria-pressed={!config.chart.visible}
           onClick={() => onChange({ chart: { ...config.chart, visible: false } })}
-          className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-sm ${
+          className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs ${
             !config.chart.visible ? "bg-primary text-primary-foreground" : "bg-card text-foreground"
           }`}
         >
-          <Table2 className="h-4 w-4" aria-hidden="true" />
+          <Table2 className="h-3.5 w-3.5" aria-hidden="true" />
           {strings.grid}
         </button>
         <button
           type="button"
           aria-pressed={config.chart.visible}
           onClick={() => onChange({ chart: { ...config.chart, visible: true } })}
-          className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-sm ${
+          className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs ${
             config.chart.visible ? "bg-primary text-primary-foreground" : "bg-card text-foreground"
           }`}
         >
-          <BarChart3 className="h-4 w-4" aria-hidden="true" />
+          <BarChart3 className="h-3.5 w-3.5" aria-hidden="true" />
           {strings.chart}
         </button>
       </div>
 
       {config.chart.visible && (
-        <label className="flex items-center gap-1.5 text-sm text-muted-foreground">
+        <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <span className="sr-only">Chart type</span>
           <select
             aria-label="Chart type"
@@ -66,7 +87,7 @@ export function PivotToolbar({
             onChange={(e) =>
               onChange({ chart: { ...config.chart, type: e.target.value as PivotConfig["chart"]["type"] } })
             }
-            className="rounded-lg border border-border bg-card px-2 py-1.5 text-sm"
+            className={select}
           >
             <option value="bar">Bars</option>
             <option value="stackedBar">Stacked bars</option>
@@ -79,8 +100,8 @@ export function PivotToolbar({
 
       <span className="mx-1 h-5 w-px bg-border" aria-hidden="true" />
 
-      <label className="flex items-center gap-1.5 text-sm text-muted-foreground">
-        <Download className="h-4 w-4" aria-hidden="true" />
+      <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+        <Download className="h-3.5 w-3.5" aria-hidden="true" />
         <span className="sr-only">{strings.export}</span>
         <select
           aria-label={strings.export}
@@ -90,7 +111,7 @@ export function PivotToolbar({
             if (e.target.value) onExport(e.target.value as ExportFormat);
             e.target.value = "";
           }}
-          className="rounded-lg border border-border bg-card px-2 py-1.5 text-sm disabled:opacity-50"
+          className="
         >
           <option value="">{strings.export}…</option>
           <option value="excel">Excel (.xls)</option>
@@ -102,24 +123,24 @@ export function PivotToolbar({
       </label>
 
       <button type="button" className={btn} onClick={onPrint} disabled={!canExport}>
-        <Printer className="h-4 w-4" aria-hidden="true" />
+        <Printer className="h-3.5 w-3.5" aria-hidden="true" />
         {strings.print} / PDF
       </button>
 
       <button type="button" className={btn} onClick={onCopy} disabled={!canExport}>
-        <Copy className="h-4 w-4" aria-hidden="true" />
+        <Copy className="h-3.5 w-3.5" aria-hidden="true" />
         Copy
       </button>
 
       <span className="mx-1 h-5 w-px bg-border" aria-hidden="true" />
 
-      <label className="flex items-center gap-1.5 text-sm text-muted-foreground">
+      <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
         <span className="sr-only">Language</span>
         <select
           aria-label="Language"
           value={config.locale}
           onChange={(e) => onChange({ locale: e.target.value })}
-          className="rounded-lg border border-border bg-card px-2 py-1.5 text-sm"
+          className={select}
         >
           {Object.entries(locales).map(([code, l]) => (
             <option key={code} value={code}>
@@ -130,7 +151,7 @@ export function PivotToolbar({
       </label>
 
       <button type="button" className={btn} onClick={onReset} disabled={readOnly}>
-        <RotateCcw className="h-4 w-4" aria-hidden="true" />
+        <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
         {strings.clear}
       </button>
     </div>
