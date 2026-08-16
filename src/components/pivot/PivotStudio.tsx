@@ -6,7 +6,7 @@ import { applyFilters } from "./filters";
 import { applyCellEdit } from "./editing";
 import { getLocale } from "./locales";
 import { secureRows, visibleFields, can } from "./security";
-import { buildChartData } from "./analysis";
+import { buildChartData, chartDrillKeys } from "./analysis";
 import { exportMatrix, matrixFromResult, printMatrix, copyMatrix } from "./export";
 import type { ExportDecoration, ExportFormat } from "./export";
 import { buildReportUrl, readReportFromUrl } from "./report-link";
@@ -88,7 +88,9 @@ export function PivotStudio({
 }: PivotStudioProps) {
   const [internal, setInternal] = useState<PivotConfig>(() => createDefaultConfig(initialConfig));
   const config = controlled ?? internal;
-  const [drill, setDrill] = useState<{ title: string; rows: PivotRow[] } | null>(null);
+  const [drill, setDrill] = useState<{ title: string; rows: PivotRow[]; total: number } | null>(
+    null,
+  );
   const [status, setStatus] = useState("");
   const [fieldsOpen, setFieldsOpen] = useState(false);
   const [formatOpen, setFormatOpen] = useState(false);
@@ -322,8 +324,20 @@ export function PivotStudio({
   }, []);
 
   const openDrill = async (rowKey: string[], colKey: string[], label: string) => {
-    const rows = await adapter.drillThrough({ rowKey, colKey, query }, derivedRows);
-    setDrill({ title: label, rows });
+    const slice = config.drillThrough ?? {};
+    const all = await adapter.drillThrough({ rowKey, colKey, query }, derivedRows);
+    const rows = await adapter.drillThrough(
+      {
+        rowKey,
+        colKey,
+        query,
+        ...(slice.maxRows ? { limit: slice.maxRows } : {}),
+        ...(slice.fields?.length ? { fields: slice.fields } : {}),
+        ...(slice.sort ? { sort: slice.sort } : {}),
+      },
+      derivedRows,
+    );
+    setDrill({ title: label, rows, total: all.length });
   };
 
 
@@ -636,7 +650,10 @@ export function PivotStudio({
                 onSeriesClick={handleSeriesClick}
                 onPointClick={
                   allowDrillThrough
-                    ? (point) => void openDrill([String(point.name)], [], String(point.name))
+                    ? (point, series) => {
+                        const keys = chartDrillKeys(chart, String(point.name), series);
+                        void openDrill(keys.rowKey, keys.colKey, keys.label);
+                      }
                     : undefined
                 }
               />
@@ -683,9 +700,21 @@ export function PivotStudio({
         open={drill !== null}
         title={drill?.title ?? ""}
         rows={drill?.rows ?? []}
+        total={drill?.total ?? 0}
         strings={strings}
         canExport={allowExport}
         decoration={decoration}
+        fields={config.drillThrough?.fields ?? []}
+        {...(config.drillThrough?.maxRows ? { maxRows: config.drillThrough.maxRows } : {})}
+        sort={config.drillThrough?.sort}
+        onFieldsChange={
+          readOnly
+            ? undefined
+            : (fields) => update({ drillThrough: { ...(config.drillThrough ?? {}), fields } })
+        }
+        onSortChange={(sort) =>
+          update({ drillThrough: { ...(config.drillThrough ?? {}), sort } })
+        }
         onStatus={setStatus}
         onClose={() => setDrill(null)}
       />
