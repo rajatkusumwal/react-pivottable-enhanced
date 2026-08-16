@@ -517,6 +517,7 @@ const gridStudioOverrides: Record<string, Cell> = {
   "Drill up/down multilevel hierarchies": y("Row and column levels, plus drill all"),
   "Grand totals top or bottom (flat table)": y("Toolbar position selector"),
   "Sort multiple columns in flat table": y("Shift-click sort controls"),
+  "Enable/disable drag and drop": y("Toolbar switch (config.dragAndDrop)"),
 };
 
 function studioCell(row: RawRow, base: Cell): Cell {

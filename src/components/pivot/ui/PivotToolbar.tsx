@@ -153,6 +153,16 @@ export function PivotToolbar({
         </label>
       )}
 
+      <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+        <input
+          type="checkbox"
+          checked={config.dragAndDrop}
+          disabled={readOnly}
+          onChange={(e) => onChange({ dragAndDrop: e.target.checked })}
+        />
+        Drag &amp; drop
+      </label>
+
       <span className="mx-1 h-5 w-px bg-border" aria-hidden="true" />
 
       <label className="flex items-center gap-1.5 text-xs text-muted-foreground">

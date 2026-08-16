@@ -9,6 +9,8 @@ export interface FieldChipProps {
   /** Small suffix such as the aggregation name, Flexmonster style. */
   hint?: string | undefined;
   disabled?: boolean | undefined;
+  /** Hides the grab handle when drag & drop is switched off. */
+  dragDisabled?: boolean | undefined;
   active?: boolean | undefined;
   onRemove?: (() => void) | undefined;
   onFilter?: (() => void) | undefined;
@@ -25,6 +27,7 @@ export function FieldChip({
   label,
   hint,
   disabled,
+  dragDisabled,
   active,
   onRemove,
   onFilter,
@@ -32,7 +35,7 @@ export function FieldChip({
 }: FieldChipProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id,
-    disabled: disabled === true,
+    disabled: disabled === true || dragDisabled === true,
   });
 
   return (
@@ -45,16 +48,18 @@ export function FieldChip({
       data-testid={`field-chip-${id}`}
     >
       <div className="flex items-center gap-1">
-        <button
-          type="button"
-          className="cursor-grab touch-none text-muted-foreground disabled:cursor-not-allowed"
-          aria-label={`Drag ${label}`}
-          disabled={disabled}
-          {...attributes}
-          {...listeners}
-        >
-          <GripVertical className="h-3.5 w-3.5" aria-hidden="true" />
-        </button>
+        {!dragDisabled && (
+          <button
+            type="button"
+            className="cursor-grab touch-none text-muted-foreground disabled:cursor-not-allowed"
+            aria-label={`Drag ${label}`}
+            disabled={disabled}
+            {...attributes}
+            {...listeners}
+          >
+            <GripVertical className="h-3.5 w-3.5" aria-hidden="true" />
+          </button>
+        )}
         <span className="min-w-0 flex-1 truncate font-medium text-foreground">{label}</span>
         {hint && <span className="shrink-0 text-[10px] uppercase text-muted-foreground">{hint}</span>}
         {onFilter && (

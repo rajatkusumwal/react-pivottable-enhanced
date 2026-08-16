@@ -165,6 +165,8 @@ export interface PivotConfig {
   showSpreadsheetHeaders: boolean;
   repeatMemberLabels: boolean;
   showSortingControls: boolean;
+  /** Allow dragging fields between areas; when false only the menus work. */
+  dragAndDrop: boolean;
   locale: string;
   theme: PivotTheme;
   chart: { visible: boolean; type: ChartType };
@@ -199,6 +201,7 @@ export function createDefaultConfig(partial: Partial<PivotConfig> = {}): PivotCo
     showSpreadsheetHeaders: false,
     repeatMemberLabels: false,
     showSortingControls: true,
+    dragAndDrop: true,
     locale: "en",
     theme: defaultTheme,
     chart: { visible: false, type: "bar" },
