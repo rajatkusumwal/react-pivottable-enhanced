@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 
 const TITLE = "Pivot Table Tools Compared: Flexmonster vs Free Options";
 const DESCRIPTION =
-  "A plain-English comparison of the paid Flexmonster pivot table against the free react-pivottable engine and our free Pivot Studio demo built on top of it.";
+  "A plain-English comparison of the paid Flexmonster pivot table against the free react-pivottable engine and the inhouse-grid-monster shell built on top of it.";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -34,7 +34,7 @@ export const Route = createFileRoute("/")({
 const plainNames: Record<ProductKey, { name: string; price: string }> = {
   flexmonster: { name: "Flexmonster", price: "Paid" },
   reactPivottable: { name: "react-pivottable", price: "Free" },
-  studio: { name: "Our free demo", price: "Free" },
+  studio: { name: "inhouse-grid-monster", price: "Free" },
 };
 
 const statusMeta = {
@@ -267,7 +267,7 @@ function ComparisonPage() {
           <div className="mt-6 hidden overflow-hidden rounded-xl border border-border md:block">
             <table className="w-full border-collapse text-sm">
               <caption className="sr-only">
-                Feature support comparison between Flexmonster, react-pivottable and our free Pivot Studio demo
+                Feature support comparison between Flexmonster, react-pivottable and inhouse-grid-monster
               </caption>
               <thead>
                 <tr className="bg-surface-2">
