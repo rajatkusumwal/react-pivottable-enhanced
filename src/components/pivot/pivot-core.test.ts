@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { areaOfField, moveField, removeField, reorderField } from "./dnd";
-import { aggregate, registerAggregator } from "./aggregators";
+import { aggregate, aggregatorsForType, registerAggregator } from "./aggregators";
 import {
   applyFilters,
   describeFilter,
@@ -16,7 +16,14 @@ import { inferFields, parseCsv } from "./data-sources";
 import { formatNumber } from "./format";
 import { getLocale, locales } from "./locales";
 import { createDefaultConfig } from "./types";
-import { sampleCsv, sampleData, sampleFields, generateSalesData } from "./sample-data";
+import {
+  sampleCsv,
+  sampleData,
+  sampleFields,
+  sampleHierarchies,
+  generateSalesData,
+} from "./sample-data";
+
 import type { PivotRow } from "./types";
 
 const rows: PivotRow[] = [
