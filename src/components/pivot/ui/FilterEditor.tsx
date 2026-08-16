@@ -159,7 +159,7 @@ export function FilterEditor({
               disabled={readOnly}
               onChange={(e) => setOperator(e.target.value as ConditionOperator)}
             >
-              {operators.map((o) => (
+              {shownOperators.map((o) => (
                 <option key={o.value} value={o.value}>
                   {o.label}
                 </option>
@@ -167,6 +167,7 @@ export function FilterEditor({
             </select>
             <input
               className={small}
+              type={isDateField ? "date" : "text"}
               aria-label="Filter value"
               value={value}
               disabled={readOnly}
@@ -175,6 +176,7 @@ export function FilterEditor({
             {operator === "between" && (
               <input
                 className={`col-span-2 ${small}`}
+                type={isDateField ? "date" : "text"}
                 aria-label="Second value"
                 value={value2}
                 disabled={readOnly}
