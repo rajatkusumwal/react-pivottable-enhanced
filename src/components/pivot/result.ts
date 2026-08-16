@@ -80,6 +80,8 @@ export interface PivotQuery {
   layout: PivotLayout;
   /** Collapsed row member paths, joined with "\u0000". */
   collapsed: string[];
+  /** Collapsed column member paths, joined with "\u0000". */
+  collapsedCols?: string[];
   sort?: PivotSort | undefined;
   /** Multi-column sort for the flat layout; takes precedence over `sort`. */
   sorts?: PivotSort[] | undefined;
