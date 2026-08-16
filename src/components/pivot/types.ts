@@ -22,7 +22,13 @@ export interface FieldDef {
   hierarchy?: string;
   /** 1-based level inside `hierarchy` (Region = 1, Country = 2, …). */
   level?: number;
+  /**
+   * Restricts the aggregations offered for this field in the measure menus,
+   * e.g. `["average", "min", "max"]` for a unit-price column.
+   */
+  aggregators?: AggregatorName[];
 }
+
 
 
 export type AggregatorName =
