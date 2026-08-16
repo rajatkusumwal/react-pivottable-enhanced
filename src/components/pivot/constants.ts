@@ -33,3 +33,9 @@ export const DEFAULT_DRILL_THROUGH_ROWS = 1000;
 
 /** Rough in-browser cost of one record kept as a JS object, in bytes. */
 export const ESTIMATED_BYTES_PER_ROW = 400;
+
+/** sessionStorage key holding the dataset the user uploaded in this tab. */
+export const SESSION_DATASET_KEY = "inhouse-grid-monster:dataset";
+
+/** Largest serialised dataset we cache in sessionStorage (~8 MB of JSON). */
+export const SESSION_DATASET_MAX_CHARS = 8_000_000;
