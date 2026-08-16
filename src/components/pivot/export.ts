@@ -1,5 +1,5 @@
 /** Export & print helpers shared by every engine. */
-import type { PivotResult } from "./result";
+import type { PivotCellValue, PivotResult } from "./result";
 import { formatNumber } from "./format";
 
 /** Builds an export matrix straight from a PivotResult (no DOM needed). */
@@ -8,25 +8,35 @@ export function matrixFromResult(
   locale = "en",
   title = "Pivot table",
 ): ExportMatrix {
+  const measures = result.measures ?? [result.measure];
   const corner = result.rowFields.join(" / ") || result.measure.caption;
   const head = result.colHeaderRows.map((level, i) => [
     i === 0 ? corner : "",
     ...level.flatMap((n) => [n.label, ...Array<string>(Math.max(0, n.span - 1)).fill("")]),
     i === 0 ? "Total" : "",
   ]);
-  if (!head.length) head.push([corner, result.measure.caption, "Total"]);
+  if (!head.length) head.push([corner, ...measures.map((m) => m.caption), "Total"]);
 
-  const fmt = (v: number | null) =>
-    v === null || v === undefined ? "" : formatNumber(v, result.measure.format, locale);
+  const fmt = (v: PivotCellValue, measureIndex = 0) => {
+    if (v === null || v === undefined) return "";
+    if (typeof v === "string") return v;
+    return formatNumber(v, measures[measureIndex]?.format ?? result.measure.format, locale);
+  };
+  const measureAt = (leafIndex: number) => result.measureIndexByLeaf?.[leafIndex] ?? 0;
 
   const body = result.rowHeaders.map((header, r) => [
     `${"  ".repeat(header.depth)}${header.label}`,
-    ...(result.cells[r] ?? []).map(fmt),
+    ...(result.cells[r] ?? []).map((v, c) => fmt(v, measureAt(c))),
     fmt(result.rowTotals[r] ?? null),
   ]);
-  body.push(["Grand Total", ...result.colTotals.map(fmt), fmt(result.grandTotal)]);
+  body.push([
+    "Grand Total",
+    ...result.colTotals.map((v, c) => fmt(v, measureAt(c))),
+    fmt(result.grandTotal),
+  ]);
   return { title, head, body };
 }
+
 
 export interface ExportMatrix {
   title: string;

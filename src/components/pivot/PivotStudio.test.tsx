@@ -223,6 +223,7 @@ describe("PivotStudio grid", () => {
       rowFields: ["region"],
       colFields: [],
       measure: { field: "revenue", caption: "Revenue", aggregator: "sum" as const },
+      measures: [{ field: "revenue", caption: "Revenue", aggregator: "sum" as const }],
       rowHeaders: [
         { key: ["Remote"], label: "Remote", depth: 0, kind: "member" as const, expandable: false, expanded: true, span: 1 },
       ],
@@ -230,12 +231,16 @@ describe("PivotStudio grid", () => {
       colLeaves: [
         { key: [], label: "Revenue", depth: 0, kind: "member" as const, expandable: false, expanded: true, span: 1 },
       ],
+      measureIndexByLeaf: [0],
       cells: [[42]],
       rowTotals: [42],
+      rowTotalsByMeasure: [[42]],
       colTotals: [42],
       grandTotal: 42,
+      grandTotals: [42],
       sourceCount: 1,
       meta: { source: "backend" as const },
+
     }));
     setup({ engine: { id: "test", query, drillThrough: async () => [] } });
     const grid = await screen.findByTestId("pivot-grid");

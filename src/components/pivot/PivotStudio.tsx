@@ -160,15 +160,19 @@ export function PivotStudio({
   }, [data, uploaded]);
 
   const handleCellEdit = useCallback(
-    (rowKey: string[], colKey: string[], value: number) => {
-      const measure = measureOf(config.values);
+    (rowKey: string[], colKey: string[], value: number, measureIndex = 0) => {
+      const value_ = config.values[measureIndex] ?? config.values[0];
+      if (!value_) return setStatus("Add a measure before editing");
+      if ((value_.type ?? "number") !== "number")
+        return setStatus("Only number measures can be edited");
       const outcome = applyCellEdit(activeData, {
         rowFields: config.rows,
         colFields: config.cols,
         rowKey,
-        colKey,
-        field: measure.field,
-        aggregator: measure.aggregator,
+        // The measure caption is appended to column keys when several measures show.
+        colKey: colKey.slice(0, config.cols.length),
+        field: value_.field,
+        aggregator: value_.aggregator,
         value,
       });
       if (!outcome.changed) return setStatus(outcome.reason ?? "Cell not editable");
@@ -178,6 +182,7 @@ export function PivotStudio({
     },
     [activeData, config.values, config.rows, config.cols, onDataChange],
   );
+
 
   const chart = useMemo(() => buildChartData(derivedRows, config), [derivedRows, config]);
 

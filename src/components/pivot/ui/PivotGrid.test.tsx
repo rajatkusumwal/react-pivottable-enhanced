@@ -108,8 +108,9 @@ describe("totals", () => {
     const first = multi.cells.filter((_, i) => multi.rowHeaders[i]?.kind === "member")[0]?.[0];
     const values = multi.cells
       .filter((_, i) => multi.rowHeaders[i]?.kind === "member")
-      .map((row) => row[0] ?? -Infinity);
+      .map((row) => Number(row[0] ?? -Infinity));
     expect([...values].sort((a, b) => b - a)).toEqual(values);
+
     expect(members(multi).length).toBe(members(single).length);
     expect(first).toBeDefined();
   });

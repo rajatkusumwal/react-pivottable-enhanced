@@ -5,13 +5,17 @@
  * DuckDB service) produces this exact shape, and `PivotGrid` only knows how to
  * render it. That is what makes the aggregation side swappable.
  */
+import type { PivotCellValue } from "./aggregators";
 import type {
   AggregatorName,
+  FieldType,
   FilterDef,
   NumberFormat,
   PivotRow,
   ValueDef,
 } from "./types";
+
+export type { PivotCellValue };
 
 export type HeaderKind = "member" | "subtotal" | "grand";
 
@@ -38,27 +42,40 @@ export interface PivotMeasure {
   caption: string;
   aggregator: AggregatorName;
   format?: NumberFormat | undefined;
+  /** Type of the measured field; non-number measures render as text. */
+  type?: FieldType | undefined;
 }
 
 export interface PivotResult {
   rowFields: string[];
   colFields: string[];
+  /** First measure — kept for single-measure consumers. */
   measure: PivotMeasure;
+  /** Every measure, in report order. Leaf columns repeat per measure. */
+  measures: PivotMeasure[];
   /** Grid rows in display order (members, subtotals and the grand total row). */
   rowHeaders: HeaderNode[];
-  /** Column header rows, one array per level. */
+  /** Column header rows, one array per level (plus a measure row when > 1). */
   colHeaderRows: HeaderNode[][];
   /** Leaf columns, aligned with every `cells[i]`. */
   colLeaves: HeaderNode[];
+  /** Measure index behind each leaf column. */
+  measureIndexByLeaf: number[];
   /** cells[rowIndex][colIndex] */
-  cells: (number | null)[][];
+  cells: PivotCellValue[][];
+  /** Row grand totals for the first measure. */
   rowTotals: (number | null)[];
-  colTotals: (number | null)[];
+  /** rowTotalsByMeasure[rowIndex][measureIndex] */
+  rowTotalsByMeasure: PivotCellValue[][];
+  colTotals: PivotCellValue[];
   grandTotal: number | null;
+  /** Grand total per measure. */
+  grandTotals: PivotCellValue[];
   /** Records behind the result — used for local drill-through and windowing info. */
   sourceCount: number;
   meta: { source: "local" | "backend"; queryId?: string };
 }
+
 
 export type PivotLayout = "compact" | "classic" | "flat";
 
@@ -115,14 +132,19 @@ export function emptyResult(measure: PivotMeasure): PivotResult {
     rowFields: [],
     colFields: [],
     measure,
+    measures: [measure],
     rowHeaders: [],
     colHeaderRows: [],
     colLeaves: [],
+    measureIndexByLeaf: [],
     cells: [],
     rowTotals: [],
+    rowTotalsByMeasure: [],
     colTotals: [],
     grandTotal: null,
+    grandTotals: [],
     sourceCount: 0,
     meta: { source: "local" },
   };
 }
+

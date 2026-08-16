@@ -432,7 +432,18 @@ const sharedStudioOverrides: Record<string, Cell> = {
   "Show/hide filter controls on the grid": y(),
   // Field list
   "Dedicated Field List panel": y("Sidebar panel"),
-  "Multiple measures": p("One measure rendered at a time"),
+  "Multiple measures": y("Any number of measures side by side"),
+  "Same field with different aggregations": y("Drop a field twice, pick an aggregation each"),
+  "String field as a value": y("Count / distinct count / first / last"),
+  "Date field as a value": y("Min, max, count on dates"),
+  "Time field as a value": y("Earliest / latest clock time"),
+  "Field folders / grouping": y("folder on each field"),
+  "Hierarchy levels shown in the list": y("Indented L1…Ln levels"),
+  "Selecting sublevels of a hierarchy": y("Pick one level or add all"),
+  "Search in the Field List": y("Matches fields, folders and hierarchies"),
+  "Expand All button": y("Expand all / collapse all groups"),
+  "Custom sorting of Field List items": y("Data order, A-Z, Z-A"),
+
   "UI for adding calculated values": y("Formula box"),
   "Open/close the Field List from the API": y("showSidebar prop"),
   // Aggregations

@@ -59,8 +59,10 @@ export function drillThroughRows(rows: PivotRow[], selection: DrillSelection): P
 
 /** Grand total for one value definition, used by "% of grand total". */
 export function grandTotal(rows: PivotRow[], value: ValueDef): number | null {
-  return aggregate(value.aggregator, rows, value.field);
+  const total = aggregate(value.aggregator, rows, value.field, value.type);
+  return typeof total === "number" ? total : null;
 }
+
 
 export function applyDisplayMode(
   raw: number | null,
