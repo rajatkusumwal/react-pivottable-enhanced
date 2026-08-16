@@ -113,8 +113,8 @@ describe("show values as — differences and running totals", () => {
     expect(acrossRow.cells[uk]?.[0]).toBe(100);
     expect(acrossRow.cells[uk]?.[1]).toBe(400); // 100 + 300
 
-    // Parent rows take part in the accumulation: North (200) then UK (100).
-    expect(downColumn.cells[rowOf(["North", "UK"], downColumn)]?.[0]).toBe(300);
+    // Parent rows take part: North (200), IE (100), UK (100).
+    expect(downColumn.cells[rowOf(["North", "UK"], downColumn)]?.[0]).toBe(400);
 
   });
 
