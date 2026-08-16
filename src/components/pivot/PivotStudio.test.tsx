@@ -130,7 +130,19 @@ describe("PivotStudio grid", () => {
 
   it("offers date operators and filters by a date condition", async () => {
     const user = userEvent.setup();
-    setup();
+    setup({
+      data: [
+        { region: "North", category: "Bikes", orderDate: "2024-01-05", revenue: 100 },
+        { region: "North", category: "Clothing", orderDate: "2024-02-10", revenue: 200 },
+        { region: "South", category: "Bikes", orderDate: "2024-03-20", revenue: 300 },
+      ],
+      fields: [
+        { name: "region", caption: "Region", type: "string" as const },
+        { name: "category", caption: "Category", type: "string" as const },
+        { name: "orderDate", caption: "Order date", type: "date" as const },
+        { name: "revenue", caption: "Revenue", type: "number" as const },
+      ],
+    });
     await user.selectOptions(screen.getByLabelText("Filter type"), "condition");
     await user.selectOptions(screen.getByLabelText("Filter field"), "orderDate");
     const operator = screen.getByLabelText("Operator") as HTMLSelectElement;
