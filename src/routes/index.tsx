@@ -117,9 +117,9 @@ function ComparisonPage() {
             A pivot table lets people slice and summarise data on a screen, like in Excel.
             Below we take everything the paid tool <strong className="font-medium text-foreground">Flexmonster</strong>{" "}
             can do — {totalFeatures} things in total — and check whether the two most popular
-            free tools can do the same — plus the ready-made{" "}
-            <strong className="font-medium text-foreground">Pivot Studio</strong> setup you can
-            try on the demos page, which wraps those free tools with extra features.
+            free tools can do the same — plus the two{" "}
+            <strong className="font-medium text-foreground">Pivot Studio</strong> demo tabs on this
+            site, one built on each free engine, which add extra features on top.
           </p>
           <Link
             to="/demos"
