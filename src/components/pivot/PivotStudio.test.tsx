@@ -322,3 +322,79 @@ describe("File upload", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent(/no rows/i);
   });
 });
+
+describe("PivotStudio filter surfaces", () => {
+  it("hides the report filter area from the toolbar", async () => {
+    const user = userEvent.setup();
+    setup({
+      initialConfig: {
+        ...baseConfig,
+        filters: [{ kind: "values", field: "region", mode: "include", members: ["North"] }],
+      },
+    });
+    expect(screen.getByTestId("report-filter-area")).toBeInTheDocument();
+    await user.click(screen.getByLabelText("Filter area"));
+    expect(screen.queryByTestId("report-filter-area")).not.toBeInTheDocument();
+  });
+
+  it("shows chart filter controls and filters the chart from them", async () => {
+    const user = userEvent.setup();
+    setup({ initialConfig: { ...baseConfig, chart: { visible: true, type: "bar" } } });
+    const bar = screen.getByTestId("chart-filter-bar");
+    await user.click(within(bar).getByLabelText("Filter chart by region"));
+    await user.click(await screen.findByLabelText("North"));
+    await user.click(screen.getByRole("button", { name: /apply/i }));
+    await waitFor(() =>
+      expect(screen.getByTestId("chart-filter-summary")).toHaveTextContent("region"),
+    );
+    expect(screen.queryByText("South")).not.toBeInTheDocument();
+  });
+
+  it("hides chart filter controls from the toolbar", async () => {
+    const user = userEvent.setup();
+    setup({ initialConfig: { ...baseConfig, chart: { visible: true, type: "bar" } } });
+    await user.click(screen.getByLabelText("Chart filters"));
+    expect(screen.queryByTestId("chart-filter-bar")).not.toBeInTheDocument();
+  });
+
+  it("offers a time picker and clock wording for time fields", async () => {
+    const user = userEvent.setup();
+    const timedRows: PivotRow[] = [
+      { region: "North", orderTime: "08:15", revenue: 100 },
+      { region: "South", orderTime: "12:30", revenue: 200 },
+    ];
+    setup({
+      data: timedRows,
+      fields: [
+        { name: "region", caption: "Region", type: "string" },
+        { name: "orderTime", caption: "Order time", type: "time" },
+        { name: "revenue", caption: "Revenue", type: "number" },
+      ],
+      initialConfig: createDefaultConfig({
+        rows: ["region"],
+        values: [{ field: "revenue", aggregator: "sum" }],
+      }),
+    });
+    await user.selectOptions(screen.getByLabelText("Filter type"), "condition");
+    await user.selectOptions(screen.getByLabelText("Filter field"), "orderTime");
+    expect(screen.getByLabelText("Filter value")).toHaveAttribute("type", "time");
+    await user.selectOptions(screen.getByLabelText("Condition"), "gte");
+    expect(screen.getByRole("option", { name: "is at or after" })).toBeInTheDocument();
+    await user.type(screen.getByLabelText("Filter value"), "09:00");
+    await user.click(screen.getByRole("button", { name: /add filter/i }));
+    await waitFor(() => expect(screen.queryByText("North")).not.toBeInTheDocument());
+  });
+
+  it("adds a group condition (subquery) filter", async () => {
+    const user = userEvent.setup();
+    setup();
+    await user.selectOptions(screen.getByLabelText("Filter type"), "subquery");
+    await user.selectOptions(screen.getByLabelText("Filter field"), "region");
+    await user.selectOptions(screen.getByLabelText("Group operator"), "gt");
+    await user.clear(screen.getByLabelText("Group value"));
+    await user.type(screen.getByLabelText("Group value"), "500");
+    await user.click(screen.getByRole("button", { name: /add filter/i }));
+    await waitFor(() => expect(screen.queryByText("North")).not.toBeInTheDocument());
+    expect(screen.getByText(/region where sum of revenue/i)).toBeInTheDocument();
+  });
+});
