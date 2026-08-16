@@ -68,14 +68,10 @@ export function detectCsvOptions(text: string): CsvOptions {
   const sample = text.slice(0, 64_000);
   const [headerLine = ""] = sample.split(/\r?\n/);
   const candidates = [",", ";", "\t", "|"];
-  const delimiter =
-    candidates
-      .map((d) => ({ d, n: headerLine.split(d).length }))
-      .sort((a, b) => b.n - a.n)[0]?.n ?? 0 > 1
-      ? (candidates
-          .map((d) => ({ d, n: headerLine.split(d).length }))
-          .sort((a, b) => b.n - a.n)[0]?.d ?? ",")
-      : ",";
+  const best = candidates
+    .map((d) => ({ d, n: headerLine.split(d).length }))
+    .sort((a, b) => b.n - a.n)[0];
+  const delimiter = best && best.n > 1 ? best.d : ",";
   const body = sample.split(/\r?\n/).slice(1).join("\n");
   const commaDecimals = (body.match(/\d,\d{1,2}(?!\d)/g) ?? []).length;
   const dotDecimals = (body.match(/\d\.\d{1,2}(?!\d)/g) ?? []).length;
