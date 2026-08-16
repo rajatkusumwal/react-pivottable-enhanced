@@ -54,7 +54,7 @@ other than Tailwind tokens (`--color-border`, `--color-card`, …) and `@/lib/ut
 | Prop | Type | Purpose |
 | --- | --- | --- |
 | `data` | `PivotRow[]` | Records for the local engine |
-| `fields` | `FieldDef[]` | Captions, types, hidden flags (`inferFields()` helps) |
+| `fields` | `FieldDef[]` | Captions, types, folders, hierarchy metadata (`inferFields()` helps) |
 | `engine` | `PivotEngineAdapter` | Aggregation engine; defaults to the local one |
 | `initialConfig` / `config` + `onConfigChange` | `PivotConfig` | Uncontrolled or controlled state |
 | `permissions` | `Permissions` | `readOnly`, `allowExport`, `allowDrillThrough`, `deniedFields`, `maskedFields`, `rowFilter` |
@@ -129,7 +129,13 @@ All endpoints are JSON over POST.
 {
   "rows": ["region", "category"],
   "cols": ["quarter"],
-  "values": [{ "field": "revenue", "aggregator": "sum", "caption": "Revenue" }],
+  "values": [
+    { "field": "revenue", "aggregator": "sum", "caption": "Revenue", "type": "number" },
+    { "field": "revenue", "aggregator": "average", "caption": "Avg revenue", "type": "number" },
+    { "field": "customerName", "aggregator": "distinctCount", "type": "string" },
+    { "field": "orderDate", "aggregator": "min", "type": "date" },
+    { "field": "orderTime", "aggregator": "max", "type": "time" }
+  ],
   "filters": [
     { "kind": "values", "field": "region", "mode": "include", "members": ["North"] },
     { "kind": "condition", "field": "revenue", "operator": "gt", "value": 1000 },
@@ -180,6 +186,14 @@ Response (`PivotResult`):
   "rowFields": ["region", "category"],
   "colFields": ["quarter"],
   "measure": { "field": "revenue", "caption": "Revenue", "aggregator": "sum" },
+  "measures": [
+    { "field": "revenue", "caption": "Revenue", "aggregator": "sum", "type": "number" },
+    { "field": "revenue", "caption": "Avg revenue", "aggregator": "average", "type": "number" }
+  ],
+  // One leaf column per (column member x measure); this maps leaf -> measure index.
+  "measureIndexByLeaf": [0, 1],
+  "rowTotalsByMeasure": [[576158, 1200]],
+  "grandTotals": [2583335, 1345],
   "rowHeaders": [
     { "key": ["North"], "label": "North", "depth": 0, "kind": "member",
       "expandable": true, "expanded": true, "span": 1 },
