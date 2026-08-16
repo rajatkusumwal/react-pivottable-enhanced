@@ -11,6 +11,7 @@ import {
   SlidersHorizontal,
   Table2,
 } from "lucide-react";
+import { DEFAULT_DRILL_THROUGH_ROWS } from "../constants";
 import type { ExportFormat } from "../export";
 import type { PivotConfig } from "../types";
 import { locales } from "../locales";
