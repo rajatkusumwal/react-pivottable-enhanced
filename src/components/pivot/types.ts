@@ -4,6 +4,7 @@
  * app can move aggregation server-side without changing its state.
  */
 import type { PivotLayout, PivotSort } from "./result";
+import { defaultCsvOptions, type CsvOptions } from "./csv";
 
 export type PivotValue = string | number | boolean | null | undefined;
 export type PivotRow = Record<string, PivotValue>;
@@ -313,6 +314,8 @@ export interface PivotConfig {
   chart: ChartConfig;
   /** Drill-through slice configuration (columns, sorting, row cap). */
   drillThrough: DrillThroughConfig;
+  /** CSV dialect used when reading files and writing CSV exports. */
+  csv: CsvOptions;
 }
 
 
@@ -363,6 +366,7 @@ export function createDefaultConfig(partial: Partial<PivotConfig> = {}): PivotCo
       hiddenSeries: [],
     },
     drillThrough: { maxRows: 1000 },
+    csv: { ...defaultCsvOptions },
     ...partial,
   };
 }

@@ -13,6 +13,22 @@ export { createLocalEngine, buildLocalResult, localDrillThrough, measureOf } fro
 export { createBackendClient } from "./engines/backend";
 export { createBackendEngine, createHybridEngine } from "./engines/backend";
 export type { BackendEngineOptions } from "./engines/backend";
+export { createCustomEngine } from "./engines/custom";
+export type { CustomDataSource } from "./engines/custom";
+export {
+  createServerAggregationEngine,
+  registerRemoteDataset,
+  streamCsvRows,
+  shouldOffload,
+  OFFLOAD_ROW_THRESHOLD,
+  OFFLOAD_BYTE_THRESHOLD,
+} from "./engines/large-data";
+export type {
+  ServerAggregationOptions,
+  CsvStreamOptions,
+  CsvStreamSummary,
+  OffloadDecision,
+} from "./engines/large-data";
 export { createMockPivotApi } from "./engines/mock-api";
 export type { MockPivotApi, MockPivotApiOptions } from "./engines/mock-api";
 export { applyCellEdit, isEditableAggregator } from "./editing";
@@ -104,6 +120,14 @@ export { secureRows, visibleFields, can, defaultPermissions } from "./security";
 export { formatNumber, formatPercent } from "./format";
 export { locales, getLocale } from "./locales";
 export type { PivotStrings } from "./locales";
+export {
+  csvOptions,
+  defaultCsvOptions,
+  detectCsvOptions,
+  parseCsvNumber,
+  formatCsvNumber,
+} from "./csv";
+export type { CsvOptions } from "./csv";
 export {
   parseCsv,
   inferFields,

@@ -8,6 +8,7 @@
 import { useRef, useState } from "react";
 import { FileUp, RotateCcw, Table2 } from "lucide-react";
 import { inferFields, readFileAsRows } from "../data-sources";
+import { defaultCsvOptions, type CsvOptions } from "../csv";
 import type { FieldDef, PivotRow } from "../types";
 
 const MAX_BYTES = 25 * 1024 * 1024;
@@ -27,6 +28,9 @@ export interface DataSourceBarProps {
   /** Optional backend uploader (Spring Boot + DuckDB). */
   onUploadToBackend?: (file: File) => Promise<{ datasetId: string; rowCount: number; fields: FieldDef[] }>;
   isCustom: boolean;
+  /** CSV dialect used for reading files and writing CSV exports. */
+  csv?: CsvOptions;
+  onCsvChange?: (csv: CsvOptions) => void;
 }
 
 export function DataSourceBar({
@@ -36,6 +40,8 @@ export function DataSourceBar({
   onReset,
   onUploadToBackend,
   isCustom,
+  csv = defaultCsvOptions,
+  onCsvChange,
 }: DataSourceBarProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState("");
@@ -60,7 +66,7 @@ export function DataSourceBar({
         onLoad({ name: file.name, rows: [], fields: meta.fields, datasetId: meta.datasetId });
         return;
       }
-      const rows = await readFileAsRows(file);
+      const rows = await readFileAsRows(file, csv);
       if (!rows.length) {
         setError("That file has no rows in it.");
         return;
@@ -129,6 +135,53 @@ export function DataSourceBar({
           <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
           Use sample data
         </button>
+      )}
+
+      {onCsvChange && (
+        <span className="flex items-center gap-1.5" data-testid="csv-options">
+          <span className="mx-1 h-4 w-px bg-border" aria-hidden="true" />
+          <span className="text-muted-foreground">CSV</span>
+          <label className="sr-only" htmlFor="csv-delimiter">
+            CSV separator
+          </label>
+          <select
+            id="csv-delimiter"
+            value={csv.delimiter}
+            onChange={(e) => onCsvChange({ ...csv, delimiter: e.target.value })}
+            className="rounded border border-border bg-card px-1.5 py-1"
+          >
+            <option value=",">Comma ,</option>
+            <option value=";">Semicolon ;</option>
+            <option value={"\t"}>Tab</option>
+            <option value="|">Pipe |</option>
+          </select>
+          <label className="sr-only" htmlFor="csv-decimal">
+            Decimal mark
+          </label>
+          <select
+            id="csv-decimal"
+            value={csv.decimalSeparator}
+            onChange={(e) => onCsvChange({ ...csv, decimalSeparator: e.target.value })}
+            className="rounded border border-border bg-card px-1.5 py-1"
+          >
+            <option value=".">Decimal .</option>
+            <option value=",">Decimal ,</option>
+          </select>
+          <label className="sr-only" htmlFor="csv-thousands">
+            Thousands mark
+          </label>
+          <select
+            id="csv-thousands"
+            value={csv.thousandsSeparator}
+            onChange={(e) => onCsvChange({ ...csv, thousandsSeparator: e.target.value })}
+            className="rounded border border-border bg-card px-1.5 py-1"
+          >
+            <option value="">No thousands</option>
+            <option value=",">Thousands ,</option>
+            <option value=".">Thousands .</option>
+            <option value=" ">Thousands space</option>
+          </select>
+        </span>
       )}
 
       <span className="ml-auto text-muted-foreground">

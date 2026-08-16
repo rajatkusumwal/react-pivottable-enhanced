@@ -510,7 +510,10 @@ const sharedStudioOverrides: Record<string, Cell> = {
   "Conditional formatting rules": y("Rule-based cell colours"),
   // Data sources
   "CSV files": y("Built-in CSV loader"),
-  "CSV separator / decimal / thousands options": p("Separator only"),
+  "CSV separator / decimal / thousands options": y("Separator, decimal and thousands marks (read + export)"),
+  "Custom data source API for any backend": y("createCustomEngine(): query, aggregate or raw rows"),
+  "Server-side aggregation of large datasets": y("createServerAggregationEngine() with paging"),
+  "1GB+ datasets": y("Streaming CSV reader + remote dataset registration"),
   "Field captions, types and hidden fields mapping": y("Field metadata + inference"),
   "Update data without resetting the report": y("Controlled config"),
   // Styling

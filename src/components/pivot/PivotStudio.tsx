@@ -273,7 +273,7 @@ export function PivotStudio({
   const handleExport = (format: ExportFormat) => {
     const matrix = getMatrix();
     if (!matrix.body.length) return setStatus(strings.noData);
-    exportMatrix(matrix, format);
+    exportMatrix(matrix, format, config.csv);
     setStatus(`${strings.export}: ${format.toUpperCase()}`);
   };
 
@@ -487,6 +487,8 @@ export function PivotStudio({
 
       {allowFileUpload && (
         <DataSourceBar
+          csv={config.csv}
+          onCsvChange={(csv) => update({ csv })}
           currentName={uploaded?.name ?? "Sample data"}
           rowCount={uploaded?.rows.length ?? data.length}
           isCustom={uploaded !== null}

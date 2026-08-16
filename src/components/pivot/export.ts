@@ -2,6 +2,7 @@
 import type { PivotCellValue, PivotResult } from "./result";
 import type { PivotRow } from "./types";
 import { formatNumber } from "./format";
+import { csvOptions, formatCsvNumber, type CsvOptions } from "./csv";
 
 /** Optional page furniture printed above/below the table on export & print. */
 export interface ExportDecoration {
@@ -93,20 +94,33 @@ export function matrixFromTable(table: HTMLTableElement, title = "Pivot table"):
   return { title, head, body };
 }
 
-const escapeCsv = (v: string) => (/[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v);
+const escapeCsv = (v: string, delimiter: string) =>
+  new RegExp(`["\n\r${delimiter === "\t" ? "\\t" : delimiter.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}]`).test(v)
+    ? `"${v.replace(/"/g, '""')}"`
+    : v;
 
 /** Header / footer lines as single-cell rows so text formats keep them. */
 const decorationRows = (text: string | undefined) =>
   text ? text.split("\n").map((line) => [line]) : [];
 
-export function toCsv(matrix: ExportMatrix, delimiter = ","): string {
+/**
+ * Serialises the matrix as CSV in the given dialect. Numeric-looking cells are
+ * re-written with the chosen decimal and thousands marks so Excel in any locale
+ * reads them as numbers.
+ */
+export function toCsv(matrix: ExportMatrix, options: string | Partial<CsvOptions> = ","): string {
+  const dialect = csvOptions(options);
+  const cell = (v: string) => {
+    const num = /^[+-]?\d+(\.\d+)?$/.test(v.trim()) ? Number(v.trim()) : null;
+    return escapeCsv(num !== null ? formatCsvNumber(num, dialect) : v, dialect.delimiter);
+  };
   return [
     ...decorationRows(matrix.header),
     ...matrix.head,
     ...matrix.body,
     ...decorationRows(matrix.footer),
   ]
-    .map((row) => row.map(escapeCsv).join(delimiter))
+    .map((row) => row.map(cell).join(dialect.delimiter))
     .join("\n");
 }
 
@@ -169,11 +183,15 @@ export function downloadFile(filename: string, content: string, mime: string) {
 
 export type ExportFormat = "csv" | "tsv" | "excel" | "html" | "json";
 
-export function exportMatrix(matrix: ExportMatrix, format: ExportFormat) {
+export function exportMatrix(
+  matrix: ExportMatrix,
+  format: ExportFormat,
+  csv?: string | Partial<CsvOptions>,
+) {
   const base = matrix.title.replace(/\s+/g, "-").toLowerCase();
   switch (format) {
     case "csv":
-      return downloadFile(`${base}.csv`, toCsv(matrix), "text/csv");
+      return downloadFile(`${base}.csv`, toCsv(matrix, csv ?? ","), "text/csv");
     case "tsv":
       return downloadFile(`${base}.tsv`, toTsv(matrix), "text/tab-separated-values");
     case "excel":

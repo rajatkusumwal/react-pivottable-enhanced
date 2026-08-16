@@ -515,6 +515,106 @@ their current share; for `average` / `min` / `max` / `median` / `first` / `last`
 every contributing record is set to the value; `count` / `distinctCount` are rejected with 422.
 Call it from `createBackendClient(...).applyEdit(request)`.
 
+#### `POST /api/pivot/datasets` (remote dataset registration)
+
+For files that are far too big to upload from the browser (1GB+ parquet/CSV in object
+storage, or a warehouse table), register them by reference instead:
+
+```jsonc
+{ "uri": "s3://warehouse/sales-2024.parquet", "format": "parquet",
+  "csv": { "delimiter": ";", "decimalSeparator": ",", "thousandsSeparator": "." } }
+```
+
+Returns `{ "datasetId": "sales-2024", "rowCount": 812345678, "fields": [...] }`. The same
+endpoint still accepts a multipart upload for small files.
+
+```ts
+import { registerRemoteDataset } from "@/components/pivot";
+
+const { datasetId } = await registerRemoteDataset({
+  baseUrl: "/api/pivot",
+  uri: "s3://warehouse/sales-2024.parquet",
+  format: "parquet",
+});
+```
+
+### Custom data source API (any backend)
+
+`createCustomEngine` adapts *any* transport — GraphQL, gRPC-web, an internal SDK, a Web
+Worker — to the engine contract. Implement whichever level your backend supports:
+
+```ts
+import { createCustomEngine, PivotStudio } from "@/components/pivot";
+
+const engine = createCustomEngine({
+  id: "graphql",
+  // 1. Full server-side aggregation: return a ready PivotResult.
+  query: async (request) => gql.pivot(request),
+  // 2. or partial: return pre-grouped records, the browser lays them out.
+  // aggregate: async (request) => sdk.groupBy(request),
+  // 3. or raw records only: the browser aggregates.
+  // fetchRows: async (request) => sdk.rows(request),
+  drillThrough: async (request) => gql.records(request),   // optional
+  getFields:   async () => gql.schema(),                   // optional
+  getMembers:  async (field, search) => gql.members(field, search), // optional
+});
+
+<PivotStudio data={[]} fields={fields} engine={engine} />;
+```
+
+Results are tagged `meta.source: "backend"` and `meta.queryId: <id>`.
+
+### Server-side aggregation of large datasets (1GB+)
+
+```ts
+import {
+  createServerAggregationEngine,
+  shouldOffload,
+  streamCsvRows,
+} from "@/components/pivot";
+
+// Every query is answered by the service; records never reach the browser.
+const engine = createServerAggregationEngine({
+  baseUrl: "/api/pivot",
+  datasetId: "sales-2024",
+  pageSize: 5000,              // grid rows requested per query (limit/offset)
+});
+
+// Decide browser vs backend from a file or row estimate.
+shouldOffload({ rowCount: 2_000_000 });      // { offload: true, reason: "rows" }
+shouldOffload({ byteSize: 1024 ** 3 });      // { offload: true, reason: "bytes" }
+
+// Read a multi-GB CSV in batches (nothing bigger than one batch in memory).
+await streamCsvRows(file, async (rows, summary) => {
+  await fetch("/api/pivot/datasets/sales-2024/rows", {
+    method: "POST",
+    body: JSON.stringify(rows),
+  });
+  console.log(summary.rowCount);
+}, { batchSize: 10_000, csv: { delimiter: ";", decimalSeparator: "," } });
+```
+
+`streamCsvRows` accepts a `File`/`Blob`, a `ReadableStream`, or an async iterable of text
+chunks, and supports `maxRows` for sampling. Thresholds: `OFFLOAD_ROW_THRESHOLD` (100 000
+rows) and `OFFLOAD_BYTE_THRESHOLD` (50 MB) — both overridable per call.
+
+### CSV separator / decimal / thousands options
+
+The CSV dialect lives in `config.csv` and is used both when reading a file and when writing a
+CSV export, so a round trip keeps the same format. The data source bar exposes three
+dropdowns (separator, decimal mark, thousands mark) and uploads auto-detect the dialect.
+
+```ts
+<PivotStudio
+  data={data}
+  fields={fields}
+  initialConfig={{ csv: { delimiter: ";", decimalSeparator: ",", thousandsSeparator: "." } }}
+/>
+```
+
+Helpers: `parseCsv(text, csvOptions)`, `toCsv(matrix, csvOptions)`, `parseCsvNumber`,
+`formatCsvNumber`, `detectCsvOptions(text)`.
+
 ### Spring Boot + DuckDB sketch
 
 ```java
@@ -591,7 +691,15 @@ report filtering and the grid + chart split view.
 tokens) and `reporting-ui.test.tsx` covers the reporting UX end to end: export headers and
 footers in CSV/TSV/HTML, the drill-through export controls (including the read-only case),
 copying and restoring a share link, the number and conditional formatting dialogs, fullscreen
-and the grid context menu. 250 tests in total.
+and the grid context menu.
+
+`csv-options.test.ts` covers the CSV dialect: European number parsing and writing, semicolon
+files, dialect detection, exports with a chosen separator/decimal/thousands mark and a full
+export → parse round trip. `large-data.test.ts` covers the custom data source API (query /
+aggregate / fetchRows levels, drill-through fallback), server-side aggregation with paging,
+remote dataset registration, the offload thresholds and the streaming CSV reader (batching,
+dialects, `maxRows` sampling, Blob input) — all against the in-memory mock API. 273 tests in
+total.
 
 ### Backend integration tests (no server required)
 
