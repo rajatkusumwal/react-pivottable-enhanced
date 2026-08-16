@@ -18,6 +18,7 @@ import {
   type PivotMeasure,
   type PivotQuery,
   type PivotResult,
+  type PivotSort,
 } from "../result";
 
 interface TreeNode {

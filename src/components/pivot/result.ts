@@ -79,6 +79,8 @@ export interface PivotQuery {
   /** Collapsed row member paths, joined with "\u0000". */
   collapsed: string[];
   sort?: PivotSort | undefined;
+  /** Multi-column sort for the flat layout; takes precedence over `sort`. */
+  sorts?: PivotSort[] | undefined;
   locale: string;
   /** Backend paging. */
   limit?: number;
