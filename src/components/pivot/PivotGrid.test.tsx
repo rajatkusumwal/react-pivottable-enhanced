@@ -110,7 +110,7 @@ describe("expand and collapse", () => {
   });
 
   it("hides children of a collapsed member", () => {
-    renderGrid({ collapsed: ["North"] });
+    renderGrid({ collapsed: ["North"] }, { onToggleCollapse: vi.fn() });
     const grid = screen.getByTestId("pivot-grid");
     expect(within(grid).queryByText("Oslo")).not.toBeInTheDocument();
     expect(within(grid).getByLabelText("Expand North")).toBeInTheDocument();
@@ -121,8 +121,8 @@ describe("header options", () => {
   it("shows spreadsheet-style A/B/C headers when enabled", () => {
     renderGrid({}, { showSpreadsheetHeaders: true });
     const grid = screen.getByTestId("pivot-grid");
-    expect(within(grid).getByText("A")).toBeInTheDocument();
     expect(within(grid).getByText("B")).toBeInTheDocument();
+    expect(within(grid).getByText("C")).toBeInTheDocument();
   });
 
   it("repeats member labels in classic form when enabled", () => {
@@ -166,12 +166,12 @@ describe("selection, keyboard and copy", () => {
   });
 
   it("copies the selected cells to the clipboard", async () => {
+    const user = userEvent.setup();
     const writeText = vi.fn().mockResolvedValue(undefined);
     Object.defineProperty(navigator, "clipboard", {
       value: { writeText },
       configurable: true,
     });
-    const user = userEvent.setup();
     renderGrid({}, { allowDrillThrough: false });
     const grid = screen.getByTestId("pivot-grid");
     await user.click(within(grid).getByTestId("cell-0-0"));
