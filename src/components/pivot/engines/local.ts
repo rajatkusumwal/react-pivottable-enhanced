@@ -304,18 +304,56 @@ export function buildLocalResult(rows: PivotRow[], query: PivotQuery): PivotResu
   );
   const rowTotals = rowTotalsByMeasure.map((t) => num(t[0] ?? null));
 
+  // Member paths -> the records underneath them, used by the "% of parent" modes.
+  const rowIndexByPath = new Map<string, number[]>();
+  const collectRows = (node: TreeNode) => {
+    if (node.path.length) rowIndexByPath.set(keyOf(node.path), node.rowIndexes);
+    node.children.forEach(collectRows);
+  };
+  collectRows(rowTree);
+  const colIndexByPath = new Map<string, Set<number>>();
+  const collectCols = (node: TreeNode) => {
+    if (node.path.length) colIndexByPath.set(keyOf(node.path), new Set(node.rowIndexes));
+    node.children.forEach(collectCols);
+  };
+  collectCols(colTree);
+
+  /** Parent group of a member path; null means "the whole report". */
+  const parentRowIndexes = rowNodes.map((r) =>
+    r.header.key.length > 1 ? (rowIndexByPath.get(keyOf(r.header.key.slice(0, -1))) ?? null) : null,
+  );
+  const parentColIndexes = baseColumns.map((base) => {
+    const path = query.cols.length ? base.key.slice(0, query.cols.length) : [];
+    return path.length > 1 ? (colIndexByPath.get(keyOf(path.slice(0, -1))) ?? null) : null;
+  });
+
+  // Pass 1 — raw aggregates. Pass 2 applies "show values as", which may need
+  // neighbouring cells (differences, running totals down a column).
+  const rawCells: PivotCellValue[][] = rowNodes.map((r) => {
+    const out: PivotCellValue[] = [];
+    baseColumns.forEach((base) => {
+      measures.forEach((m) => out.push(cellValue(rows, r.indexes, base.indexes, m)));
+    });
+    return out;
+  });
+
+  const runningColumn = colLeaves.map(() => 0);
   const cells: PivotCellValue[][] = rowNodes.map((r, rowIndex) => {
     const running = measures.map(() => 0);
     const out: PivotCellValue[] = [];
     baseColumns.forEach((base, baseIndex) => {
       measures.forEach((m, mi) => {
-        const raw = cellValue(rows, r.indexes, base.indexes, m);
         const leafIndex = baseIndex * measureCount + mi;
+        const raw = rawCells[rowIndex]?.[leafIndex] ?? null;
         if (typeof raw !== "number") {
           out.push(raw);
           return;
         }
         running[mi] = (running[mi] ?? 0) + raw;
+        runningColumn[leafIndex] = (runningColumn[leafIndex] ?? 0) + raw;
+        const mode = query.values[mi]?.displayMode ?? "raw";
+        const needsParent =
+          mode === "percentOfParentRowTotal" || mode === "percentOfParentColumnTotal";
         out.push(
           applyDisplayMode(
             raw,
@@ -323,15 +361,25 @@ export function buildLocalResult(rows: PivotRow[], query: PivotQuery): PivotResu
               grand: num(grandTotals[mi] ?? null),
               rowTotal: num(rowTotalsByMeasure[rowIndex]?.[mi] ?? null),
               colTotal: num(colTotals[leafIndex] ?? null),
+              parentRowTotal: needsParent
+                ? num(cellValue(rows, parentRowIndexes[rowIndex] ?? null, base.indexes, m))
+                : null,
+              parentColTotal: needsParent
+                ? num(cellValue(rows, r.indexes, parentColIndexes[baseIndex] ?? null, m))
+                : null,
               running: running[mi] as number,
+              runningColumn: runningColumn[leafIndex] as number,
+              prevInRow: baseIndex > 0 ? num(rawCells[rowIndex]?.[leafIndex - measureCount] ?? null) : null,
+              prevInColumn: rowIndex > 0 ? num(rawCells[rowIndex - 1]?.[leafIndex] ?? null) : null,
             },
-            query.values[mi]?.displayMode ?? "raw",
+            mode,
           ),
         );
       });
     });
     return out;
   });
+
 
   return {
     rowFields: query.rows,
