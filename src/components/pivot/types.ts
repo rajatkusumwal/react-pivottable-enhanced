@@ -92,6 +92,8 @@ export type FilterDef =
       operator: ConditionOperator;
       value: string | number;
       value2?: string | number;
+      /** Comparison mode; defaults to "auto". Use "date" for date fields. */
+      valueType?: ConditionValueType;
     }
   | {
       kind: "top";
