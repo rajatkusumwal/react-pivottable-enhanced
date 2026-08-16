@@ -101,6 +101,11 @@ export function PivotStudio({
 
   const [selection, setSelection] = useState<SelectionStats | null>(null);
   const [uploaded, setUploaded] = useState<UploadedDataset | null>(null);
+  // Restore the file the user imported in this tab after a reload (SSR-safe: runs after hydration).
+  useEffect(() => {
+    const cached = loadSessionDataset();
+    if (cached) setUploaded(cached);
+  }, []);
   /** Records after inline edits; null while the source data is untouched. */
   const [editedRows, setEditedRows] = useState<PivotRow[] | null>(null);
   const [result, setResult] = useState<PivotResult>(() => emptyResult(measureOf(config.values)));
