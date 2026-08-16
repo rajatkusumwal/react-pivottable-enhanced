@@ -89,14 +89,21 @@ describe("show values as — differences and running totals", () => {
   });
 
   it("shows the difference and percent difference against the row above", () => {
-    const diff = buildLocalResult(rows, queryWith("differenceOfColumn"));
-    const pct = buildLocalResult(rows, queryWith("percentDifferenceOfColumn"));
-    const ie = rowOf(["North", "IE"], diff);
-    const uk = rowOf(["North", "UK"], diff);
-    expect(diff.cells[uk]?.[0]).toBeNull(); // first row has nothing above it
-    // IE Q2 = 100 against UK Q2 = 300
-    expect(diff.cells[ie]?.[1]).toBe(-200);
-    expect(pct.cells[ie]?.[1]).toBeCloseTo(-66.67, 1);
+    // A single row field keeps the comparison between sibling members.
+    const diff = buildLocalResult(rows, queryWith("differenceOfColumn", { rows: ["country"] }));
+    const pct = buildLocalResult(rows, queryWith("percentDifferenceOfColumn", { rows: ["country"] }));
+    // Members sort as ES, IE, UK.
+    expect(diff.cells[0]?.[0]).toBeNull(); // first row has nothing above it
+    // IE Q2 = 100 against ES Q2 = 200
+    expect(diff.cells[1]?.[1]).toBe(-100);
+    expect(pct.cells[1]?.[1]).toBeCloseTo(-50, 5);
+  });
+
+  it("accumulates a running total down the column across sibling rows", () => {
+    const result = buildLocalResult(rows, queryWith("runningTotalOfColumn", { rows: ["country"] }));
+    expect(result.cells[0]?.[0]).toBe(200); // ES Q1
+    expect(result.cells[1]?.[0]).toBe(300); // + IE Q1
+    expect(result.cells[2]?.[0]).toBe(400); // + UK Q1
   });
 
   it("accumulates running totals across a row and down a column", () => {
@@ -106,8 +113,9 @@ describe("show values as — differences and running totals", () => {
     expect(acrossRow.cells[uk]?.[0]).toBe(100);
     expect(acrossRow.cells[uk]?.[1]).toBe(400); // 100 + 300
 
-    const ie = rowOf(["North", "IE"], downColumn);
-    expect(downColumn.cells[ie]?.[0]).toBe(200); // 100 (IE) after 100 (UK)
+    // Parent rows take part in the accumulation: North (200) then UK (100).
+    const uk = rowOf(["North", "UK"], downColumn);
+    expect(downColumn.cells[uk]?.[0]).toBe(300);
   });
 
   it("keeps runningTotal working as an alias of the row running total", () => {
