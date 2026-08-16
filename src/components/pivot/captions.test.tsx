@@ -89,8 +89,8 @@ describe("rename UI in the field bar", () => {
 
   it("renames a row field from its chip", () => {
     const onChange = setup(baseConfig());
-    fireEvent.click(screen.getAllByLabelText("Rename region")[0] as HTMLElement);
-    const input = screen.getByLabelText("Rename region") as HTMLInputElement;
+    fireEvent.click(screen.getAllByRole("button", { name: "Rename region" })[0] as HTMLElement);
+    const input = screen.getByRole("textbox", { name: "Rename region" }) as HTMLInputElement;
     fireEvent.change(input, { target: { value: "Sales area" } });
     fireEvent.keyDown(input, { key: "Enter" });
     expect(onChange).toHaveBeenCalledWith({ fieldCaptions: { region: "Sales area" } });
@@ -98,9 +98,9 @@ describe("rename UI in the field bar", () => {
 
   it("renames one of two measures on the same field", () => {
     const onChange = setup(baseConfig());
-    const buttons = screen.getAllByLabelText("Rename revenue");
+    const buttons = screen.getAllByRole("button", { name: "Rename revenue" });
     fireEvent.click(buttons[1] as HTMLElement);
-    const input = screen.getByLabelText("Rename revenue") as HTMLInputElement;
+    const input = screen.getByRole("textbox", { name: "Rename revenue" }) as HTMLInputElement;
     fireEvent.change(input, { target: { value: "Average deal size" } });
     fireEvent.keyDown(input, { key: "Enter" });
     const patch = onChange.mock.calls[0]?.[0] as Partial<PivotConfig>;
