@@ -65,6 +65,78 @@ describe("filters", () => {
     expect(matchesCondition("Bikes", "notContains", "cloth")).toBe(true);
   });
 
+  it("compares date fields with the date operators", () => {
+    const d = (raw: unknown, op: Parameters<typeof matchesCondition>[1], v: string, v2?: string) =>
+      matchesCondition(raw as never, op, v, v2, "date");
+    expect(d("2024-03-01", "gt", "2024-02-01")).toBe(true);
+    expect(d("2024-03-01", "gt", "2024-03-01")).toBe(false);
+    expect(d("2024-03-01", "gte", "2024-03-01")).toBe(true);
+    expect(d("2024-01-15", "lt", "2024-02-01")).toBe(true);
+    expect(d("2024-02-01", "lte", "2024-02-01")).toBe(true);
+    expect(d("2024-02-01", "eq", "2024-02-01")).toBe(true);
+    expect(d("2024-02-01", "neq", "2024-02-02")).toBe(true);
+    expect(d("2024-02-10", "between", "2024-02-01", "2024-02-28")).toBe(true);
+    expect(d("2024-03-10", "between", "2024-02-01", "2024-02-28")).toBe(false);
+  });
+
+  it("matches timestamps at day granularity and rejects invalid dates", () => {
+    expect(matchesCondition("2024-02-01T18:45:00Z", "eq", "2024-02-01", undefined, "date")).toBe(
+      true,
+    );
+    expect(matchesCondition("not-a-date", "gt", "2024-01-01", undefined, "date")).toBe(false);
+    expect(matchesCondition("2024-01-02", "gt", "nope", undefined, "date")).toBe(false);
+  });
+
+  it("infers dates automatically and keeps numeric behaviour otherwise", () => {
+    expect(matchesCondition("2024-03-01", "gt", "2024-02-01")).toBe(true);
+    expect(matchesCondition(250, "gt", 100, undefined, "auto")).toBe(true);
+    // Forcing number mode on ISO strings falls back to NaN comparisons.
+    expect(matchesCondition("2024-03-01", "gt", "2024-02-01", undefined, "number")).toBe(false);
+  });
+
+  it("filters rows by a date range", () => {
+    const dated: PivotRow[] = [
+      { orderDate: "2024-01-05", revenue: 10 },
+      { orderDate: "2024-02-20", revenue: 20 },
+      { orderDate: "2024-03-30", revenue: 30 },
+    ];
+    expect(
+      applyFilters(dated, [
+        {
+          kind: "condition",
+          field: "orderDate",
+          operator: "between",
+          value: "2024-02-01",
+          value2: "2024-03-01",
+          valueType: "date",
+        },
+      ]),
+    ).toHaveLength(1);
+    expect(
+      applyFilters(dated, [
+        {
+          kind: "condition",
+          field: "orderDate",
+          operator: "gte",
+          value: "2024-02-20",
+          valueType: "date",
+        },
+      ]),
+    ).toHaveLength(2);
+  });
+
+  it("describes date conditions in plain English", () => {
+    expect(
+      describeFilter({
+        kind: "condition",
+        field: "orderDate",
+        operator: "lt",
+        value: "2024-02-01",
+        valueType: "date",
+      }),
+    ).toBe("orderDate is before 2024-02-01");
+  });
+
   it("applies top-N filters", () => {
     const top = applyFilters(rows, [
       { kind: "top", field: "region", measure: "revenue", aggregator: "sum", direction: "top", count: 1 },
