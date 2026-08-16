@@ -31,6 +31,17 @@ export function parseDate(value: unknown): number {
 
 const dateOperators: ConditionOperator[] = ["gt", "gte", "lt", "lte", "eq", "neq", "between"];
 
+/** Plain-English wording used when a condition runs on the date timeline. */
+export const dateOperatorLabels: Partial<Record<ConditionOperator, string>> = {
+  gt: "is after",
+  gte: "is on or after",
+  lt: "is before",
+  lte: "is on or before",
+  eq: "is on",
+  neq: "is not on",
+  between: "is between",
+};
+
 /** True when the condition should be evaluated on the date timeline. */
 function useDates(
   valueType: ConditionValueType | undefined,
