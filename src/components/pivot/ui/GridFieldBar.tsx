@@ -1,4 +1,4 @@
-import { Filter, SlidersHorizontal, X } from "lucide-react";
+import { Filter, Sigma, SlidersHorizontal, X } from "lucide-react";
 import { useState } from "react";
 import { aggregatorLabels } from "../aggregators";
 import { moveField } from "../dnd";
@@ -124,6 +124,9 @@ export function GridFieldBar({
           "Measures",
           config.values.map((v, i) => (
             <span key={`${v.field}-${i}`} className={chip}>
+              {config.showAggregationIcon && (
+                <Sigma data-testid="sigma-icon" className="h-3 w-3 shrink-0 text-primary" aria-hidden="true" />
+              )}
               <span className="truncate">
                 {aggregatorLabels[v.aggregator] ?? v.aggregator} of {v.caption ?? v.field}
               </span>
