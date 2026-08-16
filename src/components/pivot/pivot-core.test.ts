@@ -50,7 +50,52 @@ describe("aggregations", () => {
     }, "Margin %");
     expect(aggregate("margin", rows, "revenue")).toBeCloseTo(46, 0);
   });
+
+  it("aggregates string, date and time measures", () => {
+    const textRows: PivotRow[] = [
+      { name: "Bea", orderDate: "2024-03-01", orderTime: "12:30" },
+      { name: "Al", orderDate: "2024-01-15", orderTime: "08:05" },
+      { name: "Bea", orderDate: "2024-02-20", orderTime: "19:45" },
+    ];
+    expect(aggregate("distinctCount", textRows, "name", "string")).toBe(2);
+    expect(aggregate("min", textRows, "orderDate", "date")).toBe("2024-01-15");
+    expect(aggregate("max", textRows, "orderTime", "time")).toBe("19:45");
+    expect(aggregate("first", textRows, "name", "string")).toBe("Bea");
+    expect(aggregate("last", textRows, "name", "string")).toBe("Bea");
+    // Numeric-only aggregations fall back to count instead of returning NaN.
+    expect(aggregate("sum", textRows, "name", "string")).toBe(3);
+  });
+
+  it("offers only type-appropriate aggregations in the measure menus", () => {
+    expect(aggregatorsForType("number")).toEqual(expect.arrayContaining(["sum", "average", "median"]));
+    expect(aggregatorsForType("string")).toEqual([
+      "count",
+      "distinctCount",
+      "min",
+      "max",
+      "first",
+      "last",
+    ]);
+    expect(aggregatorsForType("date")).not.toContain("sum");
+  });
 });
+
+describe("field list metadata", () => {
+  it("tags sample fields with their hierarchy and level", () => {
+    const region = sampleFields.find((f) => f.name === "region");
+    const city = sampleFields.find((f) => f.name === "city");
+    expect(region).toMatchObject({ hierarchy: "Geography", level: 1 });
+    expect(city).toMatchObject({ hierarchy: "Geography", level: 4 });
+    expect(sampleHierarchies.map((h) => h.caption)).toEqual(
+      expect.arrayContaining(["Geography", "Product", "Time"]),
+    );
+  });
+
+  it("groups fields into folders", () => {
+    expect(new Set(sampleFields.map((f) => f.folder)).size).toBeGreaterThan(1);
+  });
+});
+
 
 describe("filters", () => {
   it("keeps or excludes chosen values", () => {
