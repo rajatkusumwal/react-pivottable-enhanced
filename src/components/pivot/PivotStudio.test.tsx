@@ -407,3 +407,124 @@ describe("PivotStudio filter surfaces", () => {
     expect(screen.getByText(/region where sum of revenue/i)).toBeInTheDocument();
   });
 });
+
+describe("PivotStudio field list and measures", () => {
+  const hierFields = [
+    { name: "region", caption: "Region", type: "string" as const, folder: "Geography", hierarchy: "Geography", level: 1 },
+    { name: "city", caption: "City", type: "string" as const, folder: "Geography", hierarchy: "Geography", level: 2 },
+    { name: "category", caption: "Category", type: "string" as const, folder: "Product" },
+    { name: "revenue", caption: "Revenue", type: "number" as const, folder: "Measures" },
+  ];
+  const hierData: PivotRow[] = [
+    { region: "North", city: "Oslo", category: "Bikes", revenue: 100 },
+    { region: "South", city: "Rome", category: "Bikes", revenue: 300 },
+  ];
+
+  const renderHier = () =>
+    render(
+      <PivotStudio
+        data={hierData}
+        fields={hierFields}
+        initialConfig={createDefaultConfig({
+          rows: ["region"],
+          cols: ["category"],
+          values: [{ field: "revenue", aggregator: "sum", type: "number" }],
+        })}
+        title="Hierarchy pivot"
+        fieldsUi="sidebar"
+      />,
+    );
+
+  it("groups fields into folders and hierarchies", () => {
+    renderHier();
+    expect(screen.getByLabelText("Toggle folder Geography")).toBeInTheDocument();
+    expect(screen.getByLabelText("Toggle folder Product")).toBeInTheDocument();
+    expect(screen.getByLabelText("Toggle hierarchy Geography")).toBeInTheDocument();
+  });
+
+  it("adds every level of a hierarchy at once", async () => {
+    const user = userEvent.setup();
+    renderHier();
+    await user.click(screen.getByLabelText("Add all levels of Geography to rows"));
+    await waitFor(() =>
+      expect(screen.getByTestId("grid-field-bar")).toHaveTextContent("City"),
+    );
+  });
+
+  it("adds a single sublevel of a hierarchy", async () => {
+    const user = userEvent.setup();
+    renderHier();
+    await user.selectOptions(screen.getByLabelText("Place City"), "rows");
+    await waitFor(() => expect(screen.getByTestId("grid-field-bar")).toHaveTextContent("city"));
+  });
+
+  it("searches the field list and collapses every group", async () => {
+    const user = userEvent.setup();
+    renderHier();
+    const search = screen.getAllByPlaceholderText(/Search/i)[0] as HTMLElement;
+    await user.type(search, "cit");
+    expect(screen.queryByLabelText("Place Category")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Place City")).toBeInTheDocument();
+    await user.clear(search);
+    await user.click(screen.getByLabelText("Collapse all field groups"));
+    expect(screen.queryByLabelText("Place Category")).not.toBeInTheDocument();
+    await user.click(screen.getByLabelText("Expand all field groups"));
+    expect(screen.getByLabelText("Place Category")).toBeInTheDocument();
+  });
+
+  it("sorts field list items A → Z and Z → A", async () => {
+    const user = userEvent.setup();
+    renderHier();
+    const sort = screen.getByLabelText("Sort fields");
+    await user.selectOptions(sort, "asc");
+    expect((sort as HTMLSelectElement).value).toBe("asc");
+    await user.selectOptions(sort, "desc");
+    expect((sort as HTMLSelectElement).value).toBe("desc");
+  });
+
+  it("shows several measures side by side, including a string measure", async () => {
+    render(
+      <PivotStudio
+        data={hierData}
+        fields={hierFields}
+        initialConfig={createDefaultConfig({
+          rows: ["region"],
+          cols: [],
+          values: [
+            { field: "revenue", aggregator: "sum", type: "number" },
+            { field: "revenue", aggregator: "average", type: "number" },
+            { field: "city", aggregator: "distinctCount", type: "string" },
+          ],
+        })}
+        title="Measures pivot"
+        fieldsUi="sidebar"
+      />,
+    );
+    const bar = screen.getByTestId("grid-field-bar");
+    expect(bar).toHaveTextContent("Sum of revenue");
+    expect(bar).toHaveTextContent("Average of revenue");
+    expect(bar).toHaveTextContent("Distinct count of city");
+    // The same field twice gets its own aggregation menu.
+    expect(screen.getByLabelText("Aggregation for revenue")).toBeInTheDocument();
+    expect(screen.getByLabelText("Aggregation for revenue (2)")).toBeInTheDocument();
+  });
+
+  it("only offers text aggregations for a string measure", () => {
+    render(
+      <PivotStudio
+        data={hierData}
+        fields={hierFields}
+        initialConfig={createDefaultConfig({
+          rows: ["region"],
+          values: [{ field: "city", aggregator: "distinctCount", type: "string" }],
+        })}
+        title="String measure"
+        fieldsUi="sidebar"
+      />,
+    );
+    const select = screen.getByLabelText("Aggregation for city") as HTMLSelectElement;
+    const options = Array.from(select.options).map((o) => o.value);
+    expect(options).toContain("distinctCount");
+    expect(options).not.toContain("sum");
+  });
+});
