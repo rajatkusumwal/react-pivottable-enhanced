@@ -179,7 +179,7 @@ describe("multilevel column drill", () => {
   it("clamps stale full-depth spans after drilling up to the top level", () => {
     const result = buildLocalResult(
       data,
-      query({ ...colQuery, collapsedCols: ["Bikes", "Cars"] }),
+      query({ ...colQuery, collapsedCols: ["Bikes", "Clothing"] }),
     );
     result.colHeaderRows[0]?.forEach((header) => {
       header.rowSpan = 2;
@@ -196,7 +196,7 @@ describe("multilevel column drill", () => {
     );
 
     expect(screen.getByText("Bikes").closest("th")).toHaveAttribute("rowspan", "1");
-    expect(screen.getByText("Cars").closest("th")).toHaveAttribute("rowspan", "1");
+    expect(screen.getByText("Clothing").closest("th")).toHaveAttribute("rowspan", "1");
   });
 });
 
