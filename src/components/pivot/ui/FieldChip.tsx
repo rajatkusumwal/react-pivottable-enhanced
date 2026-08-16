@@ -7,11 +7,11 @@ export interface FieldChipProps {
   id: string;
   label: string;
   /** Small suffix such as the aggregation name, Flexmonster style. */
-  hint?: string;
-  disabled?: boolean;
-  active?: boolean;
-  onRemove?: () => void;
-  onFilter?: () => void;
+  hint?: string | undefined;
+  disabled?: boolean | undefined;
+  active?: boolean | undefined;
+  onRemove?: (() => void) | undefined;
+  onFilter?: (() => void) | undefined;
   /** Extra controls (e.g. the aggregation menu) rendered under the label. */
   children?: ReactNode;
 }
