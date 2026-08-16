@@ -579,9 +579,9 @@ chart filter controls are covered in `pivot-core.test.ts`, `PivotStudio.test.tsx
 `engines/mock-api.test.ts` (the last one over the REST contract).
 
 `drillthrough.test.tsx` covers drill-through end to end: the slice helpers (projection,
-sorting, row cap), the local engine and the REST contract (including the uncapped `total`),
-chart drill keys and clicking through from the chart, plus the dialog's column sorting and
-built-in field list.
+sorting, row cap, the `fields: undefined` vs `[]` semantics), the local engine and the REST
+contract (including the uncapped `total`), chart drill keys and clicking through from the chart,
+plus the dialog's column sorting, built-in field list and Select all / Deselect all buttons.
 
 `charts.test.tsx` covers the chart layer: stacked columns, the combined column + line chart,
 axis and legend drill (including the drill breadcrumbs), legend series hiding, axis-click
