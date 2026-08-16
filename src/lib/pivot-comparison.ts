@@ -9,7 +9,7 @@ export type FeatureRow = {
   feature: string;
   flexmonster: Cell;
   reactPivottable: Cell;
-  /** Our Pivot Studio demo (see /demos). */
+  /** inhouse-grid-monster (see /demos). */
   studio: Cell;
 };
 
