@@ -1,12 +1,22 @@
 /** Export & print helpers shared by every engine. */
 import type { PivotCellValue, PivotResult } from "./result";
+import type { PivotRow } from "./types";
 import { formatNumber } from "./format";
+
+/** Optional page furniture printed above/below the table on export & print. */
+export interface ExportDecoration {
+  /** Text shown above the table (supports \n for several lines). */
+  header?: string | undefined;
+  /** Text shown below the table. */
+  footer?: string | undefined;
+}
 
 /** Builds an export matrix straight from a PivotResult (no DOM needed). */
 export function matrixFromResult(
   result: PivotResult,
   locale = "en",
   title = "Pivot table",
+  decoration: ExportDecoration = {},
 ): ExportMatrix {
   const measures = result.measures ?? [result.measure];
   const corner = result.rowFields.join(" / ") || result.measure.caption;
@@ -34,16 +44,39 @@ export function matrixFromResult(
     ...result.colTotals.map((v, c) => fmt(v, measureAt(c))),
     fmt(result.grandTotal),
   ]);
-  return { title, head, body };
+  return {
+    title,
+    head,
+    body,
+    ...(decoration.header ? { header: decoration.header } : {}),
+    ...(decoration.footer ? { footer: decoration.footer } : {}),
+  };
+}
+
+/** Builds an export matrix from raw records — used by the drill-through view. */
+export function matrixFromRows(
+  rows: PivotRow[],
+  title = "Drill-through",
+  decoration: ExportDecoration = {},
+): ExportMatrix {
+  const columns = [...new Set(rows.flatMap((r) => Object.keys(r)))];
+  return {
+    title,
+    head: [columns],
+    body: rows.map((row) => columns.map((c) => String(row[c] ?? ""))),
+    ...(decoration.header ? { header: decoration.header } : {}),
+    ...(decoration.footer ? { footer: decoration.footer } : {}),
+  };
 }
 
 
-export interface ExportMatrix {
+export interface ExportMatrix extends ExportDecoration {
   title: string;
   /** Header rows (may be more than one for nested columns). */
   head: string[][];
   body: string[][];
 }
+
 
 /** Reads a rendered <table> into a plain matrix so any engine can be exported. */
 export function matrixFromTable(table: HTMLTableElement, title = "Pivot table"): ExportMatrix {
@@ -62,18 +95,40 @@ export function matrixFromTable(table: HTMLTableElement, title = "Pivot table"):
 
 const escapeCsv = (v: string) => (/[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v);
 
+/** Header / footer lines as single-cell rows so text formats keep them. */
+const decorationRows = (text: string | undefined) =>
+  text ? text.split("\n").map((line) => [line]) : [];
+
 export function toCsv(matrix: ExportMatrix, delimiter = ","): string {
-  return [...matrix.head, ...matrix.body]
+  return [
+    ...decorationRows(matrix.header),
+    ...matrix.head,
+    ...matrix.body,
+    ...decorationRows(matrix.footer),
+  ]
     .map((row) => row.map(escapeCsv).join(delimiter))
     .join("\n");
 }
 
 export function toTsv(matrix: ExportMatrix): string {
-  return [...matrix.head, ...matrix.body].map((row) => row.join("\t")).join("\n");
+  return [
+    ...decorationRows(matrix.header),
+    ...matrix.head,
+    ...matrix.body,
+    ...decorationRows(matrix.footer),
+  ]
+    .map((row) => row.join("\t"))
+    .join("\n");
 }
 
 const escapeHtml = (v: string) =>
   v.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+const htmlLines = (text: string | undefined) =>
+  (text ?? "")
+    .split("\n")
+    .map((line) => escapeHtml(line))
+    .join("<br>");
 
 export function toHtml(matrix: ExportMatrix): string {
   const head = matrix.head
@@ -82,12 +137,19 @@ export function toHtml(matrix: ExportMatrix): string {
   const body = matrix.body
     .map((r) => `<tr>${r.map((c) => `<td>${escapeHtml(c)}</td>`).join("")}</tr>`)
     .join("");
+  const header = matrix.header
+    ? `<header class="pivot-export-header">${htmlLines(matrix.header)}</header>`
+    : "";
+  const footer = matrix.footer
+    ? `<footer class="pivot-export-footer">${htmlLines(matrix.footer)}</footer>`
+    : "";
   return `<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(
     matrix.title,
-  )}</title><style>body{font-family:system-ui,sans-serif;padding:24px}table{border-collapse:collapse}th,td{border:1px solid #ccc;padding:6px 10px;font-size:13px;text-align:right}th{background:#f1f4f9}td:first-child,th:first-child{text-align:left}</style></head><body><h1>${escapeHtml(
+  )}</title><style>body{font-family:system-ui,sans-serif;padding:24px}table{border-collapse:collapse}th,td{border:1px solid #ccc;padding:6px 10px;font-size:13px;text-align:right}th{background:#f1f4f9}td:first-child,th:first-child{text-align:left}.pivot-export-header,.pivot-export-footer{color:#475069;font-size:12px;margin:8px 0;white-space:pre-line}</style></head><body>${header}<h1>${escapeHtml(
     matrix.title,
-  )}</h1><table><thead>${head}</thead><tbody>${body}</tbody></table></body></html>`;
+  )}</h1><table><thead>${head}</thead><tbody>${body}</tbody></table>${footer}</body></html>`;
 }
+
 
 export function toJson(matrix: ExportMatrix): string {
   return JSON.stringify(matrix, null, 2);

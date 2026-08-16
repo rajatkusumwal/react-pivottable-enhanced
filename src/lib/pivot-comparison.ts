@@ -477,12 +477,20 @@ const sharedStudioOverrides: Record<string, Cell> = {
   "Open a saved report": y("Report JSON"),
   "Switch between grid and charts": y(),
   "Show/hide and customise the toolbar": y("showToolbar prop"),
+  "Share a report by link": y("Copies a self-contained URL"),
+  "Conditional formatting UI": y("Format dialog: cell rules"),
+  "Number formatting UI": y("Format dialog: decimals, currency, prefix"),
+  "Fullscreen mode": y("Toolbar toggle, Esc to leave"),
+  "Context menu": y("Right-click a value"),
   // Export & print
   "Export to Excel": y(".xls export"),
   "Export to CSV": y(),
   "Export to HTML": y(),
   "Export to PDF": p("Through the print dialog"),
   "Printing with the OS print manager": y("Print view"),
+  "Export the drill-through view": y("Export, print and copy in the dialog"),
+  "Custom headers and footers on export/print": y("Set in the Format dialog"),
+
   // Options & localisation
   "Save/restore full report state as JSON": y(),
   "Multilingual localisation packs": y("Bundled locales"),

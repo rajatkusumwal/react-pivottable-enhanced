@@ -266,10 +266,15 @@ export interface PivotConfig {
   dragAndDrop: boolean;
   /** Allow typing a new value straight into a grid cell (writes back to data). */
   editing: boolean;
+  /** Text printed above the table on export and print (\n for several lines). */
+  exportHeader?: string;
+  /** Text printed below the table on export and print. */
+  exportFooter?: string;
   locale: string;
   theme: PivotTheme;
   chart: { visible: boolean; type: ChartType };
 }
+
 
 export const defaultTheme: PivotTheme = {
   accent: "#2f6feb",

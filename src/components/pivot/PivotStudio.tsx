@@ -7,7 +7,9 @@ import { getLocale } from "./locales";
 import { secureRows, visibleFields, can } from "./security";
 import { buildChartData } from "./analysis";
 import { exportMatrix, matrixFromResult, printMatrix, copyMatrix } from "./export";
-import type { ExportFormat } from "./export";
+import type { ExportDecoration, ExportFormat } from "./export";
+import { buildReportUrl, readReportFromUrl } from "./report-link";
+
 import { createDefaultConfig } from "./types";
 import type { FieldDef, Permissions, PivotConfig, PivotRow } from "./types";
 import { createLocalEngine, measureOf } from "./engines/local";
@@ -19,7 +21,12 @@ import { PivotChart } from "./ui/PivotChart";
 import { ChartFilterBar } from "./ui/ChartFilterBar";
 import { DrillThroughDialog } from "./ui/DrillThroughDialog";
 import { FieldListDialog } from "./ui/FieldListDialog";
+import { FormatDialog } from "./ui/FormatDialog";
+import type { FormatTab } from "./ui/FormatDialog";
+import { GridContextMenu } from "./ui/GridContextMenu";
+import type { ContextMenuItem } from "./ui/GridContextMenu";
 import { GridFieldBar } from "./ui/GridFieldBar";
+
 import { PivotGrid } from "./ui/PivotGrid";
 import type { SelectionStats } from "./ui/PivotGrid";
 import { DataSourceBar, suggestConfig } from "./ui/DataSourceBar";
@@ -82,6 +89,11 @@ export function PivotStudio({
   const [drill, setDrill] = useState<{ title: string; rows: PivotRow[] } | null>(null);
   const [status, setStatus] = useState("");
   const [fieldsOpen, setFieldsOpen] = useState(false);
+  const [formatOpen, setFormatOpen] = useState(false);
+  const [formatTab, setFormatTab] = useState<FormatTab>("number");
+  const [fullscreen, setFullscreen] = useState(false);
+  const [menu, setMenu] = useState<{ x: number; y: number; items: ContextMenuItem[] } | null>(null);
+
   const [selection, setSelection] = useState<SelectionStats | null>(null);
   const [uploaded, setUploaded] = useState<UploadedDataset | null>(null);
   /** Records after inline edits; null while the source data is untouched. */
@@ -196,9 +208,15 @@ export function PivotStudio({
     return () => clearTimeout(timer);
   }, [status]);
 
+  /** Header & footer printed on every export and on the print view. */
+  const decoration: ExportDecoration = useMemo(
+    () => ({ header: config.exportHeader, footer: config.exportFooter }),
+    [config.exportHeader, config.exportFooter],
+  );
+
   const getMatrix = useCallback(
-    () => matrixFromResult(result, config.locale, title),
-    [result, config.locale, title],
+    () => matrixFromResult(result, config.locale, title, decoration),
+    [result, config.locale, title, decoration],
   );
 
   const handleExport = (format: ExportFormat) => {
@@ -208,10 +226,57 @@ export function PivotStudio({
     setStatus(`${strings.export}: ${format.toUpperCase()}`);
   };
 
+  /** Copies a self-contained link that restores this exact report. */
+  const shareLink = useCallback(async () => {
+    if (typeof window === "undefined") return;
+    const url = buildReportUrl(window.location.href, config);
+    window.history.replaceState(null, "", url);
+    try {
+      await navigator.clipboard.writeText(url);
+      setStatus("Report link copied to the clipboard");
+    } catch {
+      setStatus("Report link added to the address bar");
+    }
+  }, [config]);
+
+  /** Restores a report carried in the URL on first render. */
+  const restored = useRef(false);
+  useEffect(() => {
+    if (restored.current || controlled || typeof window === "undefined") return;
+    restored.current = true;
+    const shared = readReportFromUrl(window.location.href);
+    if (shared) {
+      setInternal(shared);
+      onConfigChange?.(shared);
+      setStatus("Shared report loaded");
+    }
+  }, [controlled, onConfigChange]);
+
+  /** Full-screen mode: the browser API when available, a fixed overlay otherwise. */
+  const rootRef = useRef<HTMLElement>(null);
+  const toggleFullscreen = useCallback(() => {
+    const node = rootRef.current;
+    if (node && typeof document !== "undefined" && document.fullscreenEnabled) {
+      if (document.fullscreenElement) void document.exitFullscreen?.();
+      else void node.requestFullscreen?.().catch(() => undefined);
+    }
+    setFullscreen((f) => !f);
+  }, []);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setFullscreen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
   const openDrill = async (rowKey: string[], colKey: string[], label: string) => {
     const rows = await adapter.drillThrough({ rowKey, colKey, query }, derivedRows);
     setDrill({ title: label, rows });
   };
+
 
   const toggleCollapse = (key: string[]) => {
     const id = keyOf(key);
@@ -242,8 +307,79 @@ export function PivotStudio({
   /** Drill down: expand everything again. */
   const expandAll = () => update({ collapsed: [], collapsedCols: [] });
 
+  /** Builds the right-click menu for a value cell. */
+  const openContextMenu = (payload: {
+    x: number;
+    y: number;
+    rowKey: string[];
+    colKey: string[];
+    label: string;
+    value: unknown;
+  }) => {
+    const items: ContextMenuItem[] = [
+      {
+        id: "drill",
+        label: strings.drillThrough,
+        disabled: !allowDrillThrough,
+        onSelect: () => void openDrill(payload.rowKey, payload.colKey, payload.label),
+      },
+      {
+        id: "copy-cell",
+        label: "Copy this value",
+        onSelect: () => {
+          void navigator.clipboard
+            ?.writeText(String(payload.value ?? ""))
+            .then(() => setStatus("Value copied"))
+            .catch(() => setStatus("Copy is blocked by the browser"));
+        },
+      },
+      {
+        id: "copy-table",
+        label: "Copy the whole table",
+        disabled: !allowExport,
+        onSelect: () => {
+          void copyMatrix(getMatrix()).then((ok) => setStatus(ok ? "Copied" : "Copy failed"));
+        },
+      },
+      {
+        id: "export-csv",
+        label: "Export to CSV",
+        disabled: !allowExport,
+        onSelect: () => handleExport("csv"),
+      },
+      {
+        id: "number-format",
+        label: "Number formatting…",
+        onSelect: () => {
+          setFormatTab("number");
+          setFormatOpen(true);
+        },
+      },
+      {
+        id: "conditional-format",
+        label: "Conditional formatting…",
+        onSelect: () => {
+          setFormatTab("conditional");
+          setFormatOpen(true);
+        },
+      },
+      { id: "expand-all", label: "Drill down all levels", onSelect: expandAll },
+      { id: "collapse-all", label: "Drill up to top level", onSelect: collapseAll },
+    ];
+    setMenu({ x: payload.x, y: payload.y, items });
+  };
+
   return (
-    <section className={`flex flex-col gap-3 ${className}`} aria-label={title}>
+    <section
+      ref={rootRef}
+      data-testid="pivot-studio"
+      data-fullscreen={fullscreen ? "true" : undefined}
+
+      className={`flex flex-col gap-3 ${
+        fullscreen ? "fixed inset-0 z-40 overflow-auto bg-background p-3" : ""
+      } ${className}`}
+      aria-label={title}
+    >
       {showToolbar && (
         <PivotToolbar
           strings={strings}
@@ -258,8 +394,16 @@ export function PivotStudio({
           }}
           onReset={() => update(createDefaultConfig(initialConfig))}
           onOpenFields={fieldsUi === "dialog" ? () => setFieldsOpen(true) : undefined}
+          onOpenFormat={() => {
+            setFormatTab("number");
+            setFormatOpen(true);
+          }}
+          onShare={() => void shareLink()}
+          onToggleFullscreen={toggleFullscreen}
+          isFullscreen={fullscreen}
         />
       )}
+
 
       {allowFileUpload && (
         <DataSourceBar
@@ -359,6 +503,8 @@ export function PivotStudio({
             editable={config.editing && !readOnly}
             onCellEdit={handleCellEdit}
             onDrill={(rowKey, colKey, label) => void openDrill(rowKey, colKey, label)}
+            onCellContextMenu={openContextMenu}
+
             onSelectionChange={setSelection}
             emptyLabel={strings.noData}
           />
@@ -415,13 +561,34 @@ export function PivotStudio({
         onClose={() => setFieldsOpen(false)}
       />
 
+      <FormatDialog
+        key={formatTab}
+        open={formatOpen}
+
+        strings={strings}
+        config={config}
+        fields={safeFields}
+        readOnly={readOnly}
+        onChange={update}
+        initialTab={formatTab}
+        onClose={() => setFormatOpen(false)}
+      />
+
+      {menu && (
+        <GridContextMenu x={menu.x} y={menu.y} items={menu.items} onClose={() => setMenu(null)} />
+      )}
+
       <DrillThroughDialog
         open={drill !== null}
         title={drill?.title ?? ""}
         rows={drill?.rows ?? []}
         strings={strings}
+        canExport={allowExport}
+        decoration={decoration}
+        onStatus={setStatus}
         onClose={() => setDrill(null)}
       />
+
     </section>
   );
 }

@@ -47,6 +47,18 @@ export { areaOfField, moveField, removeField, reorderField, pivotAreas } from ".
 export type { PivotArea } from "./dnd";
 export { PivotChart } from "./ui/PivotChart";
 export { DrillThroughDialog } from "./ui/DrillThroughDialog";
+export { FormatDialog } from "./ui/FormatDialog";
+export type { FormatTab } from "./ui/FormatDialog";
+export { GridContextMenu } from "./ui/GridContextMenu";
+export type { ContextMenuItem } from "./ui/GridContextMenu";
+export {
+  encodeReport,
+  decodeReport,
+  buildReportUrl,
+  readReportFromUrl,
+  REPORT_PARAM,
+} from "./report-link";
+
 
 export { aggregators, aggregatorLabels, aggregate, registerAggregator } from "./aggregators";
 export type { AggregatorFn } from "./aggregators";
@@ -69,6 +81,7 @@ export {
   exportMatrix,
   matrixFromTable,
   matrixFromResult,
+  matrixFromRows,
   printMatrix,
   copyMatrix,
   toCsv,
@@ -77,7 +90,8 @@ export {
   toJson,
   downloadFile,
 } from "./export";
-export type { ExportFormat, ExportMatrix } from "./export";
+export type { ExportFormat, ExportMatrix, ExportDecoration } from "./export";
+
 export { secureRows, visibleFields, can, defaultPermissions } from "./security";
 export { formatNumber, formatPercent } from "./format";
 export { locales, getLocale } from "./locales";
