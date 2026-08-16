@@ -327,12 +327,13 @@ describe("PivotStudio filter surfaces", () => {
   it("hides the report filter area from the toolbar", async () => {
     const user = userEvent.setup();
     setup({
+      fieldsUi: "dialog",
       initialConfig: {
         ...baseConfig,
         filters: [{ kind: "values", field: "region", mode: "include", members: ["North"] }],
       },
     });
-    expect(screen.getByTestId("report-filter-area")).toBeInTheDocument();
+    expect(await screen.findByTestId("report-filter-area")).toBeInTheDocument();
     await user.click(screen.getByLabelText("Filter area"));
     expect(screen.queryByTestId("report-filter-area")).not.toBeInTheDocument();
   });
@@ -342,8 +343,9 @@ describe("PivotStudio filter surfaces", () => {
     setup({ initialConfig: { ...baseConfig, chart: { visible: true, type: "bar" } } });
     const bar = screen.getByTestId("chart-filter-bar");
     await user.click(within(bar).getByLabelText("Filter chart by region"));
-    await user.click(await screen.findByLabelText("North"));
-    await user.click(screen.getByRole("button", { name: /apply/i }));
+    const popover = await screen.findByTestId("member-filter-region");
+    await user.click(within(popover).getByLabelText("North"));
+    await user.click(within(popover).getByRole("button", { name: "OK" }));
     await waitFor(() =>
       expect(screen.getByTestId("chart-filter-summary")).toHaveTextContent("region"),
     );
@@ -378,7 +380,7 @@ describe("PivotStudio filter surfaces", () => {
     await user.selectOptions(screen.getByLabelText("Filter type"), "condition");
     await user.selectOptions(screen.getByLabelText("Filter field"), "orderTime");
     expect(screen.getByLabelText("Filter value")).toHaveAttribute("type", "time");
-    await user.selectOptions(screen.getByLabelText("Condition"), "gte");
+    await user.selectOptions(screen.getByLabelText("Operator"), "gte");
     expect(screen.getByRole("option", { name: "is at or after" })).toBeInTheDocument();
     await user.type(screen.getByLabelText("Filter value"), "09:00");
     await user.click(screen.getByRole("button", { name: /add filter/i }));
