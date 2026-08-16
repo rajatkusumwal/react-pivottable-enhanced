@@ -41,6 +41,9 @@ export default defineConfig({
     // orb's UMD bundle references the Node `global` object.
     define: { global: "globalThis" },
     plugins: [keepHmrSocketAlive()],
+    // A slow/proxied websocket used to time out after ~30s, which made the
+    // browser reload the whole page (and drop the imported data).
+    server: { hmr: { timeout: 120_000 } },
   },
 });
 
