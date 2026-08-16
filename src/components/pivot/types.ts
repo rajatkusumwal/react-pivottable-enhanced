@@ -73,6 +73,12 @@ export type ConditionOperator =
   | "beginsWith"
   | "endsWith";
 
+/**
+ * How a conditional filter compares its operand. "auto" (the default) infers dates
+ * when both sides parse as dates, otherwise falls back to number/text comparison.
+ */
+export type ConditionValueType = "auto" | "number" | "text" | "date";
+
 export type FilterDef =
   | {
       kind: "values";
