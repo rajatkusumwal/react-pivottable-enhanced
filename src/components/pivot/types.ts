@@ -362,7 +362,7 @@ export function createDefaultConfig(partial: Partial<PivotConfig> = {}): PivotCo
       drillCols: [],
       hiddenSeries: [],
     },
-    drillThrough: { fields: [], maxRows: 1000 },
+    drillThrough: { maxRows: 1000 },
     ...partial,
   };
 }
