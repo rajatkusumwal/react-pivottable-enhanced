@@ -191,7 +191,8 @@ describe("formatting & localisation", () => {
 
 describe("sample data", () => {
   it("is deterministic", () => {
-    expect(sampleData).toHaveLength(480);
+    expect(sampleData).toHaveLength(600);
+    expect(Object.keys(sampleData[0]!).length).toBeGreaterThanOrEqual(50);
     expect(generateSalesData(10, 1)).toEqual(generateSalesData(10, 1));
   });
 });

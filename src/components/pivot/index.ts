@@ -80,7 +80,7 @@ export {
   loadJsonUrl,
   readFileAsRows,
 } from "./data-sources";
-export { sampleData, sampleFields, sampleCsv, generateSalesData } from "./sample-data";
+export { sampleData, sampleFields, sampleCsv, sampleHierarchies, generateSalesData } from "./sample-data";
 export { createDefaultConfig, defaultTheme } from "./types";
 export type {
   PivotConfig,

@@ -23,8 +23,10 @@ export const Route = createFileRoute("/demos")({
 });
 
 const startConfig = createDefaultConfig({
-  rows: ["region", "category"],
-  cols: ["quarter"],
+  rows: ["region", "country", "state", "city"],
+  cols: ["year", "half", "quarter"],
+  collapsed: [],
+  collapsedCols: [],
   values: [
     { field: "revenue", aggregator: "sum", caption: "Revenue", format: { decimals: 0, currency: "USD" } },
   ],
