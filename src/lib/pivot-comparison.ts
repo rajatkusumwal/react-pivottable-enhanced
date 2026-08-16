@@ -10,8 +10,10 @@ export type FeatureRow = {
   flexmonster: Cell;
   reactPivottable: Cell;
   orb: Cell;
-  /** What the Pivot Studio demo on the /demos page actually delivers. */
-  studio: Cell;
+  /** Pivot Studio demo tab running on the react-pivottable engine. */
+  studioRpt: Cell;
+  /** Pivot Studio demo tab running on the Orb.js engine. */
+  studioOrb: Cell;
 };
 
 export type FeatureCategory = {
