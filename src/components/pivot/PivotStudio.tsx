@@ -478,7 +478,7 @@ export function PivotStudio({
           onCopy={async () => {
             if (await copyMatrix(getMatrix())) setStatus("Copied");
           }}
-          onReset={() => update(createDefaultConfig(initialConfig))}
+          onReset={resetToSampleData}
           onOpenFields={fieldsUi === "dialog" ? () => setFieldsOpen(true) : undefined}
           onOpenFormat={() => {
             setFormatTab("number");
