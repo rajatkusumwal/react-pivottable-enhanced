@@ -46,7 +46,7 @@ describe("custom data source API", () => {
     expect(source.query).toHaveBeenCalledOnce();
     expect(result.meta?.source).toBe("backend");
     expect(result.meta?.queryId).toBe("graphql");
-    expect(result.grandTotal?.[0]?.value).toBe(450);
+    expect(result.grandTotals?.[0]?.value).toBe(450);
   });
 
   it("lays out pre-aggregated records returned by the backend", async () => {
@@ -54,7 +54,7 @@ describe("custom data source API", () => {
     const engine = createCustomEngine({ id: "duckdb", aggregate });
     const result = await engine.query(query(), []);
     expect(aggregate).toHaveBeenCalledOnce();
-    expect(result.grandTotal?.[0]?.value).toBe(450);
+    expect(result.grandTotals?.[0]?.value).toBe(450);
   });
 
   it("falls back to raw records plus browser aggregation", async () => {
@@ -68,7 +68,7 @@ describe("custom data source API", () => {
       fetchRows: async () => rows,
       drillThrough: async () => [rows[0] as PivotRow],
     });
-    const drill = { query: query(), rowPath: ["North"], colPath: ["Bikes"] };
+    const drill = { query: query(), rowKey: ["North"], colKey: ["Bikes"] };
     expect(await custom.drillThrough(drill, [])).toHaveLength(1);
 
     const local = createCustomEngine({ fetchRows: async () => rows });
@@ -96,7 +96,7 @@ describe("server-side aggregation of large datasets", () => {
     expect(sent.limit).toBe(1_000);
     expect(sent.offset).toBe(0);
     expect(result.meta?.source).toBe("backend");
-    expect(result.grandTotal?.[0]?.value).toBe(450);
+    expect(result.grandTotals?.[0]?.value).toBe(450);
   });
 
   it("honours an explicit page window", async () => {
@@ -117,7 +117,7 @@ describe("server-side aggregation of large datasets", () => {
       fetchImpl: mock.fetch,
     });
     const records = await engine.drillThrough(
-      { query: query(), rowPath: ["North"], colPath: ["Bikes"] },
+      { query: query(), rowKey: ["North"], colKey: ["Bikes"] },
       [],
     );
     expect(records).toHaveLength(1);
@@ -165,6 +165,7 @@ describe("streaming huge CSV files", () => {
       })(),
       (rowsBatch) => {
         batches.push(rowsBatch.length);
+        return undefined;
       },
       { csv: { delimiter: ";", decimalSeparator: "," }, batchSize: 10 },
     );
@@ -191,9 +192,13 @@ describe("streaming huge CSV files", () => {
 
   it("reads from a Blob stream", async () => {
     const seen: PivotRow[] = [];
-    await streamCsvRows(new Blob([csvText(3)], { type: "text/csv" }), (batch) =>
-      seen.push(...batch),
-    { csv: { delimiter: ";", decimalSeparator: "," } });
+    await streamCsvRows(
+      new Blob([csvText(3)], { type: "text/csv" }),
+      (batch) => {
+        seen.push(...batch);
+      },
+      { csv: { delimiter: ";", decimalSeparator: "," } },
+    );
     expect(seen).toHaveLength(3);
   });
 });
