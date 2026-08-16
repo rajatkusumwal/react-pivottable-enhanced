@@ -242,8 +242,8 @@ export interface ChartConfig {
 
 /** Drill-through slice: which columns come back, how they are sorted and capped. */
 export interface DrillThroughConfig {
-  /** Columns shown in the drill-through view, in order. Empty = every source field. */
-  fields?: string[];
+  /** Columns shown in the drill-through view, in order. undefined = every source field, [] = none. */
+  fields?: string[] | undefined;
   /** Hard cap on the number of records fetched and shown. */
   maxRows?: number;
   /** Initial column sorting inside the drill-through view. */
