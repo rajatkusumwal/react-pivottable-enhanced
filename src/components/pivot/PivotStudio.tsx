@@ -132,6 +132,17 @@ export function PivotStudio({
     [config, controlled, onConfigChange],
   );
 
+  /**
+   * "Clear" and "Use sample data" both mean "start over": drop the imported
+   * file (and its cached copy) so the built-in sample data comes back.
+   */
+  const resetToSampleData = useCallback(() => {
+    setUploaded(null);
+    setEditedRows(null);
+    saveSessionDataset(null);
+    update(createDefaultConfig(initialConfig));
+  }, [update, initialConfig]);
+
   const safeFields = useMemo(() => visibleFields(activeFields, permissions), [activeFields, permissions]);
   const baseRows = useMemo(() => secureRows(activeData, permissions), [activeData, permissions]);
   const derivedRows = useMemo(
