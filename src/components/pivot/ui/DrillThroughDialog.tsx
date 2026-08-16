@@ -136,8 +136,21 @@ export function DrillThroughDialog({
                     onChange={(e) => setSearch(e.target.value)}
                   />
                   <div className="mb-2 flex gap-2 text-xs">
-                    <button type="button" className="underline" onClick={() => onFieldsChange?.([])}>
-                      Show all
+                    <button
+                      type="button"
+                      className="underline disabled:no-underline disabled:opacity-50"
+                      disabled={!onFieldsChange || columns.length === allColumns.length}
+                      onClick={() => onFieldsChange?.(undefined)}
+                    >
+                      Select all
+                    </button>
+                    <button
+                      type="button"
+                      className="underline disabled:no-underline disabled:opacity-50"
+                      disabled={!onFieldsChange || columns.length === 0}
+                      onClick={() => onFieldsChange?.([])}
+                    >
+                      Deselect all
                     </button>
                   </div>
                   <ul className="max-h-56 space-y-1 overflow-auto">
