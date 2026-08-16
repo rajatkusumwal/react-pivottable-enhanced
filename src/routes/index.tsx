@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 
 const TITLE = "Pivot Table Tools Compared: Flexmonster vs Free Options";
 const DESCRIPTION =
-  "A plain-English comparison of the paid Flexmonster pivot table against the free react-pivottable engine and our free Pivot Studio demo built on top of it.";
+  "A plain-English comparison of the paid Flexmonster pivot table against the free react-pivottable engine and the inhouse-grid-monster shell built on top of it.";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -34,7 +34,7 @@ export const Route = createFileRoute("/")({
 const plainNames: Record<ProductKey, { name: string; price: string }> = {
   flexmonster: { name: "Flexmonster", price: "Paid" },
   reactPivottable: { name: "react-pivottable", price: "Free" },
-  studio: { name: "Our free demo", price: "Free" },
+  studio: { name: "inhouse-grid-monster", price: "Free" },
 };
 
 const statusMeta = {
@@ -115,15 +115,15 @@ function ComparisonPage() {
             A pivot table lets people slice and summarise data on a screen, like in Excel.
             Below we take everything the paid tool <strong className="font-medium text-foreground">Flexmonster</strong>{" "}
             can do — {totalFeatures} things in total — and check whether the leading free tool,
-            react-pivottable, can do the same — plus our free{" "}
-            <strong className="font-medium text-foreground">Pivot Studio</strong> demo on this site,
-            which builds a familiar Flexmonster-style experience on top of it.
+            react-pivottable, can do the same — plus the{" "}
+            <strong className="font-medium text-foreground">inhouse-grid-monster</strong>{" "}
+            shell on this site, which builds a familiar Flexmonster-style experience on top of it.
           </p>
           <Link
             to="/demos"
             className="mt-5 inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground"
           >
-            Try the free demo yourself
+            Try inhouse-grid-monster
           </Link>
         </header>
 
@@ -267,7 +267,7 @@ function ComparisonPage() {
           <div className="mt-6 hidden overflow-hidden rounded-xl border border-border md:block">
             <table className="w-full border-collapse text-sm">
               <caption className="sr-only">
-                Feature support comparison between Flexmonster, react-pivottable and our free Pivot Studio demo
+                Feature support comparison between Flexmonster, react-pivottable and inhouse-grid-monster
               </caption>
               <thead>
                 <tr className="bg-surface-2">

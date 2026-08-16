@@ -1,4 +1,4 @@
-# Pivot Studio
+# inhouse-grid-monster
 
 A free, Flexmonster-like pivot table for React 19, built on the open-source
 [react-pivottable](https://react-pivottable.js.org/) aggregation utilities with a

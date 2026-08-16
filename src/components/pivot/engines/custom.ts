@@ -1,5 +1,5 @@
 /**
- * Custom data source API — plug any backend into Pivot Studio.
+ * Custom data source API — plug any backend into inhouse-grid-monster.
  *
  * Implement as much of `CustomDataSource` as your service supports:
  *
