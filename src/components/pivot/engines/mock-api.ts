@@ -9,6 +9,7 @@
  *   const api = createMockPivotApi({ rows: sampleData, fields: sampleFields });
  *   const engine = createBackendEngine({ baseUrl: "https://api.test", fetchImpl: api.fetch });
  */
+import { MEMBER_PAGE_SIZE } from "../constants";
 import { applyCellEdit, type CellEditRequest } from "../editing";
 import { applyFilters, uniqueMembers } from "../filters";
 import { inferFields } from "../data-sources";

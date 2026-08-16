@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Plus, X } from "lucide-react";
+import { MEMBER_OPTION_LIMIT } from "../constants";
 import { dateOperatorLabels, describeFilter, timeOperatorLabels, uniqueMembers } from "../filters";
 import type { PivotStrings } from "../locales";
 import type { ConditionOperator, FieldDef, FilterDef, PivotRow } from "../types";
