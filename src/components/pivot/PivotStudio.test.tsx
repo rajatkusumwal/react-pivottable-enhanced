@@ -344,12 +344,14 @@ describe("PivotStudio filter surfaces", () => {
     const bar = screen.getByTestId("chart-filter-bar");
     await user.click(within(bar).getByLabelText("Filter chart by region"));
     const popover = await screen.findByTestId("member-filter-region");
-    await user.click(within(popover).getByLabelText("North"));
+    await user.click(within(popover).getByLabelText("South"));
     await user.click(within(popover).getByRole("button", { name: "OK" }));
     await waitFor(() =>
       expect(screen.getByTestId("chart-filter-summary")).toHaveTextContent("region"),
     );
-    expect(screen.queryByText("South")).not.toBeInTheDocument();
+    const grid = screen.getByRole("table");
+    expect(within(grid).queryByText("South")).not.toBeInTheDocument();
+    expect(within(grid).getByText("North")).toBeInTheDocument();
   });
 
   it("hides chart filter controls from the toolbar", async () => {
