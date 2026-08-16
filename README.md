@@ -112,7 +112,40 @@ other than Tailwind tokens (`--color-border`, `--color-card`, …) and `@/lib/ut
   `percentDifferenceOfRow` / `percentDifferenceOfColumn`, `runningTotalOfRow` /
   `runningTotalOfColumn`. Pick it from the measure menu in the field list.
 
-* **Calculated values** — safe formula parser (no `eval`), e.g. `revenue - cost`.
+* **Calculated values** — safe formula parser (no `eval`), e.g. `[revenue] - [cost]`.
+  Choose the scope in the field list: *per record* (row scope) or *per cell, totals aware*
+  (aggregate scope), which unlocks `grandTotal([revenue])`, `rowTotal(…)`, `columnTotal(…)`,
+  `parentRowTotal(…)` and `parentColumnTotal(…)` — e.g.
+  `[revenue] / grandTotal([revenue]) * 100` for a share-of-total measure.
+
+  ```tsx
+  <PivotStudio
+    data={sampleData}
+    fields={sampleFields}
+    initialConfig={{
+      rows: ["region"],
+      values: [{ field: "share", aggregator: "sum", caption: "Share %" }],
+      calculated: [
+        { name: "share", scope: "aggregate", formula: "[revenue] / grandTotal([revenue]) * 100" },
+      ],
+    }}
+  />
+  ```
+* **KPIs from the data source** — a field can declare its goal and the grid shows a status
+  arrow (on target / at risk / below target) next to every value and row total, while the
+  field list groups KPI fields together:
+
+  ```ts
+  const fields: FieldDef[] = [
+    { name: "targetRevenue", caption: "Target revenue", type: "number" },
+    {
+      name: "revenue",
+      caption: "Revenue",
+      type: "number",
+      kpi: { goal: "targetRevenue", direction: "higher", warningAt: 0.9 },
+    },
+  ];
+  ```
 * **Charts** — Recharts bar / stacked / line / area / pie with click-to-drill.
 * **Drill-through** — click any number to inspect the source records.
 * **Export & print** — Excel (.xls), CSV, TSV, HTML, JSON, clipboard, print/PDF.
@@ -196,6 +229,22 @@ All endpoints are JSON over POST.
   "sort": { "by": 0, "direction": "desc" },
   "sorts": [{ "by": 0, "direction": "desc" }, { "by": "rows", "direction": "asc" }],
   "locale": "en",
+  // Aggregate-scope formulas become measures by name (see "values" above);
+  // row-scope entries are applied to the records before grouping.
+  "calculated": [
+    {
+      "name": "share",
+      "caption": "Share of total",
+      "scope": "aggregate",
+      "aggregator": "sum",
+      "formula": "[revenue] / grandTotal([revenue]) * 100"
+    },
+    { "name": "profit", "scope": "row", "formula": "[revenue] - [cost]" }
+  ],
+  // KPI metadata copied from the field list, keyed by field name.
+  "kpis": {
+    "revenue": { "goal": "targetRevenue", "direction": "higher", "warningAt": 0.9 }
+  },
   "limit": 500,
   "offset": 0,
   "datasetId": "sales-2026"
@@ -233,6 +282,9 @@ Response (`PivotResult`):
   "rowTotals": [576158, 222656, 576158],
   "colTotals": [608186],
   "grandTotal": 2583335,
+  // Aligned with "cells" / "rowTotalsByMeasure"; null when the measure is not a KPI.
+  "kpiStatuses":  [[{ "state": "onTarget", "ratio": 1.12, "goal": 131500 }], [null], [null]],
+  "kpiRowTotals": [[{ "state": "atRisk", "ratio": 0.94, "goal": 612000 }], [null], [null]],
   "sourceCount": 480,
   "meta": { "source": "backend", "queryId": "b12f" }
 }
@@ -269,6 +321,32 @@ Rules the server must respect:
   | `runningTotalOfRow` | cumulative sum across the row, left to right |
   | `runningTotalOfColumn` (`runningTotal` is an alias of the row variant) | cumulative sum down the column, top to bottom |
 
+* `calculated` holds the report's formulas. `scope: "row"` (the default) is evaluated per
+  record before grouping and simply adds a column. `scope: "aggregate"` is evaluated **per
+  grid cell after aggregation** and is referenced as a measure by `name`, so
+  `{ "field": "share", "aggregator": "sum" }` renders the formula rather than a column.
+  Inside an aggregate formula, `[field]` is that field aggregated over the cell using the
+  formula's own `aggregator` (default `sum`), and the total functions resolve against the
+  same cell:
+
+  | Function | SQL equivalent for the cell |
+  | --- | --- |
+  | `grandTotal([f])` | aggregate of `f` over the whole (filtered) dataset |
+  | `rowTotal([f])` | over the cell's row group, all columns |
+  | `columnTotal([f])` | over the cell's column group, all rows |
+  | `parentRowTotal([f])` | over the row member's parent group, same column; falls back to `grandTotal` at the top level |
+  | `parentColumnTotal([f])` | over the column member's parent group, same row |
+
+  Operators are `+ - * / % ^`, plus `abs`, `round`, `min`, `max` and `sqrt`. Division by zero
+  yields `0`; a formula that cannot be evaluated yields `null`. Never `eval` these strings —
+  parse them (the client uses a shunting-yard parser).
+* `kpis` maps a field name to its KPI descriptor, taken from `field.kpi` in the field list:
+  `{ goal: string | number, direction?: "higher" | "lower", warningAt?: number }`. For every
+  KPI measure the server grades the cell against the goal aggregated the same way and returns
+  `kpiStatuses` / `kpiRowTotals`: `state` is `onTarget` when `ratio >= 1`, `atRisk` when
+  `ratio >= warningAt` (default `0.9`) and `below` otherwise, where
+  `ratio = value / goal` (`goal / value` when `direction` is `"lower"`). Return `null` for
+  non-KPI measures and when the goal is missing or zero.
 * Condition filters carry an optional `valueType`
   (`"auto" | "number" | "text" | "date" | "time"`).
   With `"date"` the server must compare on the date timeline at **day granularity** —

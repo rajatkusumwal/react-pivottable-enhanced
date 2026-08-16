@@ -10,7 +10,7 @@ import {
 import type { DragEndEvent } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { useDraggable } from "@dnd-kit/core";
-import { GripVertical, Layers, Plus, Sigma } from "lucide-react";
+import { GripVertical, Layers, Plus, Sigma, Target } from "lucide-react";
 import { aggregatorLabels, aggregatorsForType } from "../aggregators";
 import { displayModeLabels } from "../analysis";
 
@@ -108,6 +108,7 @@ export function FieldListPanel({
   const [memberFilter, setMemberFilter] = useState<string | null>(null);
   const [collapsedGroups, setCollapsedGroups] = useState<string[]>([]);
   const [sortMode, setSortMode] = useState<SortMode>("source");
+  const [calcScope, setCalcScope] = useState<"row" | "aggregate">("row");
   const dragDisabled = readOnly || config.dragAndDrop === false;
 
   const sensors = useSensors(
@@ -117,7 +118,8 @@ export function FieldListPanel({
 
   const allFields = useMemo<FieldDef[]>(
     () => [
-      ...fields,
+      // KPI fields from the data source get their own group in the list.
+      ...fields.map((f) => (f.kpi && !f.folder ? { ...f, folder: "KPIs" } : f)),
       ...config.calculated.map<FieldDef>((c) => ({
         name: c.name,
         caption: c.caption ?? c.name,
@@ -207,7 +209,13 @@ export function FieldListPanel({
     const error = validateFormula(formula);
     setFormulaError(error);
     if (error || !calcName.trim()) return;
-    const next: CalculatedField = { name: calcName.trim(), formula, caption: calcName.trim() };
+    const next: CalculatedField = {
+      name: calcName.trim(),
+      formula,
+      caption: calcName.trim(),
+      scope: calcScope,
+      ...(calcScope === "aggregate" ? { aggregator: "sum" as const } : {}),
+    };
     onChange({ calculated: [...config.calculated.filter((c) => c.name !== next.name), next] });
   };
 
@@ -422,6 +430,12 @@ export function FieldListPanel({
 
   const fieldRow = (f: FieldDef, indent = false) => (
     <li key={f.name} className={`flex items-center gap-2 ${indent ? "pl-4" : ""}`}>
+      {f.kpi ? (
+        <Target
+          className="h-3.5 w-3.5 shrink-0 text-primary"
+          aria-label={`KPI: ${f.caption ?? f.name}`}
+        />
+      ) : null}
       {indent && f.level ? (
         <span className="rounded bg-muted px-1 text-[10px] text-muted-foreground">L{f.level}</span>
       ) : null}
@@ -577,6 +591,16 @@ export function FieldListPanel({
             disabled={readOnly}
             onChange={(e) => setCalcName(e.target.value)}
           />
+          <select
+            className={control}
+            aria-label="Formula scope"
+            value={calcScope}
+            disabled={readOnly}
+            onChange={(e) => setCalcScope(e.target.value as "row" | "aggregate")}
+          >
+            <option value="row">Per record (row scope)</option>
+            <option value="aggregate">Per cell, totals aware (aggregate scope)</option>
+          </select>
           <input
             className={`${control} font-mono text-xs`}
             aria-label="Formula"
@@ -585,7 +609,17 @@ export function FieldListPanel({
             onChange={(e) => setFormula(e.target.value)}
           />
           <p className="text-[11px] text-muted-foreground">
-            Use square brackets for fields, e.g. <code>[revenue] - [cost]</code>
+            {calcScope === "row" ? (
+              <>
+                Use square brackets for fields, e.g. <code>[revenue] - [cost]</code>
+              </>
+            ) : (
+              <>
+                Totals are available: <code>grandTotal([revenue])</code>,{" "}
+                <code>rowTotal(…)</code>, <code>columnTotal(…)</code>,{" "}
+                <code>parentRowTotal(…)</code>, <code>parentColumnTotal(…)</code>
+              </>
+            )}
           </p>
           {formulaError && <p className="text-xs text-destructive">{formulaError}</p>}
           <button

@@ -2,9 +2,16 @@ import type { CalculatedField, PivotRow } from "./types";
 
 /**
  * A tiny, safe formula evaluator for calculated values.
+ *
  * Supports: numbers, [field] references, + - * / % ^, parentheses and the
  * functions abs, round, min, max, sqrt. It never uses eval/Function, so a
  * formula coming from user input cannot execute arbitrary code.
+ *
+ * Aggregate-scope formulas additionally get the total functions
+ * `grandTotal([f])`, `rowTotal([f])`, `columnTotal([f])`,
+ * `parentRowTotal([f])` and `parentColumnTotal([f])`, which resolve against the
+ * cell being computed — that is what makes "share of the grand total" style
+ * formulas possible.
  */
 
 type Token =
@@ -17,7 +24,31 @@ type Token =
   | { t: "rp" };
 
 const FUNCTIONS = ["abs", "round", "min", "max", "sqrt"] as const;
+
+/** Post-aggregation totals a formula can reach for. */
+export type TotalScope = "grand" | "row" | "column" | "parentRow" | "parentColumn";
+
+/** Lower-cased function name -> the total it resolves. */
+export const TOTAL_FUNCTIONS: Record<string, TotalScope> = {
+  grandtotal: "grand",
+  rowtotal: "row",
+  columntotal: "column",
+  coltotal: "column",
+  parentrowtotal: "parentRow",
+  parentcolumntotal: "parentColumn",
+  parentcoltotal: "parentColumn",
+};
+
+/** Resolves the values a formula asks for. */
+export interface FormulaContext {
+  /** `[field]` — the measure value for the current scope. */
+  value: (field: string) => number | null;
+  /** `grandTotal([field])` and friends. */
+  total?: (scope: TotalScope, field: string) => number | null;
+}
+
 const PRECEDENCE: Record<string, number> = { "+": 1, "-": 1, "*": 2, "/": 2, "%": 2, "^": 3 };
+
 
 export function tokenize(formula: string): Token[] {
   const tokens: Token[] = [];
@@ -48,9 +79,10 @@ export function tokenize(formula: string): Token[] {
       let j = i;
       while (j < formula.length && /[a-zA-Z_0-9]/.test(formula[j] as string)) j++;
       const name = formula.slice(i, j).toLowerCase();
-      if (!(FUNCTIONS as readonly string[]).includes(name)) {
+      if (!(FUNCTIONS as readonly string[]).includes(name) && !(name in TOTAL_FUNCTIONS)) {
         throw new Error(`Unknown function "${name}"`);
       }
+
       tokens.push({ t: "fn", v: name });
       i = j;
       continue;
@@ -113,53 +145,78 @@ export function toRpn(tokens: Token[]): Token[] {
   return out;
 }
 
-export function evaluateFormula(formula: string, row: PivotRow): number | null {
+interface Item {
+  v: number;
+  /** Field name when the item came straight from a `[field]` reference. */
+  field?: string;
+}
+
+/** Evaluates a formula against any value source (a record or a pivot cell). */
+export function evaluateWithContext(formula: string, ctx: FormulaContext): number | null {
   const rpn = toRpn(tokenize(formula));
-  const stack: number[] = [];
+  const stack: Item[] = [];
   for (const token of rpn) {
-    if (token.t === "num") stack.push(token.v);
+    if (token.t === "num") stack.push({ v: token.v });
     else if (token.t === "field") {
-      const n = Number(row[token.v]);
-      stack.push(Number.isFinite(n) ? n : 0);
+      const n = ctx.value(token.v);
+      stack.push({ v: Number.isFinite(Number(n)) ? Number(n) : 0, field: token.v });
     } else if (token.t === "op") {
       const b = stack.pop();
       const a = stack.pop();
       if (a === undefined || b === undefined) throw new Error("Malformed formula");
       switch (token.v) {
         case "+":
-          stack.push(a + b);
+          stack.push({ v: a.v + b.v });
           break;
         case "-":
-          stack.push(a - b);
+          stack.push({ v: a.v - b.v });
           break;
         case "*":
-          stack.push(a * b);
+          stack.push({ v: a.v * b.v });
           break;
         case "/":
-          stack.push(b === 0 ? 0 : a / b);
+          stack.push({ v: b.v === 0 ? 0 : a.v / b.v });
           break;
         case "%":
-          stack.push(b === 0 ? 0 : a % b);
+          stack.push({ v: b.v === 0 ? 0 : a.v % b.v });
           break;
         case "^":
-          stack.push(a ** b);
+          stack.push({ v: a.v ** b.v });
           break;
         default:
           throw new Error(`Unknown operator ${token.v}`);
       }
     } else if (token.t === "fn") {
-      if (token.v === "min" || token.v === "max") {
-        const b = stack.pop() ?? 0;
-        const a = stack.pop() ?? 0;
-        stack.push(token.v === "min" ? Math.min(a, b) : Math.max(a, b));
+      const scope = TOTAL_FUNCTIONS[token.v];
+      if (scope) {
+        const arg = stack.pop();
+        if (!arg?.field) throw new Error(`${token.v}() needs a [field] reference`);
+        const total = ctx.total ? ctx.total(scope, arg.field) : 0;
+        stack.push({ v: Number.isFinite(Number(total)) ? Number(total) : 0 });
+      } else if (token.v === "min" || token.v === "max") {
+        const b = stack.pop()?.v ?? 0;
+        const a = stack.pop()?.v ?? 0;
+        stack.push({ v: token.v === "min" ? Math.min(a, b) : Math.max(a, b) });
       } else {
-        const a = stack.pop() ?? 0;
-        stack.push(token.v === "abs" ? Math.abs(a) : token.v === "round" ? Math.round(a) : Math.sqrt(a));
+        const a = stack.pop()?.v ?? 0;
+        stack.push({
+          v: token.v === "abs" ? Math.abs(a) : token.v === "round" ? Math.round(a) : Math.sqrt(a),
+        });
       }
     }
   }
-  const result = stack.pop();
+  const result = stack.pop()?.v;
   return result === undefined || !Number.isFinite(result) ? null : result;
+}
+
+export function evaluateFormula(formula: string, row: PivotRow): number | null {
+  return evaluateWithContext(formula, {
+    value: (field) => {
+      const n = Number(row[field]);
+      return Number.isFinite(n) ? n : 0;
+    },
+    total: () => 0,
+  });
 }
 
 export function validateFormula(formula: string): string | null {
@@ -171,15 +228,24 @@ export function validateFormula(formula: string): string | null {
   }
 }
 
-/** Adds one extra column per calculated field to every source row. */
+
+/** True for formulas evaluated per grid cell instead of per record. */
+export const isAggregateField = (field: CalculatedField) => field.scope === "aggregate";
+
+/**
+ * Adds one extra column per row-scope calculated field to every source row.
+ * Aggregate-scope fields are skipped — the engine evaluates those per cell.
+ */
 export function applyCalculatedFields(
   rows: PivotRow[],
   calculated: CalculatedField[],
 ): PivotRow[] {
-  if (!calculated.length) return rows;
+  const rowScope = calculated.filter((f) => !isAggregateField(f));
+  if (!rowScope.length) return rows;
   return rows.map((row) => {
     const next: PivotRow = { ...row };
-    for (const field of calculated) {
+    for (const field of rowScope) {
+
       try {
         next[field.name] = evaluateFormula(field.formula, next);
       } catch {

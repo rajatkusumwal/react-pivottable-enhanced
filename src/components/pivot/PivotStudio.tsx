@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { applyCalculatedFields } from "./calculated";
+import { kpisFromFields } from "./kpi";
 import { applyFilters } from "./filters";
 import { applyCellEdit } from "./editing";
 import { getLocale } from "./locales";
@@ -131,10 +132,13 @@ export function PivotStudio({
       sort: config.sort,
       sorts: config.layout === "flat" ? config.sorts : undefined,
       locale: config.locale,
+      calculated: config.calculated,
+      kpis: kpisFromFields(safeFields),
       datasetId: activeDatasetId,
     }),
-    [config, activeDatasetId],
+    [config, safeFields, activeDatasetId],
   );
+
 
   useEffect(() => {
     const id = ++requestId.current;

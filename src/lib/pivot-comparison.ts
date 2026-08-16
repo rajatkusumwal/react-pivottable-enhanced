@@ -541,6 +541,8 @@ const gridStudioOverrides: Record<string, Cell> = {
   "% difference of column / row": y("\u201cShow values as\u201d menu"),
   "Running totals of column / row": y("Down a column or across a row"),
   "Restrict available aggregations per field": y("field.aggregators allow-list"),
+  "Grand-total-aware formulas": y("Aggregate-scope formulas with grandTotal(), rowTotal(), columnTotal() and parent totals"),
+  "KPIs from the data source": y("field.kpi goal, direction and at-risk band, shown as status arrows in the grid"),
   "Show/hide the aggregation (sigma) icon": y("Toolbar \u201c\u03a3 icon\u201d switch"),
 };
 

@@ -8,6 +8,7 @@
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
+import { KPI_ICONS, KPI_LABELS } from "../kpi";
 import { formatNumber } from "../format";
 import { keyOf } from "../result";
 import type { HeaderNode, PivotCellValue, PivotLayout, PivotResult, PivotSort } from "../result";
@@ -300,6 +301,10 @@ export function PivotGrid({
     if (typeof value === "string") return value;
     return formatNumber(value, measures[measureIndex]?.format ?? result.measure.format, locale);
   };
+
+  /** KPI status behind a cell, when the measure is a KPI. */
+  const kpiAt = (rowIndex: number, colIndex: number) =>
+    result.kpiStatuses?.[rowIndex]?.[colIndex] ?? null;
 
   const cellStyle = (value: PivotCellValue, measureIndex = 0): React.CSSProperties => {
     if (typeof value !== "number") return {};
@@ -620,6 +625,19 @@ export function PivotGrid({
                           );
                       }}
                     >
+                      {kpiAt(rowIndex, colIndex) ? (
+                        <span
+                          className="pivot-kpi mr-1"
+                          data-kpi={kpiAt(rowIndex, colIndex)?.state}
+                          title={`${KPI_LABELS[kpiAt(rowIndex, colIndex)!.state]} — goal ${formatCell(
+                            kpiAt(rowIndex, colIndex)?.goal ?? null,
+                            mi,
+                          )}`}
+                          aria-label={KPI_LABELS[kpiAt(rowIndex, colIndex)!.state]}
+                        >
+                          {KPI_ICONS[kpiAt(rowIndex, colIndex)!.state]}
+                        </span>
+                      ) : null}
                       {isEditing(rowIndex, colIndex) ? (
                         <input
                           autoFocus
@@ -655,6 +673,15 @@ export function PivotGrid({
                         setAnchor(pos);
                       }}
                     >
+                      {result.kpiRowTotals?.[rowIndex]?.[mi] ? (
+                        <span
+                          className="pivot-kpi mr-1"
+                          data-kpi={result.kpiRowTotals[rowIndex]![mi]!.state}
+                          aria-label={KPI_LABELS[result.kpiRowTotals[rowIndex]![mi]!.state]}
+                        >
+                          {KPI_ICONS[result.kpiRowTotals[rowIndex]![mi]!.state]}
+                        </span>
+                      ) : null}
                       {formatCell(totalAt(rowIndex, mi), mi)}
                     </td>
                   ))}

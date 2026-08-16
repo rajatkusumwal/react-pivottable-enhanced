@@ -54,10 +54,15 @@ export { applyFilters, matchesCondition, uniqueMembers } from "./filters";
 export {
   applyCalculatedFields,
   evaluateFormula,
+  evaluateWithContext,
   validateFormula,
+  isAggregateField,
   tokenize,
   toRpn,
+  TOTAL_FUNCTIONS,
 } from "./calculated";
+export type { FormulaContext, TotalScope } from "./calculated";
+export { computeKpiStatus, kpisFromFields, KPI_LABELS, KPI_ICONS } from "./kpi";
 export { buildChartData, drillThroughRows, applyDisplayMode, grandTotal } from "./analysis";
 export type { ChartPoint, DrillSelection } from "./analysis";
 export {
@@ -98,6 +103,9 @@ export type {
   FilterDef,
   ConditionOperator,
   CalculatedField,
+  KpiDef,
+  KpiState,
+  KpiStatus,
   ConditionalFormatRule,
   NumberFormat,
   Permissions,

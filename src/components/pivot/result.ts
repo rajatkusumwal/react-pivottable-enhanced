@@ -8,12 +8,16 @@
 import type { PivotCellValue } from "./aggregators";
 import type {
   AggregatorName,
+  CalculatedField,
   FieldType,
   FilterDef,
+  KpiDef,
+  KpiStatus,
   NumberFormat,
   PivotRow,
   ValueDef,
 } from "./types";
+
 
 export type { PivotCellValue };
 
@@ -44,7 +48,12 @@ export interface PivotMeasure {
   format?: NumberFormat | undefined;
   /** Type of the measured field; non-number measures render as text. */
   type?: FieldType | undefined;
+  /** Present when the measure is a KPI declared by the data source. */
+  kpi?: KpiDef | undefined;
+  /** Present when the measure is an aggregate-scope calculated value. */
+  calculated?: boolean | undefined;
 }
+
 
 export interface PivotResult {
   rowFields: string[];
@@ -71,10 +80,15 @@ export interface PivotResult {
   grandTotal: number | null;
   /** Grand total per measure. */
   grandTotals: PivotCellValue[];
+  /** KPI status per cell, aligned with `cells`; null when not a KPI measure. */
+  kpiStatuses: (KpiStatus | null)[][];
+  /** KPI status for the row grand totals, aligned with `rowTotalsByMeasure`. */
+  kpiRowTotals: (KpiStatus | null)[][];
   /** Records behind the result — used for local drill-through and windowing info. */
   sourceCount: number;
   meta: { source: "local" | "backend"; queryId?: string };
 }
+
 
 
 export type PivotLayout = "compact" | "classic" | "flat";
@@ -103,12 +117,21 @@ export interface PivotQuery {
   /** Multi-column sort for the flat layout; takes precedence over `sort`. */
   sorts?: PivotSort[] | undefined;
   locale: string;
+  /**
+   * Calculated fields. Row-scope entries are applied to the records before the
+   * query; aggregate-scope entries are evaluated per cell by the engine and can
+   * be used as measures by name.
+   */
+  calculated?: CalculatedField[];
+  /** KPI metadata by field name, taken from the data source field list. */
+  kpis?: Record<string, KpiDef>;
   /** Backend paging. */
   limit?: number;
   offset?: number;
   /** Backend dataset handle returned by the upload endpoint. */
   datasetId?: string | undefined;
 }
+
 
 export interface DrillThroughQuery {
   rowKey: string[];
@@ -143,6 +166,8 @@ export function emptyResult(measure: PivotMeasure): PivotResult {
     colTotals: [],
     grandTotal: null,
     grandTotals: [],
+    kpiStatuses: [],
+    kpiRowTotals: [],
     sourceCount: 0,
     meta: { source: "local" },
   };

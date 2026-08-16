@@ -294,7 +294,15 @@ const baseFields: FieldDef[] = [
   { name: "discountPct", caption: "Discount %", type: "number", folder: "Measures" },
   { name: "grossRevenue", caption: "Gross revenue", type: "number", folder: "Measures" },
   { name: "discountAmount", caption: "Discount amount", type: "number", folder: "Measures" },
-  { name: "revenue", caption: "Revenue", type: "number", folder: "Measures" },
+  {
+    name: "revenue",
+    caption: "Revenue",
+    type: "number",
+    folder: "Measures",
+    // KPI straight from the data source: revenue is measured against the
+    // target-revenue column, higher is better, "at risk" below 90% of goal.
+    kpi: { goal: "targetRevenue", direction: "higher", warningAt: 0.9, caption: "Revenue vs target" },
+  },
   { name: "cost", caption: "Cost", type: "number", folder: "Measures" },
   { name: "profit", caption: "Profit", type: "number", folder: "Measures" },
   {
