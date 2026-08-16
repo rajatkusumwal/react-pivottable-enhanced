@@ -57,10 +57,25 @@ export function FilterEditor({
     [rows, field],
   );
 
+  const isDateField = fields.find((f) => f.name === field)?.type === "date";
+  const shownOperators = isDateField
+    ? operators
+        .filter((o) => dateOperatorLabels[o.value])
+        .map((o) => ({ value: o.value, label: dateOperatorLabels[o.value] as string }))
+    : operators;
+
   const submit = () => {
     if (!field) return;
     if (kind === "values") onAdd({ kind: "values", field, mode: "include", members });
-    else if (kind === "condition") onAdd({ kind: "condition", field, operator, value, value2 });
+    else if (kind === "condition")
+      onAdd({
+        kind: "condition",
+        field,
+        operator: isDateField && !dateOperatorLabels[operator] ? "gt" : operator,
+        value,
+        value2,
+        valueType: isDateField ? "date" : "auto",
+      });
     else onAdd({ kind: "top", field, measure, aggregator: "sum", direction: "top", count });
   };
 
