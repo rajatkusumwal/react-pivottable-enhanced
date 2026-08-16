@@ -263,7 +263,7 @@ describe("drill-through dialog", () => {
     expect(header.textContent).toBe("regioncountryyearrevenuerep");
   });
 
-  it("shows no columns after deselecting all", () => {
+  it("keeps the dialog and column list open after deselecting all", () => {
     function Wrapper() {
       const [fields, setFields] = useState<string[] | undefined>(undefined);
       return (
@@ -282,8 +282,10 @@ describe("drill-through dialog", () => {
     fireEvent.click(screen.getByRole("button", { name: "Columns" }));
     const list = screen.getByLabelText("Drill-through field list");
     fireEvent.click(within(list).getByRole("button", { name: "Deselect all" }));
-    const header = within(screen.getByTestId("drill-through-table")).getAllByRole("row")[0]!;
-    expect(header.querySelectorAll("th")).toHaveLength(0);
+    expect(screen.getByRole("dialog", { name: strings.drillThrough })).toBeTruthy();
+    expect(screen.getByLabelText("Drill-through field list")).toBeTruthy();
+    expect(screen.getByTestId("drill-through-no-columns").textContent).toContain("No columns selected");
+    expect(screen.queryByTestId("drill-through-table")).toBeNull();
   });
   it("searches inside the drill-through field list", () => {
     open({ onFieldsChange: vi.fn() });
