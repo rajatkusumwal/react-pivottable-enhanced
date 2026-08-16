@@ -479,6 +479,7 @@ const sharedStudioOverrides: Record<string, Cell> = {
   "Enable/disable drill-through": y("Permission flag"),
   "Field List inside drill-through": y("Columns button with search"),
   "Configure the drill-through slice": y("drillThrough.fields"),
+  "Select / deselect all drill-through columns": y("Select all / Deselect all buttons in the Columns list"),
   "Sort columns in drill-through": y("Click a column header"),
   "Limit maximum drill-through rows": y("drillThrough.maxRows, toolbar preset"),
   // Toolbar
