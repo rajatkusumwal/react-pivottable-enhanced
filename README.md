@@ -231,3 +231,28 @@ The suite covers grid rendering and totals, sorting, drill-through, filters, cal
 values, charts, export, localisation, permissions, controlled config, the drag-and-drop
 field list, member filters, file upload, and a custom engine adapter (proving the backend
 swap works without UI changes).
+
+`src/components/pivot/ui/PivotGrid.test.tsx` covers the Flexmonster-style grid itself:
+compact / classic / flat layouts, subtotals and grand totals, expand and collapse,
+spreadsheet headers, repeated member labels, cell selection with the auto-calculation
+stats, keyboard navigation, clipboard copy and row windowing.
+
+### Backend integration tests (no server required)
+
+`src/components/pivot/engines/backend.test.ts` verifies the REST contract against a mocked
+`fetchImpl` — pass your own `fetch` mock through `createBackendClient({ fetchImpl })` or
+`createBackendEngine({ fetchImpl })` and you can test the whole Spring Boot + DuckDB
+integration without running the service:
+
+```ts
+const fetchImpl = vi.fn(async () => new Response(JSON.stringify(cannedPivotResult)));
+const engine = createBackendEngine({ baseUrl: "https://api.test", datasetId: "ds", fetchImpl });
+const result = await engine.query(pivotQuery, []);
+```
+
+The mocked tests assert request URLs and methods, JSON bodies (including `datasetId`
+injection), auth headers, custom endpoint paths, multipart uploads, `PivotBackendError`
+status/message propagation, and hybrid routing (browser-side under the row threshold,
+backend above it or whenever a `datasetId` is set). Use them as executable documentation
+when implementing the server side.
+
