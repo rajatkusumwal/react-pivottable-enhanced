@@ -28,7 +28,6 @@ const baseConfig = createDefaultConfig({
 const setup = (props: Partial<React.ComponentProps<typeof PivotStudio>> = {}) =>
   render(
     <PivotStudio
-      engine="orb"
       data={data}
       fields={fields}
       initialConfig={baseConfig}
@@ -38,25 +37,35 @@ const setup = (props: Partial<React.ComponentProps<typeof PivotStudio>> = {}) =>
     />,
   );
 
-describe("PivotStudio — Orb.js engine", () => {
-  it("renders the pivot grid with totals", async () => {
+describe("PivotStudio grid", () => {
+  it("renders row members, column members and totals", async () => {
     setup();
-    const grid = await screen.findByTestId("orb-panel");
+    const grid = await screen.findByTestId("pivot-grid");
     expect(within(grid).getByText("North")).toBeInTheDocument();
     expect(within(grid).getByText("South")).toBeInTheDocument();
-    expect(within(grid).getAllByText(/Grand total/i).length).toBeGreaterThan(0);
-    expect(grid.textContent).toContain("1,000");
+    expect(within(grid).getByText("Bikes")).toBeInTheDocument();
+    await waitFor(() => expect(grid.textContent).toContain("1,000"));
   });
 
   it("opens drill-through with the records behind a cell", async () => {
     const user = userEvent.setup();
     setup();
-    const grid = await screen.findByTestId("orb-panel");
-    const cell = within(grid).getByText("100.00");
-    await user.click(cell);
+    const grid = await screen.findByTestId("pivot-grid");
+    await user.click(within(grid).getByTestId("cell-0-0"));
     const dialog = await screen.findByRole("dialog");
     expect(within(dialog).getByTestId("drill-through-table")).toBeInTheDocument();
     expect(within(dialog).getByText(/1 records/)).toBeInTheDocument();
+  });
+
+  it("sorts by a column when the sort control is used", async () => {
+    const user = userEvent.setup();
+    setup();
+    const grid = await screen.findByTestId("pivot-grid");
+    await user.click(within(grid).getByRole("button", { name: /sort by bikes/i }));
+    await waitFor(() => {
+      const first = screen.getByTestId("pivot-grid").querySelector("tbody tr th");
+      expect(first?.textContent).toContain("North");
+    });
   });
 
   it("applies a filter from the sidebar", async () => {
@@ -79,8 +88,8 @@ describe("PivotStudio — Orb.js engine", () => {
     await waitFor(() => expect(screen.getAllByText("profit").length).toBeGreaterThan(0));
     await user.click(screen.getByRole("button", { name: "Remove Revenue" }));
     await user.selectOptions(screen.getByLabelText("Place profit"), "values");
-    const grid = await screen.findByTestId("orb-panel");
-    await waitFor(() => expect(grid.textContent).toContain("460.00"));
+    const grid = await screen.findByTestId("pivot-grid");
+    await waitFor(() => expect(grid.textContent).toContain("460"));
   });
 
   it("switches to the chart view", async () => {
@@ -101,7 +110,7 @@ describe("PivotStudio — Orb.js engine", () => {
     const user = userEvent.setup();
     const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
     setup();
-    await screen.findByTestId("orb-panel");
+    await screen.findByTestId("pivot-grid");
     await user.selectOptions(screen.getByLabelText("Export"), "csv");
     expect(click).toHaveBeenCalled();
     click.mockRestore();
@@ -116,7 +125,7 @@ describe("PivotStudio — Orb.js engine", () => {
         readOnly: true,
       },
     });
-    await screen.findByTestId("orb-panel");
+    await screen.findByTestId("pivot-grid");
     expect(screen.queryByText("Cost")).not.toBeInTheDocument();
     expect(screen.getByLabelText("Export")).toBeDisabled();
     expect(screen.getByLabelText("Place Region")).toBeDisabled();
@@ -126,35 +135,36 @@ describe("PivotStudio — Orb.js engine", () => {
     const onConfigChange = vi.fn();
     const user = userEvent.setup();
     render(
-      <PivotStudio
-        engine="orb"
-        data={data}
-        fields={fields}
-        config={baseConfig}
-        onConfigChange={onConfigChange}
-      />,
+      <PivotStudio data={data} fields={fields} config={baseConfig} onConfigChange={onConfigChange} />,
     );
     await user.click(screen.getByRole("button", { name: /chart/i }));
     expect(onConfigChange).toHaveBeenCalled();
   });
-});
 
-describe("PivotStudio — react-pivottable engine", () => {
-  it("renders the react-pivottable grid", async () => {
-    setup({ engine: "react-pivottable" });
-    const panel = await screen.findByTestId("react-pivottable-panel");
-    expect(panel.querySelector("table")).toBeTruthy();
-    expect(panel.textContent).toContain("North");
-    expect(panel.textContent).toContain("Bikes");
-  });
-
-  it("drills through from a react-pivottable cell", async () => {
-    const user = userEvent.setup();
-    setup({ engine: "react-pivottable" });
-    const panel = await screen.findByTestId("react-pivottable-panel");
-    const cell = panel.querySelector("td.pvtVal") as HTMLElement;
-    await user.click(cell);
-    expect(await screen.findByRole("dialog")).toBeInTheDocument();
+  it("uses a custom engine adapter when one is supplied", async () => {
+    const query = vi.fn(async () => ({
+      rowFields: ["region"],
+      colFields: [],
+      measure: { field: "revenue", caption: "Revenue", aggregator: "sum" as const },
+      rowHeaders: [
+        { key: ["Remote"], label: "Remote", depth: 0, kind: "member" as const, expandable: false, expanded: true, span: 1 },
+      ],
+      colHeaderRows: [],
+      colLeaves: [
+        { key: [], label: "Revenue", depth: 0, kind: "member" as const, expandable: false, expanded: true, span: 1 },
+      ],
+      cells: [[42]],
+      rowTotals: [42],
+      colTotals: [42],
+      grandTotal: 42,
+      sourceCount: 1,
+      meta: { source: "backend" as const },
+    }));
+    setup({ engine: { id: "test", query, drillThrough: async () => [] } });
+    const grid = await screen.findByTestId("pivot-grid");
+    await waitFor(() => expect(grid.textContent).toContain("Remote"));
+    expect(query).toHaveBeenCalled();
+    expect(screen.getByText(/analytics service/)).toBeInTheDocument();
   });
 });
 
@@ -196,5 +206,27 @@ describe("Flexmonster-style field list", () => {
     await user.click(within(popover).getByLabelText("South"));
     await user.click(within(popover).getByRole("button", { name: "OK" }));
     await waitFor(() => expect(screen.getByText(/2 records/)).toBeInTheDocument());
+  });
+});
+
+describe("File upload", () => {
+  it("loads a CSV file and pivots it", async () => {
+    const user = userEvent.setup();
+    setup({ allowFileUpload: true, fieldsUi: "dialog" });
+    const file = new File(["city,product,units\nOslo,Pens,5\nOslo,Pads,7\n"], "sales.csv", {
+      type: "text/csv",
+    });
+    await user.upload(screen.getByLabelText(/upload a csv or json file/i), file);
+    await waitFor(() => expect(screen.getByText("sales.csv")).toBeInTheDocument());
+    const grid = await screen.findByTestId("pivot-grid");
+    await waitFor(() => expect(grid.textContent).toContain("Oslo"));
+  });
+
+  it("rejects an unsupported file type", async () => {
+    const user = userEvent.setup();
+    setup({ allowFileUpload: true });
+    const file = new File(["nope"], "notes.txt", { type: "text/plain" });
+    await user.upload(screen.getByLabelText(/upload a csv or json file/i), file);
+    expect(await screen.findByRole("alert")).toHaveTextContent(/csv or .json/i);
   });
 });

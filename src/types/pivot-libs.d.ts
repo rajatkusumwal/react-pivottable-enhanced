@@ -20,35 +20,8 @@ declare module "react-pivottable/Utilities" {
   export const aggregators: Record<string, (...args: unknown[]) => unknown>;
   export const numberFormat: (opts?: Record<string, unknown>) => (value: number) => string;
   export const sortAs: (order: string[]) => (a: string, b: string) => number;
+  export const naturalSort: (a: unknown, b: unknown) => number;
 }
 
 declare module "react-pivottable/pivottable.css";
 
-declare module "orb/src/js/orb.pgrid.js" {
-  export interface OrbDimension {
-    id: number;
-    value: string | number | null;
-    isRoot: boolean;
-    isLeaf: boolean;
-    depth: number;
-    values: (string | number)[];
-    subdimvals: Record<string, OrbDimension>;
-    field?: { name: string; caption?: string };
-    getRowIndexes(): number[];
-  }
-  export interface OrbAxe {
-    root: OrbDimension;
-    dimensionsCount: number;
-    fields: { name: string; caption?: string }[];
-    dimensionsByDepth: Record<number, OrbDimension[]>;
-  }
-  export interface OrbPGrid {
-    rows: OrbAxe;
-    columns: OrbAxe;
-    filteredDataSource: Record<string, unknown>[];
-    getData(datafield: string, rowdim: OrbDimension, coldim: OrbDimension): number | null;
-    getFieldValues(field: string): (string | number)[];
-  }
-  const pgrid: new (config: Record<string, unknown>) => OrbPGrid;
-  export default pgrid;
-}
