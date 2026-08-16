@@ -517,7 +517,13 @@ stats, keyboard navigation, clipboard copy, multi-column sorting, column drill a
 windowing; `editing.test.tsx` covers the inline cell editing write-back. Date and time
 conditional filters, group-condition (subquery) filters, the report-filter-area toggle and the
 chart filter controls are covered in `pivot-core.test.ts`, `PivotStudio.test.tsx` and
-`engines/mock-api.test.ts` (the last one over the REST contract). 134 tests in total.
+`engines/mock-api.test.ts` (the last one over the REST contract).
+
+`report-link.test.ts` covers report sharing (encode/decode round-trip, URL building, corrupt
+tokens) and `reporting-ui.test.tsx` covers the reporting UX end to end: export headers and
+footers in CSV/TSV/HTML, the drill-through export controls (including the read-only case),
+copying and restoring a share link, the number and conditional formatting dialogs, fullscreen
+and the grid context menu. 201 tests in total.
 
 ### Backend integration tests (no server required)
 
