@@ -38,7 +38,7 @@ export const products = [
   },
   {
     key: "studio" as const,
-    name: "Pivot Studio (our demo)",
+    name: "inhouse-grid-monster",
     subtitle: "Free • built on react-pivottable",
     url: "/demos",
   },
@@ -52,7 +52,7 @@ export const verdicts: Record<ProductKey, string> = {
   reactPivottable:
     "Free and quick to drop into a React app. Good for simple internal dashboards, but there is no Excel/PDF export, no toolbar and no help desk if you get stuck.",
   studio:
-    "Our demo: the free engine wrapped in a familiar shell — drag-and-drop field list, subtotals, expand/collapse, compact/classic/flat layouts, charts, exports, filters, calculated values and language packs. The maths can also be handed to your own backend service.",
+    "inhouse-grid-monster: a Flexmonster-style shell over react-pivottable — drag-and-drop field list, subtotals, expand/collapse, compact/classic/flat layouts, charts, exports, filters, calculated values and language packs. The maths can also be handed to your own backend service.",
 };
 
 type RawRow = Omit<FeatureRow, "studio">;
@@ -412,8 +412,8 @@ const rawCategories: RawCategory[] = [
 ];
 
 /**
- * What the Pivot Studio demo (see /demos) actually ships, feature by feature.
- * Anything not listed falls back to the best of the two underlying free engines.
+ * What inhouse-grid-monster (see /demos) actually ships, feature by feature.
+ * Anything not listed falls back to the best of react-pivottable.
  */
 const sharedStudioOverrides: Record<string, Cell> = {
   // Grid
@@ -531,7 +531,7 @@ const sharedStudioOverrides: Record<string, Cell> = {
   "SLA / guaranteed response time": n(),
 };
 
-/** Grid features the custom PivotGrid renderer adds on top of the free engine. */
+/** Grid features the inhouse-grid-monster renderer adds on top of react-pivottable. */
 const gridStudioOverrides: Record<string, Cell> = {
   "Virtual grid rendering thousands of rows": y("Windowed rendering"),
   "Compact pivot table form": y("Indented hierarchy"),
