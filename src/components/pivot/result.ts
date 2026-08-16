@@ -139,8 +139,8 @@ export interface DrillThroughQuery {
   query: PivotQuery;
   /** Maximum number of records to return (drill-through row cap). */
   limit?: number;
-  /** Columns to return, in order. Empty/omitted = every source field. */
-  fields?: string[];
+  /** Columns to return, in order. undefined = every source field, [] = no fields. */
+  fields?: string[] | undefined;
   /** Server-side sorting of the returned records. */
   sort?: { field: string; dir: "asc" | "desc" } | undefined;
 }
