@@ -101,6 +101,39 @@ export function PivotToolbar({
       <span className="mx-1 h-5 w-px bg-border" aria-hidden="true" />
 
       <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+        <span className="sr-only">Layout</span>
+        <select
+          aria-label="Layout"
+          value={config.layout}
+          onChange={(e) => onChange({ layout: e.target.value as PivotConfig["layout"] })}
+          className={select}
+        >
+          <option value="compact">Compact form</option>
+          <option value="classic">Classic form</option>
+          <option value="flat">Flat form</option>
+        </select>
+      </label>
+
+      <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+        <input
+          type="checkbox"
+          checked={config.showSubTotals}
+          onChange={(e) => onChange({ showSubTotals: e.target.checked })}
+        />
+        Subtotals
+      </label>
+      <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+        <input
+          type="checkbox"
+          checked={config.showGrandTotals}
+          onChange={(e) => onChange({ showGrandTotals: e.target.checked })}
+        />
+        Grand totals
+      </label>
+
+      <span className="mx-1 h-5 w-px bg-border" aria-hidden="true" />
+
+      <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
         <Download className="h-3.5 w-3.5" aria-hidden="true" />
         <span className="sr-only">{strings.export}</span>
         <select
