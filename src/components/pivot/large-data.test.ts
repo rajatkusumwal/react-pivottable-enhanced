@@ -46,7 +46,7 @@ describe("custom data source API", () => {
     expect(source.query).toHaveBeenCalledOnce();
     expect(result.meta?.source).toBe("backend");
     expect(result.meta?.queryId).toBe("graphql");
-    expect(result.grandTotals?.[0]?.value).toBe(450);
+    expect(result.grandTotal).toBe(450);
   });
 
   it("lays out pre-aggregated records returned by the backend", async () => {
@@ -54,13 +54,13 @@ describe("custom data source API", () => {
     const engine = createCustomEngine({ id: "duckdb", aggregate });
     const result = await engine.query(query(), []);
     expect(aggregate).toHaveBeenCalledOnce();
-    expect(result.grandTotals?.[0]?.value).toBe(450);
+    expect(result.grandTotal).toBe(450);
   });
 
   it("falls back to raw records plus browser aggregation", async () => {
     const engine = createCustomEngine({ fetchRows: async () => rows });
     const result = await engine.query(query(), []);
-    expect(result.rowHeaders.length).toBe(2);
+    expect(result.rowLeaves.length).toBe(2);
   });
 
   it("drills through with the source implementation, or locally", async () => {
@@ -96,7 +96,7 @@ describe("server-side aggregation of large datasets", () => {
     expect(sent.limit).toBe(1_000);
     expect(sent.offset).toBe(0);
     expect(result.meta?.source).toBe("backend");
-    expect(result.grandTotals?.[0]?.value).toBe(450);
+    expect(result.grandTotal).toBe(450);
   });
 
   it("honours an explicit page window", async () => {

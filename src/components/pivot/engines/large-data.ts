@@ -146,6 +146,13 @@ export async function streamCsvRows(
     typeof chunk === "string" ? chunk : decoder.decode(chunk, { stream: true });
 
   if (typeof Blob !== "undefined" && source instanceof Blob) {
+    if (typeof source.stream !== "function") {
+      // Environments without Blob.stream (jsdom): fall back to a single read.
+      await consumeChunk(await source.text());
+      if (!stopped && buffer.length) await pushLine(buffer);
+      await flush(true);
+      return summary;
+    }
     const reader = source.stream().getReader();
     for (;;) {
       const { done, value } = await reader.read();
