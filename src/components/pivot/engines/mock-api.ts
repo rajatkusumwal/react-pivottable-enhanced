@@ -108,7 +108,7 @@ export function createMockPivotApi(options: MockPivotApiOptions): MockPivotApi {
     }
 
     if (path.endsWith("/members")) {
-      const { field, search = "", limit = 200, datasetId } = body as {
+      const { field, search = "", limit = MEMBER_PAGE_SIZE, datasetId } = body as {
         field: string;
         search?: string;
         limit?: number;

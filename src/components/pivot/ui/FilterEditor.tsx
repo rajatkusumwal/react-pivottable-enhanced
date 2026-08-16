@@ -53,7 +53,7 @@ export function FilterEditor({
   );
 
   const memberOptions = useMemo(
-    () => (field ? uniqueMembers(rows, field).slice(0, 200) : []),
+    () => (field ? uniqueMembers(rows, field).slice(0, MEMBER_OPTION_LIMIT) : []),
     [rows, field],
   );
 

@@ -10,6 +10,7 @@
  */
 import { csvOptions, parseCsvNumber, type CsvOptions } from "../csv";
 import type { PivotRow } from "../types";
+import { ESTIMATED_BYTES_PER_ROW } from "../constants";
 import type { PivotEngineAdapter, PivotQuery, PivotResult } from "../result";
 import { createBackendClient, type BackendEngineOptions } from "./backend";
 
@@ -34,7 +35,7 @@ export function shouldOffload(input: {
 }): OffloadDecision {
   const rowThreshold = input.rowThreshold ?? OFFLOAD_ROW_THRESHOLD;
   const byteThreshold = input.byteThreshold ?? OFFLOAD_BYTE_THRESHOLD;
-  const estimatedBytes = input.byteSize ?? (input.rowCount ?? 0) * 400;
+  const estimatedBytes = input.byteSize ?? (input.rowCount ?? 0) * ESTIMATED_BYTES_PER_ROW;
   if ((input.rowCount ?? 0) > rowThreshold) return { offload: true, reason: "rows", estimatedBytes };
   if ((input.byteSize ?? 0) > byteThreshold)
     return { offload: true, reason: "bytes", estimatedBytes };

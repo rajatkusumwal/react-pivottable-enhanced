@@ -14,10 +14,9 @@ import { keyOf } from "../result";
 import type { HeaderNode, PivotCellValue, PivotLayout, PivotResult, PivotSort } from "../result";
 import type { ConditionalFormatRule, PivotTheme } from "../types";
 import { matchesCondition } from "../filters";
+import { OVERSCAN, ROW_HEIGHT, WINDOW_THRESHOLD } from "../constants";
 
-const ROW_HEIGHT = 28;
-const WINDOW_THRESHOLD = 150;
-const OVERSCAN = 12;
+
 
 export interface SelectionStats {
   count: number;

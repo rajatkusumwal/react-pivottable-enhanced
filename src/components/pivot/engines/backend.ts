@@ -87,7 +87,7 @@ export function createBackendClient(options: BackendEngineOptions) {
         `${paths.fields}${datasetId ? `?datasetId=${encodeURIComponent(datasetId)}` : ""}`,
         { method: "GET" },
       ),
-    members: (field: string, search = "", limit = 200, datasetId = options.datasetId) =>
+    members: (field: string, search = "", limit = MEMBER_PAGE_SIZE, datasetId = options.datasetId) =>
       call<{ members: string[]; total: number }>(paths.members, {
         method: "POST",
         body: JSON.stringify({ field, search, limit, datasetId }),

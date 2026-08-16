@@ -1,4 +1,5 @@
 import type { FieldDef, PivotRow } from "./types";
+import { TYPE_INFERENCE_SAMPLE_SIZE } from "./constants";
 import { csvOptions, detectCsvOptions as detect, parseCsvNumber, type CsvOptions } from "./csv";
 
 /**
@@ -55,7 +56,7 @@ export function parseCsv(text: string, options: string | Partial<CsvOptions> = "
 
 /** Guesses field definitions from the first rows of a dataset. */
 export function inferFields(rows: PivotRow[]): FieldDef[] {
-  const sample = rows.slice(0, 50);
+  const sample = rows.slice(0, TYPE_INFERENCE_SAMPLE_SIZE);
   const names = [...new Set(sample.flatMap((r) => Object.keys(r)))];
   return names.map((name) => {
     const values = sample.map((r) => r[name]).filter((v) => v !== null && v !== undefined && v !== "");
