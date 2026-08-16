@@ -97,6 +97,16 @@ export function createMockPivotApi(options: MockPivotApiOptions): MockPivotApi {
       return json({ rows, total: all.length });
     }
 
+    // Remote dataset registration (S3 path / warehouse table / parquet file).
+    if (path.endsWith("/datasets") && method === "POST") {
+      const { uri } = body as { uri?: string };
+      if (!uri) return json({ message: "uri is required" }, 400);
+      uploads += 1;
+      const id = `remote-${uploads}`;
+      datasets.set(id, initial.map((r) => ({ ...r })));
+      return json({ datasetId: id, rowCount: initial.length, fields });
+    }
+
     if (path.endsWith("/members")) {
       const { field, search = "", limit = 200, datasetId } = body as {
         field: string;
