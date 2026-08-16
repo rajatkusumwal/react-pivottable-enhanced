@@ -277,7 +277,8 @@ swap works without UI changes).
 `src/components/pivot/ui/PivotGrid.test.tsx` covers the Flexmonster-style grid itself:
 compact / classic / flat layouts, subtotals and grand totals, expand and collapse,
 spreadsheet headers, repeated member labels, cell selection with the auto-calculation
-stats, keyboard navigation, clipboard copy and row windowing.
+stats, keyboard navigation, clipboard copy, multi-column sorting, column drill and row
+windowing; `editing.test.tsx` covers the inline cell editing write-back. 116 tests in total.
 
 ### Backend integration tests (no server required)
 
