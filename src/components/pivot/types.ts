@@ -8,7 +8,7 @@ import type { PivotLayout, PivotSort } from "./result";
 export type PivotValue = string | number | boolean | null | undefined;
 export type PivotRow = Record<string, PivotValue>;
 
-export type FieldType = "string" | "number" | "date";
+export type FieldType = "string" | "number" | "date" | "time";
 
 export interface FieldDef {
   /** Key in the source rows. */
@@ -77,7 +77,7 @@ export type ConditionOperator =
  * How a conditional filter compares its operand. "auto" (the default) infers dates
  * when both sides parse as dates, otherwise falls back to number/text comparison.
  */
-export type ConditionValueType = "auto" | "number" | "text" | "date";
+export type ConditionValueType = "auto" | "number" | "text" | "date" | "time";
 
 export type FilterDef =
   | {
@@ -92,8 +92,25 @@ export type FilterDef =
       operator: ConditionOperator;
       value: string | number;
       value2?: string | number;
-      /** Comparison mode; defaults to "auto". Use "date" for date fields. */
+      /**
+       * Comparison mode; defaults to "auto". Use "date" for date fields and
+       * "time" for clock-time fields ("HH:mm[:ss]").
+       */
       valueType?: ConditionValueType;
+    }
+  | {
+      /**
+       * Server-side subquery filter: keeps only the members of `field` whose
+       * nested aggregate of `measure` satisfies the condition. Maps to a SQL
+       * `WHERE field IN (SELECT … GROUP BY … HAVING …)` on the backend.
+       */
+      kind: "subquery";
+      field: string;
+      measure: string;
+      aggregator: AggregatorName;
+      operator: ConditionOperator;
+      value: number;
+      value2?: number;
     }
   | {
       kind: "top";
@@ -173,6 +190,10 @@ export interface PivotConfig {
   showSpreadsheetHeaders: boolean;
   repeatMemberLabels: boolean;
   showSortingControls: boolean;
+  /** Show the "Report filters" strip above the grid. */
+  showReportFilterArea: boolean;
+  /** Show member filter controls above the chart. */
+  showChartFilters: boolean;
   /** Allow dragging fields between areas; when false only the menus work. */
   dragAndDrop: boolean;
   /** Allow typing a new value straight into a grid cell (writes back to data). */
@@ -211,6 +232,8 @@ export function createDefaultConfig(partial: Partial<PivotConfig> = {}): PivotCo
     showSpreadsheetHeaders: false,
     repeatMemberLabels: false,
     showSortingControls: true,
+    showReportFilterArea: true,
+    showChartFilters: true,
     dragAndDrop: true,
     editing: false,
     locale: "en",
