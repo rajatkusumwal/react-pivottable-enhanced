@@ -217,7 +217,21 @@ describe("drill-through dialog", () => {
   });
 
   it("shows the full table again after selecting all", () => {
-    open({ fields: ["rep"] });
+    function Wrapper() {
+      const [fields, setFields] = useState<string[] | undefined>(["rep"]);
+      return (
+        <DrillThroughDialog
+          open
+          title="West"
+          rows={rows}
+          strings={strings}
+          fields={fields}
+          onFieldsChange={setFields}
+          onClose={() => undefined}
+        />
+      );
+    }
+    render(<Wrapper />);
     fireEvent.click(screen.getByRole("button", { name: "Columns" }));
     const list = screen.getByLabelText("Drill-through field list");
     fireEvent.click(within(list).getByRole("button", { name: "Select all" }));
@@ -226,7 +240,21 @@ describe("drill-through dialog", () => {
   });
 
   it("shows no columns after deselecting all", () => {
-    open();
+    function Wrapper() {
+      const [fields, setFields] = useState<string[] | undefined>(undefined);
+      return (
+        <DrillThroughDialog
+          open
+          title="West"
+          rows={rows}
+          strings={strings}
+          fields={fields}
+          onFieldsChange={setFields}
+          onClose={() => undefined}
+        />
+      );
+    }
+    render(<Wrapper />);
     fireEvent.click(screen.getByRole("button", { name: "Columns" }));
     const list = screen.getByLabelText("Drill-through field list");
     fireEvent.click(within(list).getByRole("button", { name: "Deselect all" }));
