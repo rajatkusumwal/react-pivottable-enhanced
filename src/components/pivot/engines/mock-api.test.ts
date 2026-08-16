@@ -181,8 +181,8 @@ describe("sorting and filtering over the API", () => {
 
     const drill = await dateClient.drillThrough({
       query: query({ rows: ["region"], filters }),
-      rowPath: ["North"],
-      colPath: [],
+      rowKey: ["North"],
+      colKey: [],
     });
     expect(drill.rows).toHaveLength(1);
     expect(drill.rows[0]?.["orderDate"]).toBe("2024-02-10");
