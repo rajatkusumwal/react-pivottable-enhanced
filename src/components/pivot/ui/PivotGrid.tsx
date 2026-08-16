@@ -443,11 +443,13 @@ export function PivotGrid({
                   <span className="flex items-center justify-end gap-1">
                     <button
                       type="button"
-                      aria-label={`Sort by ${leaf.label}`}
-                      onClick={() => toggleSort(i)}
+                      aria-label={
+                        multiSort ? `Sort by ${leaf.label} (shift-click to add)` : `Sort by ${leaf.label}`
+                      }
+                      onClick={(e) => toggleSort(i, e.shiftKey)}
                       className="text-[10px] text-muted-foreground hover:text-foreground"
                     >
-                      {sort?.by === i ? (sort.direction === "asc" ? "▲" : "▼") : "↕"}
+                      {sortGlyph(i)}
                     </button>
                     <span
                       role="separator"
