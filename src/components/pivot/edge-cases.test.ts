@@ -131,9 +131,9 @@ describe("security helpers", () => {
       maskedFields: ["salary"],
     });
     expect(secured).toEqual([{ country: "France", salary: "••••" }]);
-    expect(visibleFields([{ name: "salary", type: "number" }], { deniedFields: ["salary"] })).toEqual(
-      [],
-    );
+    expect(
+      visibleFields([{ name: "salary", type: "number" }], { deniedFields: ["salary"] }),
+    ).toEqual([]);
   });
 });
 

@@ -8,3 +8,45 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+# inhouse-grid-monster — working agreements
+
+This repo is one product: a Flexmonster-style pivot table (`src/components/pivot`)
+plus a small marketing/demo site (`src/routes`). Junior developers read this code
+daily, so favour the obvious solution over the clever one.
+
+## Layout
+
+```
+src/components/pivot/
+  PivotStudio.tsx     the one component apps embed
+  types.ts            PivotConfig and friends (the report state)
+  constants.ts        every tunable number lives here — no magic numbers elsewhere
+  result.ts           PivotResult: the contract every engine returns
+  engines/            local (browser) engine, REST backend engine, mock API, custom source
+  ui/               presentational pieces (grid, toolbar, sidebar, dialogs, chart)
+  *.ts                pure helpers: aggregators, filters, calculated, export, format, sort…
+  *.test.ts(x)        tests sit next to the code they cover
+src/lib/pivot-comparison.ts   feature matrix shown on the home page
+```
+
+## Test-driven workflow
+
+1. Write or extend a test next to the file you are changing (`foo.test.ts`).
+2. Run `bun run test` (all) or `bunx vitest run src/components/pivot/foo.test.ts`.
+3. Make it pass with the smallest change; keep pure logic out of components.
+4. Cover three cases for anything new: the normal case, an edge case (empty
+   input, one row, blanks/nulls) and the worst case (bad types, missing fields).
+   See `src/components/pivot/edge-cases.test.ts` for the house style.
+5. If the change adds a user-visible capability, update `README.md` and the
+   feature matrix in `src/lib/pivot-comparison.ts`.
+
+## Code style
+
+- Prettier decides formatting: `bun run format` (100 cols, double quotes, semicolons).
+- TypeScript strict; no `any`. Run `bunx tsgo --noEmit` before finishing.
+- Named exports only; no default exports in `src/components/pivot`.
+- New tunable numbers go in `constants.ts` with a one-line comment saying why.
+- Comments explain *why*, not *what*. Prefer a clear name over a comment.
+- Engines must keep returning the same `PivotResult`, so the browser engine and a
+  backend service stay swappable.
