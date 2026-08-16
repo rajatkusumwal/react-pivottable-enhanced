@@ -191,6 +191,15 @@ Rules the server must respect:
   over `sort`; `by: "rows"` sorts row members, a number sorts by that leaf column.
 * `grandTotalsPosition` decides whether the `kind: "grand"` row is emitted first or last.
 * `limit` / `offset` page the source records before aggregation.
+* Condition filters carry an optional `valueType` (`"auto" | "number" | "text" | "date"`).
+  With `"date"` the server must compare on the date timeline at **day granularity** —
+  parse ISO dates (`2024-02-01`) and timestamps (`2024-02-01T18:45:00Z`), truncate both
+  sides to UTC midnight, and treat unparseable values as non-matching. In SQL/DuckDB that is
+  `CAST(field AS DATE) >= DATE '2024-02-01'` (and `BETWEEN … AND …` for `between`).
+  Date operators map to: `lt` is before, `lte` is on or before, `gt` is after,
+  `gte` is on or after, `eq` is on, `neq` is not on, `between` is between (inclusive).
+  With `"auto"` (or omitted), values are treated as dates only when both sides are
+  ISO-like text; plain numbers stay numeric.
 
 #### `POST /api/pivot/drillthrough`
 
