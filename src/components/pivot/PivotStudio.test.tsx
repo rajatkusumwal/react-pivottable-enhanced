@@ -128,6 +128,24 @@ describe("PivotStudio grid", () => {
     await waitFor(() => expect(screen.getByText(/3 records/)).toBeInTheDocument());
   });
 
+  it("offers date operators and filters by a date condition", async () => {
+    const user = userEvent.setup();
+    setup();
+    await user.selectOptions(screen.getByLabelText("Filter type"), "condition");
+    await user.selectOptions(screen.getByLabelText("Filter field"), "orderDate");
+    const operator = screen.getByLabelText("Operator") as HTMLSelectElement;
+    expect(
+      Array.from(operator.options).map((o) => o.textContent),
+    ).toContain("is on or after");
+    const valueInput = screen.getByLabelText("Filter value") as HTMLInputElement;
+    expect(valueInput.type).toBe("date");
+    await user.selectOptions(operator, "gte");
+    await user.clear(valueInput);
+    await user.type(valueInput, "2024-02-01");
+    await user.click(screen.getByRole("button", { name: /add filter/i }));
+    await waitFor(() => expect(screen.getByText(/2 records/)).toBeInTheDocument());
+  });
+
   it("creates a calculated value that can be summarised", async () => {
     const user = userEvent.setup();
     setup();
