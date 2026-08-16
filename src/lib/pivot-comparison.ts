@@ -465,7 +465,11 @@ const sharedStudioOverrides: Record<string, Cell> = {
   "Line charts": y(),
   "Scatter charts": y(),
   "Pie charts": y(),
-  "Stacked column charts": p("Grouped columns"),
+  "Stacked column charts": y("Chart type: stacked columns"),
+  "Combined column + line": y("Chart type: columns + line"),
+  "Drillable / expandable axis and legend": y("Click an axis label or legend entry"),
+  "Interactive filtering from the chart": y("Legend hides series; axis click filters the report"),
+  "Split view: grid and chart together": y("Chart position: side by side"),
   Tooltips: y(),
   "Chart title and legend options": y(),
   // Drill-through
