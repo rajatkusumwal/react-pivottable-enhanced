@@ -220,6 +220,25 @@ export function PivotToolbar({
       )}
 
       <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+        <span className="sr-only">Drill-through row limit</span>
+        <select
+          aria-label="Drill-through row limit"
+          value={String(config.drillThrough?.maxRows ?? 1000)}
+          onChange={(e) =>
+            onChange({
+              drillThrough: { ...(config.drillThrough ?? {}), maxRows: Number(e.target.value) },
+            })
+          }
+          className={select}
+        >
+          <option value="100">Drill-through: 100 rows</option>
+          <option value="500">Drill-through: 500 rows</option>
+          <option value="1000">Drill-through: 1,000 rows</option>
+          <option value="10000">Drill-through: 10,000 rows</option>
+        </select>
+      </label>
+
+      <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
         <input
           type="checkbox"
           checked={config.showReportFilterArea}
