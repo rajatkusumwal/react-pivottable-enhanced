@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { areaOfField, moveField, removeField, reorderField } from "./dnd";
 import { aggregate, registerAggregator } from "./aggregators";
 import { applyFilters, matchesCondition, uniqueMembers } from "./filters";
 import { applyCalculatedFields, evaluateFormula, validateFormula } from "./calculated";
