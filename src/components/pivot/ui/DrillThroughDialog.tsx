@@ -225,9 +225,22 @@ export function DrillThroughDialog({
             </button>
           </div>
         </header>
-        <div className="overflow-auto">
+        <div className="min-h-64 overflow-auto">
           {rows.length === 0 ? (
             <p className="p-6 text-center text-sm text-muted-foreground">{strings.noData}</p>
+          ) : columns.length === 0 ? (
+            <div
+              className="flex min-h-64 items-center justify-center p-6 text-center"
+              data-testid="drill-through-no-columns"
+            >
+              <div>
+                <Columns3 className="mx-auto mb-2 h-5 w-5 text-muted-foreground" aria-hidden="true" />
+                <p className="text-sm font-medium text-foreground">No columns selected</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Keep this window open and use Columns above to select fields.
+                </p>
+              </div>
+            </div>
           ) : (
             <table className="w-full border-collapse text-xs" data-testid="drill-through-table">
               <thead className="sticky top-0 bg-secondary">
