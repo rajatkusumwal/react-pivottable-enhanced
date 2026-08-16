@@ -147,6 +147,35 @@ describe("expand and collapse", () => {
   });
 });
 
+describe("multilevel column drill", () => {
+  const colQuery = { rows: ["region"], cols: ["category", "city"] };
+
+  it("shows a drill control on a parent column member", () => {
+    renderGrid(colQuery, { onToggleColumnCollapse: vi.fn() });
+    expect(screen.getByLabelText("Collapse Bikes")).toBeInTheDocument();
+  });
+
+  it("reports the collapsed column path when drilled up", async () => {
+    const user = userEvent.setup();
+    const onToggleColumnCollapse = vi.fn();
+    renderGrid(colQuery, { onToggleColumnCollapse });
+    await user.click(screen.getByLabelText("Collapse Bikes"));
+    expect(onToggleColumnCollapse).toHaveBeenCalledWith(["Bikes"]);
+  });
+
+  it("aggregates a collapsed column into a single leaf", () => {
+    const expanded = buildLocalResult(data, query(colQuery));
+    const collapsed = buildLocalResult(
+      data,
+      query({ ...colQuery, collapsedCols: ["Bikes"] }),
+    );
+    expect(collapsed.colLeaves.length).toBe(expanded.colLeaves.length - 2);
+    expect(collapsed.colLeaves[0]!.label).toBe("Bikes");
+    const northRow = collapsed.rowHeaders.findIndex((h) => h.label === "North");
+    expect(collapsed.cells[northRow]![0]).toBe(150);
+  });
+});
+
 describe("header options", () => {
   it("shows spreadsheet-style A/B/C headers when enabled", () => {
     renderGrid({}, { showSpreadsheetHeaders: true });
