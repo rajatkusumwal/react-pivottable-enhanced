@@ -145,7 +145,11 @@ export function describeFilter(filter: FilterDef): string {
     return `${filter.field}: ${filter.mode === "include" ? "only" : "not"} ${filter.members.length} value(s)`;
   }
   if (filter.kind === "condition") {
-    return `${filter.field} ${filter.operator} ${filter.value}${
+    const words =
+      filter.valueType === "date"
+        ? dateOperatorLabels[filter.operator]
+        : undefined;
+    return `${filter.field} ${words ?? filter.operator} ${filter.value}${
       filter.value2 !== undefined ? ` – ${filter.value2}` : ""
     }`;
   }
