@@ -115,15 +115,15 @@ function ComparisonPage() {
             A pivot table lets people slice and summarise data on a screen, like in Excel.
             Below we take everything the paid tool <strong className="font-medium text-foreground">Flexmonster</strong>{" "}
             can do — {totalFeatures} things in total — and check whether the leading free tool,
-            react-pivottable, can do the same — plus our free{" "}
-            <strong className="font-medium text-foreground">Pivot Studio</strong> demo on this site,
-            which builds a familiar Flexmonster-style experience on top of it.
+            react-pivottable, can do the same — plus the{" "}
+            <strong className="font-medium text-foreground">inhouse-grid-monster</strong>{" "}
+            shell on this site, which builds a familiar Flexmonster-style experience on top of it.
           </p>
           <Link
             to="/demos"
             className="mt-5 inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground"
           >
-            Try the free demo yourself
+            Try inhouse-grid-monster
           </Link>
         </header>
 
