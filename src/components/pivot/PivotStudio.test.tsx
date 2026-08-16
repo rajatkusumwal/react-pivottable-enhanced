@@ -169,6 +169,55 @@ describe("PivotStudio grid", () => {
     await waitFor(() => expect(grid.textContent).toContain("460"));
   });
 
+  it("adds a totals-aware calculated value from the field list", async () => {
+    const user = userEvent.setup();
+    setup();
+    await user.selectOptions(screen.getByLabelText("Formula scope"), "aggregate");
+    expect(screen.getByText(/grandTotal\(\[revenue\]\)/)).toBeInTheDocument();
+    await user.clear(screen.getByLabelText("Calculated field name"));
+    await user.type(screen.getByLabelText("Calculated field name"), "share");
+    await user.clear(screen.getByLabelText("Formula"));
+    // userEvent treats "[" as a key descriptor, so it is escaped as "[[".
+    await user.type(
+      screen.getByLabelText("Formula"),
+      "[[revenue] / grandTotal([[revenue]) * 100",
+    );
+    await user.click(screen.getByRole("button", { name: /^add$/i }));
+    await user.click(screen.getByRole("button", { name: "Remove Revenue" }));
+    await user.selectOptions(await screen.findByLabelText("Place share"), "values");
+    const grid = await screen.findByTestId("pivot-grid");
+    // North / Bikes is 100 of the 1,000 grand total.
+    await waitFor(() => expect(screen.getByTestId("cell-0-0").textContent).toContain("10"));
+    expect(grid.textContent).toContain("100");
+  });
+
+  it("shows a KPI status against the goal declared by the data source", async () => {
+    setup({
+      fields: [
+        ...fields,
+        { name: "target", caption: "Target", type: "number" as const },
+        {
+          name: "revenueKpi",
+          caption: "Revenue KPI",
+          type: "number" as const,
+          kpi: { goal: "target", direction: "higher" as const },
+        },
+      ],
+      data: data.map((r) => ({ ...r, revenueKpi: r["revenue"], target: 150 })),
+      initialConfig: createDefaultConfig({
+        rows: ["region"],
+        cols: ["category"],
+        values: [{ field: "revenueKpi", aggregator: "sum" }],
+      }),
+    });
+    const cell = await screen.findByTestId("cell-0-0");
+    // North / Bikes is 100 against a goal of 150.
+    await waitFor(() =>
+      expect(within(cell).getByLabelText("Below target")).toBeInTheDocument(),
+    );
+    expect(screen.getAllByLabelText(/KPI: Revenue KPI/).length).toBeGreaterThan(0);
+  });
+
   it("switches to the chart view", async () => {
     const user = userEvent.setup();
     setup();
@@ -238,6 +287,8 @@ describe("PivotStudio grid", () => {
       colTotals: [42],
       grandTotal: 42,
       grandTotals: [42],
+      kpiStatuses: [[null]],
+      kpiRowTotals: [[null]],
       sourceCount: 1,
       meta: { source: "backend" as const },
 

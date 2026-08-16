@@ -27,7 +27,13 @@ export interface FieldDef {
    * e.g. `["average", "min", "max"]` for a unit-price column.
    */
   aggregators?: AggregatorName[];
+  /**
+   * Marks the field as a KPI coming from the data source: the grid shows a
+   * status indicator against the goal and the field list groups it under KPIs.
+   */
+  kpi?: KpiDef;
 }
+
 
 
 
@@ -150,11 +156,43 @@ export type FilterDef =
 
 export interface CalculatedField {
   name: string;
-  /** e.g. "[revenue] - [cost]" or "([revenue] - [cost]) / [revenue] * 100" */
+  /**
+   * Row scope: "[revenue] - [cost]" evaluated per record before aggregation.
+   * Aggregate scope: "[revenue] / grandTotal([revenue]) * 100" evaluated per
+   * grid cell, after aggregation, with access to the report totals.
+   */
   formula: string;
   caption?: string;
   format?: NumberFormat;
+  /** Defaults to "row". */
+  scope?: "row" | "aggregate";
+  /**
+   * Aggregate scope only — how `[field]` references are aggregated for the
+   * cell, its totals and its parent totals. Defaults to "sum".
+   */
+  aggregator?: AggregatorName;
 }
+
+/** KPI metadata declared on a field by the data source. */
+export interface KpiDef {
+  /** Goal field name (aggregated the same way) or a fixed number. */
+  goal: string | number;
+  /** "higher" (default) means above goal is good. */
+  direction?: "higher" | "lower";
+  /** Ratio below which the KPI is "at risk" instead of "on target". 0.9 by default. */
+  warningAt?: number;
+  caption?: string;
+}
+
+export type KpiState = "onTarget" | "atRisk" | "below";
+
+export interface KpiStatus {
+  state: KpiState;
+  /** value / goal (inverted for "lower is better"). */
+  ratio: number | null;
+  goal: number | null;
+}
+
 
 export interface ConditionalFormatRule {
   field: string;

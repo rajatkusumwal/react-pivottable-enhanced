@@ -8,7 +8,9 @@
 import { naturalSort } from "react-pivottable/Utilities";
 import { aggregate, type PivotCellValue } from "../aggregators";
 import { applyDisplayMode } from "../analysis";
-import type { PivotRow, ValueDef } from "../types";
+import { evaluateWithContext, isAggregateField, type TotalScope } from "../calculated";
+import { computeKpiStatus } from "../kpi";
+import type { AggregatorName, CalculatedField, KpiStatus, PivotRow, ValueDef } from "../types";
 import {
   KEY_SEP,
   keyOf,
@@ -103,12 +105,72 @@ function cellValue(
 }
 
 export function buildLocalResult(rows: PivotRow[], query: PivotQuery): PivotResult {
-  const measures = measuresOf(query.values);
+  // Aggregate-scope calculated fields become measures evaluated per cell, and
+  // KPI metadata from the data source rides along with the measure.
+  const calcByName = new Map<string, CalculatedField>(
+    (query.calculated ?? []).filter(isAggregateField).map((c) => [c.name, c]),
+  );
+  const kpis = query.kpis ?? {};
+  const measures = measuresOf(query.values).map((m) => {
+    const kpi = kpis[m.field];
+    return {
+      ...m,
+      ...(calcByName.has(m.field) ? { calculated: true } : {}),
+      ...(kpi ? { kpi } : {}),
+    } satisfies PivotMeasure;
+  });
   const measureCount = measures.length;
   const measure = measures[0] as PivotMeasure;
   const flat = query.layout === "flat";
   const rowTree = buildTree(rows, query.rows);
   const colTree = buildTree(rows, query.cols);
+
+  const aggFor = (
+    rowIdx: number[] | null,
+    colIdx: Set<number> | null,
+    field: string,
+    aggregator: AggregatorName,
+  ) => num(cellValue(rows, rowIdx, colIdx, { field, caption: field, aggregator }));
+
+  /**
+   * Value of one measure for a cell. Plain measures aggregate their field;
+   * aggregate-scope calculated measures evaluate their formula, with
+   * grandTotal() / rowTotal() / columnTotal() / parent totals resolved against
+   * this very cell.
+   */
+  const measureValue = (
+    rowIdx: number[] | null,
+    colIdx: Set<number> | null,
+    m: PivotMeasure,
+    parentRowIdx: number[] | null = null,
+    parentColIdx: Set<number> | null = null,
+  ): PivotCellValue => {
+    const calc = calcByName.get(m.field);
+    if (!calc) return cellValue(rows, rowIdx, colIdx, m);
+    const agg = calc.aggregator ?? "sum";
+    const total = (scope: TotalScope, field: string) => {
+      switch (scope) {
+        case "grand":
+          return aggFor(null, null, field, agg);
+        case "row":
+          return aggFor(rowIdx, null, field, agg);
+        case "column":
+          return aggFor(null, colIdx, field, agg);
+        case "parentRow":
+          return aggFor(parentRowIdx, colIdx, field, agg);
+        default:
+          return aggFor(rowIdx, parentColIdx, field, agg);
+      }
+    };
+    try {
+      return evaluateWithContext(calc.formula, {
+        value: (field) => aggFor(rowIdx, colIdx, field, agg),
+        total,
+      });
+    } catch {
+      return null;
+    }
+  };
 
   // ---- columns -------------------------------------------------------------
   // Column members drill down the same way rows do: a collapsed member keeps a
@@ -293,17 +355,6 @@ export function buildLocalResult(rows: PivotRow[], query: PivotQuery): PivotResu
   }
 
   // ---- cells ---------------------------------------------------------------
-  const grandTotals = measures.map((m) => cellValue(rows, null, null, m));
-  const colTotals = colLeaves.map((_, i) => {
-    const base = baseColumns[Math.floor(i / measureCount)];
-    const m = measures[measureIndexByLeaf[i] ?? 0] as PivotMeasure;
-    return cellValue(rows, null, base?.indexes ?? null, m);
-  });
-  const rowTotalsByMeasure = rowNodes.map((r) =>
-    measures.map((m) => cellValue(rows, r.indexes, null, m)),
-  );
-  const rowTotals = rowTotalsByMeasure.map((t) => num(t[0] ?? null));
-
   // Member paths -> the records underneath them, used by the "% of parent" modes.
   const rowIndexByPath = new Map<string, number[]>();
   const collectRows = (node: TreeNode) => {
@@ -327,12 +378,33 @@ export function buildLocalResult(rows: PivotRow[], query: PivotQuery): PivotResu
     return path.length > 1 ? (colIndexByPath.get(keyOf(path.slice(0, -1))) ?? null) : null;
   });
 
+  const grandTotals = measures.map((m) => measureValue(null, null, m));
+  const colTotals = colLeaves.map((_, i) => {
+    const base = baseColumns[Math.floor(i / measureCount)];
+    const m = measures[measureIndexByLeaf[i] ?? 0] as PivotMeasure;
+    return measureValue(null, base?.indexes ?? null, m);
+  });
+  const rowTotalsByMeasure = rowNodes.map((r, rowIndexOf) =>
+    measures.map((m) => measureValue(r.indexes, null, m, parentRowIndexes[rowIndexOf] ?? null)),
+  );
+  const rowTotals = rowTotalsByMeasure.map((t) => num(t[0] ?? null));
+
   // Pass 1 — raw aggregates. Pass 2 applies "show values as", which may need
   // neighbouring cells (differences, running totals down a column).
-  const rawCells: PivotCellValue[][] = rowNodes.map((r) => {
+  const rawCells: PivotCellValue[][] = rowNodes.map((r, rowIndex) => {
     const out: PivotCellValue[] = [];
-    baseColumns.forEach((base) => {
-      measures.forEach((m) => out.push(cellValue(rows, r.indexes, base.indexes, m)));
+    baseColumns.forEach((base, baseIndex) => {
+      measures.forEach((m) =>
+        out.push(
+          measureValue(
+            r.indexes,
+            base.indexes,
+            m,
+            parentRowIndexes[rowIndex] ?? null,
+            parentColIndexes[baseIndex] ?? null,
+          ),
+        ),
+      );
     });
     return out;
   });
@@ -366,14 +438,14 @@ export function buildLocalResult(rows: PivotRow[], query: PivotQuery): PivotResu
               ...(needsParent && parentRowIndexes[rowIndex]
                 ? {
                     parentRowTotal: num(
-                      cellValue(rows, parentRowIndexes[rowIndex] as number[], base.indexes, m),
+                      measureValue(parentRowIndexes[rowIndex] as number[], base.indexes, m),
                     ),
                   }
                 : {}),
               ...(needsParent && parentColIndexes[baseIndex]
                 ? {
                     parentColTotal: num(
-                      cellValue(rows, r.indexes, parentColIndexes[baseIndex] as Set<number>, m),
+                      measureValue(r.indexes, parentColIndexes[baseIndex] as Set<number>, m),
                     ),
                   }
                 : {}),
@@ -391,6 +463,40 @@ export function buildLocalResult(rows: PivotRow[], query: PivotQuery): PivotResu
   });
 
 
+  // ---- KPI statuses --------------------------------------------------------
+  const goalValue = (
+    m: PivotMeasure,
+    rowIdx: number[] | null,
+    colIdx: Set<number> | null,
+  ): number | null =>
+    !m.kpi
+      ? null
+      : typeof m.kpi.goal === "number"
+        ? m.kpi.goal
+        : num(cellValue(rows, rowIdx, colIdx, { ...m, field: m.kpi.goal }));
+
+  const kpiStatuses: (KpiStatus | null)[][] = rowNodes.map((r, rowIndex) =>
+    colLeaves.map((_, leafIndex) => {
+      const m = measures[measureIndexByLeaf[leafIndex] ?? 0];
+      if (!m?.kpi) return null;
+      const base = baseColumns[Math.floor(leafIndex / measureCount)];
+      const value = num(rawCells[rowIndex]?.[leafIndex] ?? null);
+      return computeKpiStatus(value, goalValue(m, r.indexes, base?.indexes ?? null), m.kpi);
+    }),
+  );
+
+  const kpiRowTotals: (KpiStatus | null)[][] = rowNodes.map((r, rowIndex) =>
+    measures.map((m, mi) =>
+      m.kpi
+        ? computeKpiStatus(
+            num(rowTotalsByMeasure[rowIndex]?.[mi] ?? null),
+            goalValue(m, r.indexes, null),
+            m.kpi,
+          )
+        : null,
+    ),
+  );
+
   return {
     rowFields: query.rows,
     colFields: query.cols,
@@ -406,6 +512,8 @@ export function buildLocalResult(rows: PivotRow[], query: PivotQuery): PivotResu
     colTotals,
     grandTotal: num(grandTotals[0] ?? null),
     grandTotals,
+    kpiStatuses,
+    kpiRowTotals,
     sourceCount: rows.length,
     meta: { source: "local" },
   };
