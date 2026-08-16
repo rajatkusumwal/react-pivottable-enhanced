@@ -125,7 +125,7 @@ describe("sorting and filtering over the API", () => {
 
   it("applies filters server-side", async () => {
     const result = await ask({
-      filters: [{ field: "region", type: "members", members: ["North"] }],
+      filters: [{ kind: "values", field: "region", mode: "include", members: ["North"] }],
     });
     expect(labels(result)).not.toContain("South");
     expect(result.grandTotal).toBe(450);
