@@ -93,6 +93,27 @@ describe("totals", () => {
     expect(without.rowHeaders.some((h) => h.kind === "grand")).toBe(false);
   });
 
+  it("sorts a flat table by multiple columns", () => {
+    const sorts = [
+      { by: 0 as const, direction: "desc" as const },
+      { by: "rows" as const, direction: "asc" as const },
+    ];
+    const multi = buildLocalResult(data, query({ layout: "flat", sorts }));
+    const single = buildLocalResult(
+      data,
+      query({ layout: "flat", sort: { by: 0, direction: "desc" } }),
+    );
+    const members = (r: typeof multi) =>
+      r.rowHeaders.filter((h) => h.kind === "member").map((h) => h.label);
+    const first = multi.cells.filter((_, i) => multi.rowHeaders[i]?.kind === "member")[0]?.[0];
+    const values = multi.cells
+      .filter((_, i) => multi.rowHeaders[i]?.kind === "member")
+      .map((row) => row[0] ?? -Infinity);
+    expect([...values].sort((a, b) => b - a)).toEqual(values);
+    expect(members(multi).length).toBe(members(single).length);
+    expect(first).toBeDefined();
+  });
+
   it("places the grand total row at the top or the bottom", () => {
     const bottom = buildLocalResult(data, query({ grandTotalsPosition: "bottom" }));
     expect(bottom.rowHeaders.at(-1)?.kind).toBe("grand");
