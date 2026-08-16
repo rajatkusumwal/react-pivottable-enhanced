@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { areaOfField, moveField, removeField, reorderField } from "./dnd";
+import { areaOfField, defaultAggregatorFor, moveField, removeField, reorderField } from "./dnd";
 import { aggregate, aggregatorsForType, registerAggregator } from "./aggregators";
 import {
   applyFilters,
@@ -16,6 +16,7 @@ import { inferFields, parseCsv } from "./data-sources";
 import { formatNumber } from "./format";
 import { getLocale, locales } from "./locales";
 import { createDefaultConfig } from "./types";
+import { buildLocalResult } from "./engines/local";
 import {
   sampleCsv,
   sampleData,
