@@ -186,11 +186,12 @@ other than Tailwind tokens (`--color-border`, `--color-card`, …) and `@/lib/ut
 * **Drill-through** — click any number, or any bar / point / slice in the chart, to inspect the
   source records. Chart drill-through keeps the axis and legend drill path, so a click on the
   second level drills through `[region, country] × [year, quarter]`. The dialog has a built-in
-  field list ("Columns", with search) to pick the slice, sortable column headers and a row cap:
+  field list ("Columns", with search) to pick the slice, plus **Select all** / **Deselect all**
+  buttons, sortable column headers and a row cap:
 
   ```ts
   config.drillThrough = {
-    fields: ["orderId", "customer", "revenue"], // [] = every source field
+    fields: ["orderId", "customer", "revenue"], // undefined = every source field, [] = no fields
     maxRows: 1000,                              // hard cap, toolbar preset
     sort: { field: "revenue", dir: "desc" },    // initial column sort
   };
@@ -199,6 +200,8 @@ other than Tailwind tokens (`--color-border`, `--color-card`, …) and `@/lib/ut
   The same options travel over the REST contract — `POST /drillthrough` accepts
   `{ rowKey, colKey, query, fields?, sort?, limit? }` and answers
   `{ rows, total }` (`total` = matches before the cap, used for the "N of M" note).
+  `fields` is optional: omit it or send `undefined` for every source field; send `[]` to return
+  empty record objects (matching the Deselect-all state).
   `applyDrillSlice(rows, { fields, sort, maxRows })` is exported so a backend adapter can
   reproduce the projection, sorting and cap exactly; `chartDrillKeys(chartData, category,
   series)` turns a chart click into `{ rowKey, colKey, label }`.
@@ -576,9 +579,9 @@ chart filter controls are covered in `pivot-core.test.ts`, `PivotStudio.test.tsx
 `engines/mock-api.test.ts` (the last one over the REST contract).
 
 `drillthrough.test.tsx` covers drill-through end to end: the slice helpers (projection,
-sorting, row cap), the local engine and the REST contract (including the uncapped `total`),
-chart drill keys and clicking through from the chart, plus the dialog's column sorting and
-built-in field list.
+sorting, row cap, the `fields: undefined` vs `[]` semantics), the local engine and the REST
+contract (including the uncapped `total`), chart drill keys and clicking through from the chart,
+plus the dialog's column sorting, built-in field list and Select all / Deselect all buttons.
 
 `charts.test.tsx` covers the chart layer: stacked columns, the combined column + line chart,
 axis and legend drill (including the drill breadcrumbs), legend series hiding, axis-click
@@ -588,7 +591,7 @@ report filtering and the grid + chart split view.
 tokens) and `reporting-ui.test.tsx` covers the reporting UX end to end: export headers and
 footers in CSV/TSV/HTML, the drill-through export controls (including the read-only case),
 copying and restoring a share link, the number and conditional formatting dialogs, fullscreen
-and the grid context menu. 201 tests in total.
+and the grid context menu. 250 tests in total.
 
 ### Backend integration tests (no server required)
 

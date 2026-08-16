@@ -17,10 +17,10 @@ export interface DrillThroughDialogProps {
   /** Header & footer printed on the drill-through export. */
   decoration?: ExportDecoration;
   onStatus?: (message: string) => void;
-  /** Columns of the configured slice; empty = every field in the records. */
-  fields?: string[];
+  /** Columns of the configured slice; undefined = show every field in the records, [] = show none. */
+  fields?: string[] | undefined;
   /** Persists a change made with the drill-through field list. */
-  onFieldsChange?: ((fields: string[]) => void) | undefined;
+  onFieldsChange?: ((fields: string[] | undefined) => void) | undefined;
   /** Row cap applied when the records were fetched. */
   maxRows?: number;
   /** Total number of matching records before the cap (when the engine reports it). */
@@ -42,7 +42,7 @@ export function DrillThroughDialog({
   canExport = true,
   decoration = {},
   onStatus,
-  fields = [],
+  fields,
   onFieldsChange,
   maxRows,
   total,
@@ -55,8 +55,9 @@ export function DrillThroughDialog({
 
   const allColumns = useMemo(() => drillColumns(rows), [rows]);
   const columns = useMemo(() => {
-    const picked = fields.filter((f) => allColumns.includes(f));
-    return picked.length ? picked : allColumns;
+    if (fields === undefined) return allColumns;
+    if (fields.length === 0) return [];
+    return fields.filter((f) => allColumns.includes(f));
   }, [fields, allColumns]);
   const visible = useMemo(
     () => applyDrillSlice(rows, { fields: columns, sort: localSort }),
@@ -83,7 +84,7 @@ export function DrillThroughDialog({
     const next = current.includes(field)
       ? current.filter((f) => f !== field)
       : [...allColumns.filter((f) => current.includes(f) || f === field)];
-    onFieldsChange?.(next.length === allColumns.length ? [] : next);
+    onFieldsChange?.(next.length === allColumns.length ? undefined : next);
   };
 
   return (
@@ -135,8 +136,21 @@ export function DrillThroughDialog({
                     onChange={(e) => setSearch(e.target.value)}
                   />
                   <div className="mb-2 flex gap-2 text-xs">
-                    <button type="button" className="underline" onClick={() => onFieldsChange?.([])}>
-                      Show all
+                    <button
+                      type="button"
+                      className="underline disabled:no-underline disabled:opacity-50"
+                      disabled={!onFieldsChange || columns.length === allColumns.length}
+                      onClick={() => onFieldsChange?.(undefined)}
+                    >
+                      Select all
+                    </button>
+                    <button
+                      type="button"
+                      className="underline disabled:no-underline disabled:opacity-50"
+                      disabled={!onFieldsChange || columns.length === 0}
+                      onClick={() => onFieldsChange?.([])}
+                    >
+                      Deselect all
                     </button>
                   </div>
                   <ul className="max-h-56 space-y-1 overflow-auto">

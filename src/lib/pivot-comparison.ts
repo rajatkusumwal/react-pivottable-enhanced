@@ -254,6 +254,7 @@ const rawCategories: RawCategory[] = [
       { feature: "Enable/disable drill-through", flexmonster: y(), reactPivottable: n() },
       { feature: "Field List inside drill-through", flexmonster: y(), reactPivottable: n() },
       { feature: "Configure the drill-through slice", flexmonster: y(), reactPivottable: n() },
+      { feature: "Select / deselect all drill-through columns", flexmonster: y(), reactPivottable: n() },
       { feature: "Sort columns in drill-through", flexmonster: y(), reactPivottable: n() },
       { feature: "Limit maximum drill-through rows", flexmonster: y(), reactPivottable: n() },
     ],
@@ -478,6 +479,7 @@ const sharedStudioOverrides: Record<string, Cell> = {
   "Enable/disable drill-through": y("Permission flag"),
   "Field List inside drill-through": y("Columns button with search"),
   "Configure the drill-through slice": y("drillThrough.fields"),
+  "Select / deselect all drill-through columns": y("Select all / Deselect all buttons in the Columns list"),
   "Sort columns in drill-through": y("Click a column header"),
   "Limit maximum drill-through rows": y("drillThrough.maxRows, toolbar preset"),
   // Toolbar

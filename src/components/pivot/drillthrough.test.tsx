@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { useState } from "react";
 import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import { applyDrillSlice, chartDrillKeys, drillColumns } from "./analysis";
 import { localDrillThrough } from "./engines/local";
@@ -89,6 +90,29 @@ describe("engine contract", () => {
       limit: 1,
     });
     expect(out).toEqual([{ rep: "Ann", revenue: 100 }]);
+  });
+
+  it("returns empty objects when fields are deselected", () => {
+    const c = cfg();
+    const out = localDrillThrough(rows, {
+      rowKey: ["West"],
+      colKey: ["2024"],
+      query: query(c),
+      fields: [],
+    });
+    expect(out.length).toBe(2);
+    expect(out[0]).toEqual({});
+    expect(out[1]).toEqual({});
+  });
+
+  it("includes every source field when fields are omitted", () => {
+    const c = cfg();
+    const out = localDrillThrough(rows, {
+      rowKey: ["West"],
+      colKey: ["2024"],
+      query: query(c),
+    });
+    expect(Object.keys(out[0]!).sort()).toEqual(["country", "region", "rep", "revenue", "year"]);
   });
 
   it("returns the slice and the uncapped total over the REST contract", async () => {
@@ -198,6 +222,69 @@ describe("drill-through dialog", () => {
     expect(onFieldsChange).toHaveBeenCalledWith(["region", "country", "year", "revenue"]);
   });
 
+  it("selects all columns in the drill-through field list", () => {
+    const onFieldsChange = vi.fn();
+    open({ onFieldsChange, fields: ["rep", "revenue"] });
+    fireEvent.click(screen.getByRole("button", { name: "Columns" }));
+    const list = screen.getByLabelText("Drill-through field list");
+    fireEvent.click(within(list).getByRole("button", { name: "Select all" }));
+    expect(onFieldsChange).toHaveBeenCalledWith(undefined);
+  });
+
+  it("deselects all columns in the drill-through field list", () => {
+    const onFieldsChange = vi.fn();
+    open({ onFieldsChange });
+    fireEvent.click(screen.getByRole("button", { name: "Columns" }));
+    const list = screen.getByLabelText("Drill-through field list");
+    fireEvent.click(within(list).getByRole("button", { name: "Deselect all" }));
+    expect(onFieldsChange).toHaveBeenCalledWith([]);
+  });
+
+  it("shows the full table again after selecting all", () => {
+    function Wrapper() {
+      const [fields, setFields] = useState<string[] | undefined>(["rep"]);
+      return (
+        <DrillThroughDialog
+          open
+          title="West"
+          rows={rows}
+          strings={strings}
+          fields={fields}
+          onFieldsChange={setFields}
+          onClose={() => undefined}
+        />
+      );
+    }
+    render(<Wrapper />);
+    fireEvent.click(screen.getByRole("button", { name: "Columns" }));
+    const list = screen.getByLabelText("Drill-through field list");
+    fireEvent.click(within(list).getByRole("button", { name: "Select all" }));
+    const header = within(screen.getByTestId("drill-through-table")).getAllByRole("row")[0]!;
+    expect(header.textContent).toBe("regioncountryyearrevenuerep");
+  });
+
+  it("shows no columns after deselecting all", () => {
+    function Wrapper() {
+      const [fields, setFields] = useState<string[] | undefined>(undefined);
+      return (
+        <DrillThroughDialog
+          open
+          title="West"
+          rows={rows}
+          strings={strings}
+          fields={fields}
+          onFieldsChange={setFields}
+          onClose={() => undefined}
+        />
+      );
+    }
+    render(<Wrapper />);
+    fireEvent.click(screen.getByRole("button", { name: "Columns" }));
+    const list = screen.getByLabelText("Drill-through field list");
+    fireEvent.click(within(list).getByRole("button", { name: "Deselect all" }));
+    const header = within(screen.getByTestId("drill-through-table")).getAllByRole("row")[0]!;
+    expect(header.querySelectorAll("th")).toHaveLength(0);
+  });
   it("searches inside the drill-through field list", () => {
     open({ onFieldsChange: vi.fn() });
     fireEvent.click(screen.getByRole("button", { name: "Columns" }));

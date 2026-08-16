@@ -142,8 +142,12 @@ export function applyDrillSlice(
       return String(x ?? "").localeCompare(String(y ?? "")) * dir;
     });
   }
-  const fields = slice.fields?.filter(Boolean) ?? [];
-  if (fields.length) {
+  if (slice.fields === undefined) {
+    // leave every source field visible
+  } else if (slice.fields.length === 0) {
+    out = out.map(() => ({}));
+  } else {
+    const fields = slice.fields.filter(Boolean);
     out = out.map((r) => {
       const picked: PivotRow = {};
       for (const f of fields) picked[f] = r[f] as PivotRow[string];

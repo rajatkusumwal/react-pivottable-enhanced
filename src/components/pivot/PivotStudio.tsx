@@ -704,7 +704,7 @@ export function PivotStudio({
         strings={strings}
         canExport={allowExport}
         decoration={decoration}
-        fields={config.drillThrough?.fields ?? []}
+        fields={config.drillThrough?.fields}
         {...(config.drillThrough?.maxRows ? { maxRows: config.drillThrough.maxRows } : {})}
         sort={config.drillThrough?.sort}
         onFieldsChange={
