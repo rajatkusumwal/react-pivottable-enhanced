@@ -254,6 +254,7 @@ const rawCategories: RawCategory[] = [
       { feature: "Enable/disable drill-through", flexmonster: y(), reactPivottable: n() },
       { feature: "Field List inside drill-through", flexmonster: y(), reactPivottable: n() },
       { feature: "Configure the drill-through slice", flexmonster: y(), reactPivottable: n() },
+      { feature: "Select / deselect all drill-through columns", flexmonster: y(), reactPivottable: n() },
       { feature: "Sort columns in drill-through", flexmonster: y(), reactPivottable: n() },
       { feature: "Limit maximum drill-through rows", flexmonster: y(), reactPivottable: n() },
     ],
