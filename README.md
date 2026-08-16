@@ -742,3 +742,24 @@ status/message propagation, and hybrid routing (browser-side under the row thres
 backend above it or whenever a `datasetId` is set). Use them as executable documentation
 when implementing the server side.
 
+
+## 5. Contributing / customising
+
+Everything tunable is in one file, `src/components/pivot/constants.ts` — row
+height, virtualisation thresholds, member list limits, the default
+drill-through row cap and the type-inference sample size. Change a value there
+instead of hunting through components.
+
+Useful commands:
+
+```bash
+bun run dev      # start the demo app
+bun run test     # run the whole suite once (vitest)
+bun run lint     # eslint + prettier rules
+bun run format   # rewrite files with prettier
+```
+
+Conventions (also documented for AI coding agents in `AGENTS.md`, `CLAUDE.md`
+and `GEMINI.md`): tests live next to the code, cover a normal case, an edge case
+and a worst case; pure logic stays out of components; every engine returns the
+same `PivotResult` so the browser engine and a REST backend stay swappable.

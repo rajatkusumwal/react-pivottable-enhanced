@@ -11,6 +11,7 @@ import {
   SlidersHorizontal,
   Table2,
 } from "lucide-react";
+import { DEFAULT_DRILL_THROUGH_ROWS } from "../constants";
 import type { ExportFormat } from "../export";
 import type { PivotConfig } from "../types";
 import { locales } from "../locales";
@@ -223,7 +224,7 @@ export function PivotToolbar({
         <span className="sr-only">Drill-through row limit</span>
         <select
           aria-label="Drill-through row limit"
-          value={String(config.drillThrough?.maxRows ?? 1000)}
+          value={String(config.drillThrough?.maxRows ?? DEFAULT_DRILL_THROUGH_ROWS)}
           onChange={(e) =>
             onChange({
               drillThrough: { ...(config.drillThrough ?? {}), maxRows: Number(e.target.value) },

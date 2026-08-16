@@ -5,8 +5,16 @@ export type PivotCellValue = number | string | null;
 
 export type AggregatorFn = (rows: PivotRow[], field: string) => PivotCellValue;
 
+/**
+ * Numeric values of a field. Blank cells (null / undefined / "") are skipped
+ * rather than counted as 0, so an average is not dragged down by missing data.
+ */
 const nums = (rows: PivotRow[], field: string): number[] =>
-  rows.map((r) => Number(r[field])).filter((n) => Number.isFinite(n));
+  rows
+    .map((r) => r[field])
+    .filter((v: PivotValue) => v !== null && v !== undefined && v !== "")
+    .map((v) => Number(v))
+    .filter((n) => Number.isFinite(n));
 
 /** Non-empty raw values as text, used by string / date / time measures. */
 const texts = (rows: PivotRow[], field: string): string[] =>

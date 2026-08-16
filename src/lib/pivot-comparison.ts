@@ -39,7 +39,7 @@ export const products = [
   {
     key: "studio" as const,
     name: "inhouse-grid-monster",
-    subtitle: "Free • built on react-pivottable",
+    subtitle: "Free • in-house React grid",
     url: "/demos",
   },
 ];
@@ -52,7 +52,7 @@ export const verdicts: Record<ProductKey, string> = {
   reactPivottable:
     "Free and quick to drop into a React app. Good for simple internal dashboards, but there is no Excel/PDF export, no toolbar and no help desk if you get stuck.",
   studio:
-    "inhouse-grid-monster: a Flexmonster-style shell over react-pivottable — drag-and-drop field list, subtotals, expand/collapse, compact/classic/flat layouts, charts, exports, filters, calculated values and language packs. The maths can also be handed to your own backend service.",
+    "inhouse-grid-monster: a Flexmonster-style React grid with no third-party pivot dependency — drag-and-drop field list, subtotals, expand/collapse, compact/classic/flat layouts, charts, exports, filters, calculated values and language packs. The maths can also be handed to your own backend service.",
 };
 
 type RawRow = Omit<FeatureRow, "studio">;

@@ -83,7 +83,6 @@ export {
   REPORT_PARAM,
 } from "./report-link";
 
-
 export { aggregators, aggregatorLabels, aggregate, registerAggregator } from "./aggregators";
 export type { AggregatorFn } from "./aggregators";
 export { applyFilters, matchesCondition, uniqueMembers } from "./filters";
@@ -128,14 +127,26 @@ export {
   formatCsvNumber,
 } from "./csv";
 export type { CsvOptions } from "./csv";
+export { parseCsv, inferFields, loadCsvUrl, loadJsonUrl, readFileAsRows } from "./data-sources";
 export {
-  parseCsv,
-  inferFields,
-  loadCsvUrl,
-  loadJsonUrl,
-  readFileAsRows,
-} from "./data-sources";
-export { sampleData, sampleFields, sampleCsv, sampleHierarchies, generateSalesData } from "./sample-data";
+  sampleData,
+  sampleFields,
+  sampleCsv,
+  sampleHierarchies,
+  generateSalesData,
+} from "./sample-data";
+export { naturalSort } from "./sort";
+export {
+  ROW_HEIGHT,
+  WINDOW_THRESHOLD,
+  OVERSCAN,
+  TYPE_INFERENCE_SAMPLE_SIZE,
+  MEMBER_LIST_LIMIT,
+  MEMBER_OPTION_LIMIT,
+  MEMBER_PAGE_SIZE,
+  DEFAULT_DRILL_THROUGH_ROWS,
+  ESTIMATED_BYTES_PER_ROW,
+} from "./constants";
 export { createDefaultConfig, defaultTheme } from "./types";
 export type {
   PivotConfig,

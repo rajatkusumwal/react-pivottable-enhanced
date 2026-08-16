@@ -5,6 +5,7 @@
  */
 import type { PivotLayout, PivotSort } from "./result";
 import { defaultCsvOptions, type CsvOptions } from "./csv";
+import { DEFAULT_DRILL_THROUGH_ROWS } from "./constants";
 
 export type PivotValue = string | number | boolean | null | undefined;
 export type PivotRow = Record<string, PivotValue>;
@@ -365,7 +366,7 @@ export function createDefaultConfig(partial: Partial<PivotConfig> = {}): PivotCo
       drillCols: [],
       hiddenSeries: [],
     },
-    drillThrough: { maxRows: 1000 },
+    drillThrough: { maxRows: DEFAULT_DRILL_THROUGH_ROWS },
     csv: { ...defaultCsvOptions },
     ...partial,
   };

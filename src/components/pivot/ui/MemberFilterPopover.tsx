@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { uniqueMembers } from "../filters";
+import { MEMBER_LIST_LIMIT } from "../constants";
 import type { PivotStrings } from "../locales";
 import type { FilterDef, PivotRow } from "../types";
 
@@ -23,7 +24,7 @@ export function MemberFilterPopover({
   onApply,
   onClose,
 }: MemberFilterPopoverProps) {
-  const all = useMemo(() => uniqueMembers(rows, field).slice(0, 500), [rows, field]);
+  const all = useMemo(() => uniqueMembers(rows, field).slice(0, MEMBER_LIST_LIMIT), [rows, field]);
   const [query, setQuery] = useState("");
   const [checked, setChecked] = useState<string[]>(
     current?.members.length ? current.members : all,

@@ -1,11 +1,11 @@
 /**
  * Local pivot engine — aggregates in the browser.
  *
- * Member ordering comes from react-pivottable's `naturalSort`, the aggregation
+ * Member ordering uses the in-house `naturalSort` helper, the aggregation
  * itself from the shared aggregator registry, so subtotals and grand totals are
  * consistent with what the backend engine returns.
  */
-import { naturalSort } from "react-pivottable/Utilities";
+import { naturalSort } from "../sort";
 import { aggregate, type PivotCellValue } from "../aggregators";
 import { applyDisplayMode, applyDrillSlice } from "../analysis";
 import { evaluateWithContext, isAggregateField, type TotalScope } from "../calculated";

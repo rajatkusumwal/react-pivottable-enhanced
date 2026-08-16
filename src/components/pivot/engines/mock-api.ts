@@ -9,6 +9,7 @@
  *   const api = createMockPivotApi({ rows: sampleData, fields: sampleFields });
  *   const engine = createBackendEngine({ baseUrl: "https://api.test", fetchImpl: api.fetch });
  */
+import { MEMBER_PAGE_SIZE } from "../constants";
 import { applyCellEdit, type CellEditRequest } from "../editing";
 import { applyFilters, uniqueMembers } from "../filters";
 import { inferFields } from "../data-sources";
@@ -108,7 +109,7 @@ export function createMockPivotApi(options: MockPivotApiOptions): MockPivotApi {
     }
 
     if (path.endsWith("/members")) {
-      const { field, search = "", limit = 200, datasetId } = body as {
+      const { field, search = "", limit = MEMBER_PAGE_SIZE, datasetId } = body as {
         field: string;
         search?: string;
         limit?: number;
