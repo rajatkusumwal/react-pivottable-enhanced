@@ -138,12 +138,7 @@ const rawCategories: RawCategory[] = [
       { feature: "Keyboard navigation shortcuts", flexmonster: y(), reactPivottable: n() },
       { feature: "Highlight rows and columns", flexmonster: y(), reactPivottable: n() },
       { feature: "Auto-calculation bar for selection", flexmonster: y(), reactPivottable: n() },
-      {
-        feature: "Editing cells inline",
-        flexmonster: y(),
-        reactPivottable: n(),
-        studio: y("Toggle \u201cEdit cells\u201d, double-click a number"),
-      },
+      { feature: "Editing cells inline", flexmonster: y(), reactPivottable: n() },
       { feature: "Grid title", flexmonster: y(), reactPivottable: n() },
       { feature: "Show/hide spreadsheet headers", flexmonster: y(), reactPivottable: n() },
       { feature: "Show/hide field captions", flexmonster: y(), reactPivottable: n() },
@@ -523,6 +518,7 @@ const gridStudioOverrides: Record<string, Cell> = {
   "Grand totals top or bottom (flat table)": y("Toolbar position selector"),
   "Sort multiple columns in flat table": y("Shift-click sort controls"),
   "Enable/disable drag and drop": y("Toolbar switch (config.dragAndDrop)"),
+  "Editing cells inline": y("\u201cEdit cells\u201d switch, double-click a value"),
 };
 
 function studioCell(row: RawRow, base: Cell): Cell {
