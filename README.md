@@ -68,7 +68,11 @@ other than Tailwind tokens (`--color-border`, `--color-card`, …) and `@/lib/ut
 
 * **Grid** — compact / classic / flat layouts, subtotals, grand totals, expand & collapse,
   column resize, cell selection with a sum/avg/min/max bar, keyboard navigation, row & column
-  hover highlight, spreadsheet headers, windowed rendering for large results.
+  hover highlight, spreadsheet headers, windowed rendering for large results,
+  inline cell editing (`config.editing: true` or the "Edit cells" toolbar checkbox —
+  double-click a value cell, type a number, press Enter; the change is written back to the
+  underlying records, spread proportionally for `sum` measures, and `onDataChange` fires with
+  the updated rows).
 * **Filters** — member checkbox filters with search, conditional filters (number/text),
   top/bottom N, report-filter chips above the grid.
 * **Field list** — drag-and-drop between Filters / Columns / Rows / Measures (`@dnd-kit`).

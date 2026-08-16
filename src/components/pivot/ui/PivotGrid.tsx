@@ -49,6 +49,10 @@ export interface PivotGridProps {
   onToggleColumnCollapse?: (key: string[]) => void;
   conditionalFormats?: ConditionalFormatRule[];
   allowDrillThrough?: boolean;
+  /** Enables inline cell editing (double-click a value to type a new one). */
+  editable?: boolean;
+  /** Called with the edited cell's coordinates and the typed number. */
+  onCellEdit?: (rowKey: string[], colKey: string[], value: number) => void;
   onDrill?: (rowKey: string[], colKey: string[], label: string) => void;
   onSelectionChange?: (stats: SelectionStats | null) => void;
   emptyLabel?: string;
@@ -98,6 +102,8 @@ export function PivotGrid({
   onToggleColumnCollapse,
   conditionalFormats = [],
   allowDrillThrough = true,
+  editable = false,
+  onCellEdit,
   onDrill,
   onSelectionChange,
   emptyLabel = "No data to show",
@@ -108,6 +114,8 @@ export function PivotGrid({
   const [focus, setFocus] = useState<CellPos | null>(null);
   const [hover, setHover] = useState<CellPos | null>(null);
   const [scrollTop, setScrollTop] = useState(0);
+  const [editing, setEditing] = useState<CellPos | null>(null);
+  const [draft, setDraft] = useState("");
   const [viewport, setViewport] = useState(600);
 
   const rowHeaders = result.rowHeaders;
@@ -254,6 +262,15 @@ export function PivotGrid({
     if (index === -1) return "↕";
     const arrow = activeSorts[index]!.direction === "asc" ? "▲" : "▼";
     return activeSorts.length > 1 ? `${arrow}${index + 1}` : arrow;
+  };
+
+  const canEdit = editable && Boolean(onCellEdit);
+  const isEditing = (row: number, col: number) => editing?.row === row && editing?.col === col;
+
+  const commitEdit = (rowKey: string[], colKey: string[]) => {
+    const parsed = Number(draft);
+    if (draft.trim() !== "" && Number.isFinite(parsed)) onCellEdit?.(rowKey, colKey, parsed);
+    setEditing(null);
   };
 
   const formatCell = (value: number | null) =>
@@ -535,24 +552,49 @@ export function PivotGrid({
                         setFocus(pos);
                         if (!e.shiftKey) setAnchor(pos);
                       }}
-                      onDoubleClick={() =>
-                        allowDrillThrough &&
-                        onDrill?.(
-                          header.kind === "grand" ? [] : header.key,
-                          leaf.key,
-                          [...header.key, ...leaf.key].join(" · ") || "All records",
-                        )
-                      }
-                      onClick={() =>
-                        allowDrillThrough &&
-                        onDrill?.(
-                          header.kind === "grand" ? [] : header.key,
-                          leaf.key,
-                          [...header.key, ...leaf.key].join(" · ") || "All records",
-                        )
-                      }
+                      onDoubleClick={() => {
+                        if (canEdit && header.kind === "member") {
+                          setEditing({ row: rowIndex, col: colIndex });
+                          setDraft(value === null ? "" : String(value));
+                          return;
+                        }
+                        if (allowDrillThrough)
+                          onDrill?.(
+                            header.kind === "grand" ? [] : header.key,
+                            leaf.key,
+                            [...header.key, ...leaf.key].join(" · ") || "All records",
+                          );
+                      }}
+                      onClick={() => {
+                        if (canEdit) return;
+                        if (allowDrillThrough)
+                          onDrill?.(
+                            header.kind === "grand" ? [] : header.key,
+                            leaf.key,
+                            [...header.key, ...leaf.key].join(" · ") || "All records",
+                          );
+                      }}
                     >
-                      {formatCell(value)}
+                      {isEditing(rowIndex, colIndex) ? (
+                        <input
+                          autoFocus
+                          type="number"
+                          className="pivot-cell-input w-full bg-transparent text-right outline-none"
+                          aria-label={`Edit value for ${[...header.key, ...leaf.key].join(" · ") || "cell"}`}
+                          value={draft}
+                          onChange={(e) => setDraft(e.target.value)}
+                          onClick={(e) => e.stopPropagation()}
+                          onMouseDown={(e) => e.stopPropagation()}
+                          onBlur={() => commitEdit(header.key, leaf.key)}
+                          onKeyDown={(e) => {
+                            e.stopPropagation();
+                            if (e.key === "Enter") commitEdit(header.key, leaf.key);
+                            if (e.key === "Escape") setEditing(null);
+                          }}
+                        />
+                      ) : (
+                        formatCell(value)
+                      )}
                     </td>
                   );
                 })}
