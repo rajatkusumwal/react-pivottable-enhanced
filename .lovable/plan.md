@@ -89,6 +89,17 @@ Hard / out of scope
 6. Add a threshold/hybrid switch so the component picks the backend for large datasets and the local engine for small ones.
 7. Layer tests: adapter unit tests, `PivotGrid` rendering tests, and end-to-end integration tests with a mock backend.
 
+## Upload your own file in the demo
+
+The demo should not be limited to the bundled sample data. Add a small data-source bar above the pivot table with:
+
+- A **Choose file** button and a drag-and-drop area accepting `.csv` and `.json`, using the existing `readFileAsRows()` and `inferFields()` helpers so the field list, filters and measures repopulate automatically from the uploaded columns.
+- A **Use sample data** button to switch back at any time, plus the file name and row count once loaded.
+- Sensible first configuration after upload: pick the first text column for rows, the first numeric column as a sum measure, so the user immediately sees a populated grid instead of an empty one.
+- Clear inline errors for unparseable files, empty files, and files with no columns; a size guard with a friendly message for very large files.
+- Everything stays in the browser for the local engine — no upload leaves the machine, and the demo says so.
+- Backend path: when the hybrid backend is configured, the same control posts the file to a `POST /api/pivot/datasets` endpoint that loads it into DuckDB and returns a dataset id the subsequent pivot queries reference. Document that endpoint in the README alongside the other routes.
+
 ## Remove Orb.js entirely
 
 Orb goes away in this work, so there is one engine, one demo, one story.
