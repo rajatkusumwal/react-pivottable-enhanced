@@ -1,107 +1,233 @@
 # Pivot Studio
 
-A drop-in React pivot table UI that layers Flexmonster-style features on top of the two
-open-source engines: **react-pivottable** and the headless **orb.js** (`orb.pgrid`) engine.
+A free, Flexmonster-like pivot table for React 19, built on the open-source
+[react-pivottable](https://react-pivottable.js.org/) aggregation utilities with a
+custom grid renderer on top. Drag-and-drop field list, subtotals, expand/collapse,
+compact / classic / flat layouts, filters, calculated values, charts, drill-through,
+exports, localisation and row-level security — in one component.
 
-Live demos: `/demos` (one tab per engine). Feature comparison vs Flexmonster: `/`.
+Aggregation is **pluggable**: it runs in the browser by default and can be handed to a
+backend service (for example Spring Boot + DuckDB) without changing any UI code.
 
-## Install
+---
+
+## 1. Install
 
 ```bash
-npm i react-pivottable orb recharts
+npm i react-pivottable recharts @dnd-kit/core @dnd-kit/sortable lucide-react
 ```
 
-Copy `src/components/pivot/` into your app (it has no project-specific imports beyond
-Tailwind classes), then:
+Vite users — react-pivottable's UMD dependency references Node's `global`:
+
+```ts
+// vite.config.ts
+export default defineConfig({ define: { global: "globalThis" } });
+```
+
+## 2. Use it
 
 ```tsx
-import { PivotStudio, sampleData, sampleFields } from "@/components/pivot";
+import { PivotStudio, inferFields, createDefaultConfig } from "@/components/pivot";
 
-export default function Page() {
+export function Report({ rows }) {
   return (
     <PivotStudio
-      engine="react-pivottable"   // or "orb"
-      data={sampleData}
-      fields={sampleFields}
+      data={rows}
+      fields={inferFields(rows)}
+      initialConfig={createDefaultConfig({
+        rows: ["region", "category"],
+        cols: ["quarter"],
+        values: [{ field: "revenue", aggregator: "sum", format: { decimals: 0, currency: "USD" } }],
+      })}
       title="Sales analysis"
+      allowFileUpload
     />
   );
 }
 ```
 
-Vite users: orb's UMD bundle references Node's `global`, so add to `vite.config.ts`:
+Copy `src/components/pivot/` into any React 19 app — it has no app-specific imports
+other than Tailwind tokens (`--color-border`, `--color-card`, …) and `@/lib/utils`.
 
-```ts
-define: { global: "globalThis" }
-```
+### Props
 
-## Props
-
-| Prop | Type | Notes |
+| Prop | Type | Purpose |
 | --- | --- | --- |
-| `data` | `PivotRow[]` | Flat records to analyse |
-| `fields` | `FieldDef[]` | Metadata; use `inferFields(rows)` to generate |
-| `engine` | `"react-pivottable" \| "orb"` | Grid renderer |
-| `initialConfig` | `Partial<PivotConfig>` | Uncontrolled starting state |
-| `config` / `onConfigChange` | `PivotConfig` | Fully controlled mode |
-| `permissions` | `Permissions` | Export / drill-through / edit / field masking |
-| `showSidebar`, `showToolbar` | `boolean` | Hide chrome if the host app supplies its own |
-| `fieldsUi` | `"dialog" \| "sidebar"` | `"dialog"` (default) gives the Flexmonster look: a field bar above the grid plus a popup field list. `"sidebar"` docks the panel on the left |
+| `data` | `PivotRow[]` | Records for the local engine |
+| `fields` | `FieldDef[]` | Captions, types, hidden flags (`inferFields()` helps) |
+| `engine` | `PivotEngineAdapter` | Aggregation engine; defaults to the local one |
+| `initialConfig` / `config` + `onConfigChange` | `PivotConfig` | Uncontrolled or controlled state |
+| `permissions` | `Permissions` | `readOnly`, `allowExport`, `allowDrillThrough`, `deniedFields`, `maskedFields`, `rowFilter` |
+| `fieldsUi` | `"dialog" \| "sidebar"` | Flexmonster-style popup (default) or docked panel |
+| `allowFileUpload` | `boolean` | Show the CSV/JSON upload bar |
+| `onUploadToBackend` | `(file) => Promise<{ datasetId, rowCount, fields }>` | Send uploads to your service instead of memory |
+| `datasetId` | `string` | Dataset handle passed to the backend engine |
+| `showToolbar` / `showSidebar` / `title` / `className` | | Presentation |
 
-### Flexmonster-style field list
+### Feature map
 
-Users coming from Flexmonster get the familiar layout out of the box:
+* **Grid** — compact / classic / flat layouts, subtotals, grand totals, expand & collapse,
+  column resize, cell selection with a sum/avg/min/max bar, keyboard navigation, row & column
+  hover highlight, spreadsheet headers, windowed rendering for large results.
+* **Filters** — member checkbox filters with search, conditional filters (number/text),
+  top/bottom N, report-filter chips above the grid.
+* **Field list** — drag-and-drop between Filters / Columns / Rows / Measures (`@dnd-kit`).
+* **Aggregations** — sum, count, distinct count, average, median, min, max, product,
+  population/sample stdev, percent-of-total; add your own with `registerAggregator()`.
+* **Calculated values** — safe formula parser (no `eval`), e.g. `revenue - cost`.
+* **Charts** — Recharts bar / stacked / line / area / pie with click-to-drill.
+* **Drill-through** — click any number to inspect the source records.
+* **Export & print** — Excel (.xls), CSV, TSV, HTML, JSON, clipboard, print/PDF.
+* **Localisation** — bundled `en`, `fr`, `de`, `es`; locale-aware number formats.
+* **Security** — `rowFilter` row-level security, field masking, denied fields, read-only mode.
 
-- a toolbar **Fields** button and an in-grid field bar showing Report filters / Columns / Rows / Measures;
-- a popup field list with a searchable source list and four drop zones;
-- drag & drop of fields between zones (powered by `@dnd-kit`), plus a keyboard/select fallback on every field;
-- member checklists on filter chips ("Select all" + search), aggregation and "show value as" menus on each measure;
-- a compact grid skin (`.pivot-fm`) with 1px grid lines and grey headers, applied to both engines.
+---
 
-```tsx
-<PivotStudio engine="react-pivottable" data={rows} fields={fields} fieldsUi="dialog" />
-```
+## 3. Moving aggregation to a backend (Spring Boot + DuckDB)
 
-Lower-level pieces are exported too: `FieldListPanel`, `FieldListDialog`, `GridFieldBar`, `FieldChip`, `DropArea`, `MemberFilterPopover`, and the pure helpers `moveField`, `reorderField`, `removeField`, `areaOfField`.
-| `title`, `className` | `string` | Presentation |
-
-## Feature map
-
-- **Grid** — compact/classic/flat layouts, totals & grand totals, expand/collapse, sorting,
-  conditional formatting, number formats.
-- **Filters** — value (member) filters, conditional filters, top-N, report filters.
-- **Field list** — drag-free select-to-area sidebar, rows/columns/values/filters, reordering.
-- **Aggregations** — sum, count, distinct count, average, median, min, max, product, stdev,
-  variance, percent of total; register your own with `registerAggregator`.
-- **Calculated values** — safe formula parser (`evaluateFormula`, `validateFormula`) with
-  `+ - * / ()` and field references.
-- **Charts** — column, bar, line, area, pie, scatter via Recharts, driven by `buildChartData`.
-- **Drill-through** — click any cell to see the underlying records (`drillThroughRows`).
-- **Toolbar & UI** — save/load report JSON, layout switch, chart switch, locale switch, print.
-- **Export & print** — CSV, TSV, HTML, JSON, Excel (`.xls`), clipboard copy, print view.
-- **Options & localisation** — bundled locales (`locales`, `getLocale`), locale-aware number
-  and percent formatting.
-- **Data sources** — inline JSON, CSV string/file/URL, remote JSON (`parseCsv`, `loadCsvUrl`,
-  `loadJsonUrl`, `readFileAsRows`) with automatic type inference.
-- **Customization & style** — `PivotTheme` tokens plus `className` overrides; all sub-components
-  (`PivotToolbar`, `PivotSidebar`, `PivotChart`, `DrillThroughDialog`) are exported for reuse.
-- **Security & authentication** — `secureRows` (row-level security predicates), field masking,
-  and `can()` permission checks that hide export/drill-through/edit actions.
-
-## Composing your own shell
-
-Every layer is exported independently, so you can use the shared feature core with your own UI:
+Everything the grid renders is a `PivotResult`. Swap the engine and the UI is unchanged:
 
 ```tsx
-import { applyFilters, applyCalculatedFields, aggregate, exportMatrix } from "@/components/pivot";
+import { PivotStudio, createBackendEngine, createHybridEngine } from "@/components/pivot";
+
+const engine = createBackendEngine({
+  baseUrl: "https://analytics.example.com",
+  headers: () => ({ Authorization: `Bearer ${token}` }),
+});
+
+// Or: local for small datasets, backend above the threshold.
+const hybrid = createHybridEngine({ baseUrl: "...", threshold: 50_000 });
+
+<PivotStudio data={rows} fields={fields} engine={engine} datasetId={datasetId} allowFileUpload
+  onUploadToBackend={uploadCsv} />
 ```
 
-## Tests
+### REST contract
+
+All endpoints are JSON over POST.
+
+#### `POST /api/pivot/query`
+
+```jsonc
+{
+  "rows": ["region", "category"],
+  "cols": ["quarter"],
+  "values": [{ "field": "revenue", "aggregator": "sum", "caption": "Revenue" }],
+  "filters": [
+    { "kind": "values", "field": "region", "mode": "include", "members": ["North"] },
+    { "kind": "condition", "field": "revenue", "operator": "gt", "value": 1000 }
+  ],
+  "showSubTotals": true,
+  "showGrandTotals": true,
+  "layout": "compact",
+  "collapsed": ["North"],
+  "sort": { "by": 0, "direction": "desc" },
+  "locale": "en",
+  "datasetId": "sales-2026"
+}
+```
+
+Response (`PivotResult`):
+
+```jsonc
+{
+  "rowFields": ["region", "category"],
+  "colFields": ["quarter"],
+  "measure": { "field": "revenue", "caption": "Revenue", "aggregator": "sum" },
+  "rowHeaders": [
+    { "key": ["North"], "label": "North", "depth": 0, "kind": "member",
+      "expandable": true, "expanded": true, "span": 1 },
+    { "key": ["North", "Bikes"], "label": "Bikes", "depth": 1, "kind": "member",
+      "expandable": false, "expanded": true, "span": 1 },
+    { "key": ["North"], "label": "North total", "depth": 0, "kind": "subtotal",
+      "expandable": false, "expanded": true, "span": 1 }
+  ],
+  "colHeaderRows": [[{ "key": ["Q1"], "label": "Q1", "depth": 0, "kind": "member",
+                       "expandable": false, "expanded": true, "span": 1 }]],
+  "colLeaves":     [{ "key": ["Q1"], "label": "Q1", "depth": 0, "kind": "member",
+                      "expandable": false, "expanded": true, "span": 1 }],
+  "cells":     [[147312], [43290], [147312]],
+  "rowTotals": [576158, 222656, 576158],
+  "colTotals": [608186],
+  "grandTotal": 2583335,
+  "sourceCount": 480,
+  "meta": { "source": "backend", "queryId": "b12f" }
+}
+```
+
+Rules the server must respect:
+
+* `cells[i][j]` aligns with `rowHeaders[i]` and `colLeaves[j]`; use `null` for empty cells.
+* Emit subtotal rows only when `showSubTotals` is true, and skip children of any path in
+  `collapsed`.
+* `layout: "flat"` means one row per source record combination, no subtotals.
+
+#### `POST /api/pivot/drillthrough`
+
+```jsonc
+{ "rowKey": ["North", "Bikes"], "colKey": ["Q1"], "limit": 500, "query": { /* as above */ } }
+```
+
+Returns `{ "rows": [ { "region": "North", ... } ] }` — the raw records behind the cell.
+
+#### `POST /api/pivot/datasets` (multipart upload)
+
+`file` part; returns `{ "datasetId": "…", "rowCount": 12345, "fields": [{ "name": "region", "caption": "Region", "type": "string" }] }`.
+
+#### `GET /api/pivot/datasets/{id}/fields`
+
+Returns the same `fields` array so the field list can be built without downloading data.
+
+### Spring Boot + DuckDB sketch
+
+```java
+@RestController
+@RequestMapping("/api/pivot")
+public class PivotController {
+  private final DataSource duckdb; // jdbc:duckdb:/data/analytics.db
+
+  @PostMapping("/query")
+  public PivotResult query(@RequestBody @Valid PivotQuery q) {
+    return pivotService.run(q); // build SQL, map to PivotResult
+  }
+}
+```
+
+DuckDB does the grouping in one pass with `GROUPING SETS`, which gives you leaf rows and
+subtotals together:
+
+```sql
+SELECT region, category, quarter,
+       SUM(revenue) AS value,
+       GROUPING(category) AS is_subtotal
+FROM   read_parquet('sales/*.parquet')
+WHERE  region IN ('North', 'South')
+GROUP BY GROUPING SETS ((region, category, quarter), (region, quarter), (quarter), ())
+ORDER BY region, is_subtotal, category;
+```
+
+Then walk the result set once: rows with `is_subtotal = 0` become `kind: "member"`,
+`is_subtotal = 1` becomes `kind: "subtotal"`, the `()` set becomes `grandTotal`.
+
+Practical notes:
+
+* Whitelist field names against the dataset schema before interpolating them into SQL, and
+  bind every filter literal as a parameter.
+* Apply row-level security server-side too — the client `rowFilter` is a UX convenience, not
+  a security boundary.
+* Uploaded files land well in DuckDB via `read_csv_auto('…')` / `read_json_auto('…')`, saved
+  as a Parquet file keyed by `datasetId`.
+* Cache on `(datasetId, query hash)` and return the hash as `meta.queryId`.
+
+---
+
+## 4. Testing
 
 ```bash
 npx vitest run
 ```
 
-30 tests cover the aggregation registry, formula parser, filters, security, export helpers,
-and full integration flows for both engines (render, drill-through, filtering, calculated
-values, charts, localisation, export, permissions, controlled config).
+The suite covers grid rendering and totals, sorting, drill-through, filters, calculated
+values, charts, export, localisation, permissions, controlled config, the drag-and-drop
+field list, member filters, file upload, and a custom engine adapter (proving the backend
+swap works without UI changes).
