@@ -1,7 +1,15 @@
 import type { FieldDef, PivotRow } from "./types";
+import { csvOptions, detectCsvOptions as detect, parseCsvNumber, type CsvOptions } from "./csv";
 
-/** Minimal RFC-4180 style CSV parser (handles quotes and embedded commas). */
-export function parseCsv(text: string, delimiter = ","): PivotRow[] {
+/**
+ * Minimal RFC-4180 style CSV parser (handles quotes and embedded separators).
+ *
+ * Pass a dialect to read European files:
+ *   parseCsv(text, { delimiter: ";", decimalSeparator: ",", thousandsSeparator: "." })
+ */
+export function parseCsv(text: string, options: string | Partial<CsvOptions> = ","): PivotRow[] {
+  const dialect = csvOptions(options);
+  const delimiter = dialect.delimiter;
   const rows: string[][] = [];
   let field = "";
   let record: string[] = [];
@@ -38,8 +46,8 @@ export function parseCsv(text: string, delimiter = ","): PivotRow[] {
     const row: PivotRow = {};
     header.forEach((name, i) => {
       const raw = (cells[i] ?? "").trim();
-      const num = Number(raw);
-      row[name.trim()] = raw !== "" && Number.isFinite(num) ? num : raw;
+      const num = parseCsvNumber(raw, dialect);
+      row[name.trim()] = num !== null ? num : raw;
     });
     return row;
   });
@@ -72,24 +80,45 @@ export async function loadJsonUrl(url: string, signal?: AbortSignal): Promise<Pi
   return json as PivotRow[];
 }
 
-export async function loadCsvUrl(url: string, signal?: AbortSignal): Promise<PivotRow[]> {
+export async function loadCsvUrl(
+  url: string,
+  signal?: AbortSignal,
+  options: string | Partial<CsvOptions> = ",",
+): Promise<PivotRow[]> {
   const res = await fetch(url, signal ? { signal } : {});
   if (!res.ok) throw new Error(`Could not load ${url} (${res.status})`);
-  return parseCsv(await res.text());
+  return parseCsv(await res.text(), options);
 }
 
-export function readFileAsRows(file: File): Promise<PivotRow[]> {
+export function readFileAsRows(
+  file: File,
+  options?: string | Partial<CsvOptions>,
+): Promise<PivotRow[]> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onerror = () => reject(new Error("Could not read the file"));
     reader.onload = () => {
       const text = String(reader.result ?? "");
       try {
-        resolve(file.name.toLowerCase().endsWith(".json") ? (JSON.parse(text) as PivotRow[]) : parseCsv(text));
+        resolve(
+          file.name.toLowerCase().endsWith(".json")
+            ? (JSON.parse(text) as PivotRow[])
+            : parseCsv(text, options ?? detectCsvOptionsSafe(text)),
+        );
       } catch (e) {
         reject(e instanceof Error ? e : new Error("Could not parse the file"));
       }
     };
     reader.readAsText(file);
   });
+}
+
+/** Detects the CSV dialect, falling back to the default one on any problem. */
+function detectCsvOptionsSafe(text: string): CsvOptions {
+  try {
+    // Lazy require avoids a cycle-free import surprise in tests.
+    return detect(text);
+  } catch {
+    return csvOptions();
+  }
 }
