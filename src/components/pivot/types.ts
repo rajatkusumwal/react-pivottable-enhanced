@@ -22,7 +22,13 @@ export interface FieldDef {
   hierarchy?: string;
   /** 1-based level inside `hierarchy` (Region = 1, Country = 2, …). */
   level?: number;
+  /**
+   * Restricts the aggregations offered for this field in the measure menus,
+   * e.g. `["average", "min", "max"]` for a unit-price column.
+   */
+  aggregators?: AggregatorName[];
 }
+
 
 
 export type AggregatorName =
@@ -46,8 +52,18 @@ export type ValueDisplayMode =
   | "percentOfGrandTotal"
   | "percentOfRowTotal"
   | "percentOfColumnTotal"
+  | "percentOfParentRowTotal"
+  | "percentOfParentColumnTotal"
+  | "differenceOfRow"
+  | "differenceOfColumn"
+  | "percentDifferenceOfRow"
+  | "percentDifferenceOfColumn"
+  | "runningTotalOfRow"
+  | "runningTotalOfColumn"
+  /** Alias of `runningTotalOfRow`, kept for older reports. */
   | "runningTotal"
   | "index";
+
 
 export interface NumberFormat {
   decimals?: number;
@@ -205,6 +221,9 @@ export interface PivotConfig {
   showReportFilterArea: boolean;
   /** Show member filter controls above the chart. */
   showChartFilters: boolean;
+  /** Show the Σ icon next to measures in the field list and field bar. */
+  showAggregationIcon: boolean;
+
   /** Allow dragging fields between areas; when false only the menus work. */
   dragAndDrop: boolean;
   /** Allow typing a new value straight into a grid cell (writes back to data). */
@@ -245,6 +264,8 @@ export function createDefaultConfig(partial: Partial<PivotConfig> = {}): PivotCo
     showSortingControls: true,
     showReportFilterArea: true,
     showChartFilters: true,
+    showAggregationIcon: true,
+
     dragAndDrop: true,
     editing: false,
     locale: "en",

@@ -64,21 +64,64 @@ export function grandTotal(rows: PivotRow[], value: ValueDef): number | null {
 }
 
 
+/** Everything a "show values as" transform can reference for one cell. */
+export interface DisplayModeContext {
+  /** Grand total of the measure over the whole report. */
+  grand: number | null;
+  /** Total of the current row (all columns). */
+  rowTotal: number | null;
+  /** Total of the current column (all rows). */
+  colTotal: number | null;
+  /** Total of the parent row group; falls back to the row total. */
+  parentRowTotal?: number | null;
+  /** Total of the parent column group; falls back to the column total. */
+  parentColTotal?: number | null;
+  /** Running total accumulated across the row (left to right). */
+  running: number;
+  /** Running total accumulated down the column (top to bottom). */
+  runningColumn?: number;
+  /** Raw value of the previous cell in the same row. */
+  prevInRow?: number | null;
+  /** Raw value of the cell above in the same column. */
+  prevInColumn?: number | null;
+}
+
+const ratio = (a: number, b: number | null | undefined) => (b ? (a / b) * 100 : null);
+const diff = (a: number, prev: number | null | undefined) =>
+  prev === null || prev === undefined ? null : a - prev;
+const pctDiff = (a: number, prev: number | null | undefined) =>
+  prev === null || prev === undefined || prev === 0 ? null : ((a - prev) / prev) * 100;
+
 export function applyDisplayMode(
   raw: number | null,
-  ctx: { grand: number | null; rowTotal: number | null; colTotal: number | null; running: number },
+  ctx: DisplayModeContext,
   mode: ValueDef["displayMode"],
 ): number | null {
   if (raw === null) return null;
   switch (mode) {
     case "percentOfGrandTotal":
-      return ctx.grand ? (raw / ctx.grand) * 100 : null;
+      return ratio(raw, ctx.grand);
     case "percentOfRowTotal":
-      return ctx.rowTotal ? (raw / ctx.rowTotal) * 100 : null;
+      return ratio(raw, ctx.rowTotal);
     case "percentOfColumnTotal":
-      return ctx.colTotal ? (raw / ctx.colTotal) * 100 : null;
+      return ratio(raw, ctx.colTotal);
+    case "percentOfParentRowTotal":
+      return ratio(raw, ctx.parentRowTotal ?? ctx.rowTotal);
+    case "percentOfParentColumnTotal":
+      return ratio(raw, ctx.parentColTotal ?? ctx.colTotal);
+    case "differenceOfRow":
+      return diff(raw, ctx.prevInRow);
+    case "differenceOfColumn":
+      return diff(raw, ctx.prevInColumn);
+    case "percentDifferenceOfRow":
+      return pctDiff(raw, ctx.prevInRow);
+    case "percentDifferenceOfColumn":
+      return pctDiff(raw, ctx.prevInColumn);
     case "runningTotal":
+    case "runningTotalOfRow":
       return ctx.running;
+    case "runningTotalOfColumn":
+      return ctx.runningColumn ?? raw;
     case "index":
       return ctx.grand && ctx.rowTotal && ctx.colTotal
         ? (raw * ctx.grand) / (ctx.rowTotal * ctx.colTotal)
@@ -87,3 +130,21 @@ export function applyDisplayMode(
       return raw;
   }
 }
+
+/** Human labels for the "show values as" menu. */
+export const displayModeLabels: Record<string, string> = {
+  raw: "Actual value",
+  percentOfGrandTotal: "% of grand total",
+  percentOfRowTotal: "% of row",
+  percentOfColumnTotal: "% of column",
+  percentOfParentRowTotal: "% of parent row total",
+  percentOfParentColumnTotal: "% of parent column total",
+  differenceOfRow: "Difference (row)",
+  differenceOfColumn: "Difference (column)",
+  percentDifferenceOfRow: "% difference (row)",
+  percentDifferenceOfColumn: "% difference (column)",
+  runningTotalOfRow: "Running total (row)",
+  runningTotalOfColumn: "Running total (column)",
+  index: "Index",
+};
+

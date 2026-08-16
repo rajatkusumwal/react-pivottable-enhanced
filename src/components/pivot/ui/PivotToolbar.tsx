@@ -174,6 +174,15 @@ export function PivotToolbar({
       <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
         <input
           type="checkbox"
+          checked={config.showAggregationIcon}
+          onChange={(e) => onChange({ showAggregationIcon: e.target.checked })}
+        />
+        &#931; icon
+      </label>
+
+      <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+        <input
+          type="checkbox"
           checked={config.dragAndDrop}
           disabled={readOnly}
           onChange={(e) => onChange({ dragAndDrop: e.target.checked })}

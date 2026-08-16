@@ -530,3 +530,59 @@ describe("PivotStudio field list and measures", () => {
     expect(options).not.toContain("sum");
   });
 });
+
+describe("aggregation menu restrictions and the Σ icon", () => {
+  const restrictedFields = [
+    { name: "region", caption: "Region", type: "string" as const },
+    {
+      name: "revenue",
+      caption: "Revenue",
+      type: "number" as const,
+      aggregators: ["average", "min", "max"],
+    },
+  ];
+
+  it("only lists the aggregations a field allows", async () => {
+    render(
+      <PivotStudio
+        data={data}
+        fields={restrictedFields}
+        initialConfig={createDefaultConfig({
+          rows: ["region"],
+          values: [{ field: "revenue", aggregator: "average" }],
+        })}
+        fieldsUi="sidebar"
+      />,
+    );
+    const menu = await screen.findByLabelText("Aggregation for revenue");
+    const options = within(menu).getAllByRole("option").map((o) => o.textContent);
+    expect(options).toEqual(["Average", "Minimum", "Maximum"]);
+  });
+
+  it("offers the parent-total, difference and running-total display modes", async () => {
+    setup();
+    const menu = await screen.findByLabelText("Show revenue as");
+    const options = within(menu).getAllByRole("option").map((o) => o.getAttribute("value"));
+    expect(options).toEqual(
+      expect.arrayContaining([
+        "percentOfParentRowTotal",
+        "percentOfParentColumnTotal",
+        "differenceOfRow",
+        "differenceOfColumn",
+        "percentDifferenceOfRow",
+        "percentDifferenceOfColumn",
+        "runningTotalOfRow",
+        "runningTotalOfColumn",
+        "index",
+      ]),
+    );
+  });
+
+  it("shows the sigma icon on measures and hides it when switched off", async () => {
+    const user = userEvent.setup();
+    setup();
+    expect((await screen.findAllByTestId("sigma-icon")).length).toBeGreaterThan(0);
+    await user.click(screen.getByRole("checkbox", { name: /icon/i }));
+    await waitFor(() => expect(screen.queryAllByTestId("sigma-icon")).toHaveLength(0));
+  });
+});

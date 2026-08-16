@@ -97,10 +97,20 @@ export const aggregatorLabels: Record<string, string> = {
   last: "Last",
 };
 
-/** Aggregations offered for a field of the given type (drives the measure menus). */
-export function aggregatorsForType(type: FieldType | undefined): AggregatorName[] {
-  if (!type || type === "number") return Object.keys(aggregators);
-  return Object.keys(textAggregators);
+/**
+ * Aggregations offered for a field of the given type (drives the measure menus).
+ * `allowed` restricts the list further, e.g. a field defined with
+ * `aggregators: ["average", "min", "max"]` never offers Sum.
+ */
+export function aggregatorsForType(
+  type: FieldType | undefined,
+  allowed?: AggregatorName[] | undefined,
+): AggregatorName[] {
+  const all: AggregatorName[] =
+    !type || type === "number" ? Object.keys(aggregators) : Object.keys(textAggregators);
+  if (!allowed?.length) return all;
+  const restricted = all.filter((name) => allowed.includes(name));
+  return restricted.length ? restricted : all;
 }
 
 /** Register a custom aggregation function usable by both engines. */

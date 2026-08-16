@@ -101,8 +101,17 @@ other than Tailwind tokens (`--color-border`, `--color-card`, …) and `@/lib/ut
   last, and render as text (ISO dates and `HH:mm` times compare correctly).
 * **Aggregations** — sum, count, distinct count, average, median, min, max, product,
   population/sample stdev, percent-of-total; add your own with `registerAggregator()`.
-  `aggregatorsForType(type)` returns the aggregations valid for a field type and drives the
-  measure menus.
+  `aggregatorsForType(type, allowed?)` returns the aggregations valid for a field type and
+  drives the measure menus. Restrict them per field with `FieldDef.aggregators`, e.g.
+  `{ name: "unitPrice", type: "number", aggregators: ["average", "min", "max"] }` hides Sum.
+  The Σ icon on measure chips can be hidden with `config.showAggregationIcon: false`
+  (toolbar "Σ icon").
+* **Show values as** — every measure takes a `displayMode`: `percentOfGrandTotal`,
+  `percentOfRowTotal`, `percentOfColumnTotal`, `percentOfParentRowTotal`,
+  `percentOfParentColumnTotal`, `index`, `differenceOfRow` / `differenceOfColumn`,
+  `percentDifferenceOfRow` / `percentDifferenceOfColumn`, `runningTotalOfRow` /
+  `runningTotalOfColumn`. Pick it from the measure menu in the field list.
+
 * **Calculated values** — safe formula parser (no `eval`), e.g. `revenue - cost`.
 * **Charts** — Recharts bar / stacked / line / area / pie with click-to-drill.
 * **Drill-through** — click any number to inspect the source records.
@@ -144,10 +153,12 @@ All endpoints are JSON over POST.
   "values": [
     { "field": "revenue", "aggregator": "sum", "caption": "Revenue", "type": "number" },
     { "field": "revenue", "aggregator": "average", "caption": "Avg revenue", "type": "number" },
+    { "field": "revenue", "aggregator": "sum", "displayMode": "percentOfParentRowTotal" },
     { "field": "customerName", "aggregator": "distinctCount", "type": "string" },
     { "field": "orderDate", "aggregator": "min", "type": "date" },
     { "field": "orderTime", "aggregator": "max", "type": "time" }
   ],
+
   "filters": [
     { "kind": "values", "field": "region", "mode": "include", "members": ["North"] },
     { "kind": "condition", "field": "revenue", "operator": "gt", "value": 1000 },
@@ -242,6 +253,22 @@ Rules the server must respect:
   over `sort`; `by: "rows"` sorts row members, a number sorts by that leaf column.
 * `grandTotalsPosition` decides whether the `kind: "grand"` row is emitted first or last.
 * `limit` / `offset` page the source records before aggregation.
+* Each measure may carry a `displayMode` ("show values as"), applied **after** aggregation and
+  per measure. Return `null` when the reference total is missing or zero:
+
+  | `displayMode` | Cell value |
+  | --- | --- |
+  | `raw` (default) | the aggregate |
+  | `percentOfGrandTotal` | value / grand total × 100 |
+  | `percentOfRowTotal` / `percentOfColumnTotal` | value / row (column) total × 100 |
+  | `percentOfParentRowTotal` | value / the same column's value for the row's **parent member**; falls back to the row total at the top level |
+  | `percentOfParentColumnTotal` | value / the parent column group's value for that row; falls back to the column total |
+  | `index` | (value × grand total) / (row total × column total) |
+  | `differenceOfRow` / `differenceOfColumn` | value − previous column (previous row); `null` in the first column (row) |
+  | `percentDifferenceOfRow` / `percentDifferenceOfColumn` | that difference ÷ the previous value × 100 |
+  | `runningTotalOfRow` | cumulative sum across the row, left to right |
+  | `runningTotalOfColumn` (`runningTotal` is an alias of the row variant) | cumulative sum down the column, top to bottom |
+
 * Condition filters carry an optional `valueType`
   (`"auto" | "number" | "text" | "date" | "time"`).
   With `"date"` the server must compare on the date timeline at **day granularity** —
