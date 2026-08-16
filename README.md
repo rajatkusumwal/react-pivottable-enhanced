@@ -72,6 +72,8 @@ other than Tailwind tokens (`--color-border`, `--color-card`, …) and `@/lib/ut
 * **Filters** — member checkbox filters with search, conditional filters (number/text),
   top/bottom N, report-filter chips above the grid.
 * **Field list** — drag-and-drop between Filters / Columns / Rows / Measures (`@dnd-kit`).
+  Drag & drop can be switched off with `config.dragAndDrop: false` (or the toolbar
+  checkbox); the select menus keep every action available without dragging.
 * **Aggregations** — sum, count, distinct count, average, median, min, max, product,
   population/sample stdev, percent-of-total; add your own with `registerAggregator()`.
 * **Calculated values** — safe formula parser (no `eval`), e.g. `revenue - cost`.
