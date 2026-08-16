@@ -131,6 +131,13 @@ other than Tailwind tokens (`--color-border`, `--color-card`, …) and `@/lib/ut
     }}
   />
   ```
+* **Renaming fields and measures** — double-click a chip in the field bar (or use the pencil
+  icon, or right-click a value cell → *Rename measure…*) to give a field or a single measure
+  its own label. Row/column renames live in `config.fieldCaptions` (`{ "region": "Sales area" }`)
+  and measure renames in `values[i].caption`, so the same field can appear twice with different
+  aggregations and different names. Both travel in the shared report link and are applied to the
+  grid, charts, exports and print output. Backends can also ship defaults via `fields[].caption`.
+
 * **KPIs from the data source** — a field can declare its goal and the grid shows a status
   arrow (on target / at risk / below target) next to every value and row total, while the
   field list groups KPI fields together:
