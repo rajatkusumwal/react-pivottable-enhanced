@@ -32,7 +32,7 @@ export function FieldChip({
 }: FieldChipProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id,
-    disabled,
+    disabled: disabled === true,
   });
 
   return (
