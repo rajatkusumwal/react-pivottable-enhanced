@@ -221,6 +221,9 @@ export interface PivotConfig {
   showReportFilterArea: boolean;
   /** Show member filter controls above the chart. */
   showChartFilters: boolean;
+  /** Show the Σ icon next to measures in the field list and field bar. */
+  showAggregationIcon: boolean;
+
   /** Allow dragging fields between areas; when false only the menus work. */
   dragAndDrop: boolean;
   /** Allow typing a new value straight into a grid cell (writes back to data). */
