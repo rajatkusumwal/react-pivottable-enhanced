@@ -37,6 +37,53 @@ const setup = (props: Partial<React.ComponentProps<typeof PivotStudio>> = {}) =>
     />,
   );
 
+describe("PivotStudio multilevel drill", () => {
+  const nested: PivotRow[] = [
+    { region: "North", city: "Oslo", category: "Bikes", revenue: 100 },
+    { region: "North", city: "Bergen", category: "Bikes", revenue: 50 },
+    { region: "South", city: "Rome", category: "Bikes", revenue: 300 },
+  ];
+  const nestedFields = [
+    { name: "region", caption: "Region", type: "string" as const },
+    { name: "city", caption: "City", type: "string" as const },
+    { name: "category", caption: "Category", type: "string" as const },
+    { name: "revenue", caption: "Revenue", type: "number" as const },
+  ];
+  const nestedConfig = createDefaultConfig({
+    rows: ["region", "city"],
+    cols: ["category"],
+    values: [{ field: "revenue", aggregator: "sum" }],
+  });
+
+  const renderNested = () =>
+    render(
+      <PivotStudio
+        data={nested}
+        fields={nestedFields}
+        initialConfig={nestedConfig}
+        title="Nested pivot"
+        fieldsUi="sidebar"
+      />,
+    );
+
+  it("drills up to the top level and back down again", async () => {
+    const user = userEvent.setup();
+    renderNested();
+    const grid = await screen.findByTestId("pivot-grid");
+    expect(within(grid).getByText("Oslo")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Drill up to top level" }));
+    await waitFor(() =>
+      expect(within(screen.getByTestId("pivot-grid")).queryByText("Oslo")).not.toBeInTheDocument(),
+    );
+
+    await user.click(screen.getByRole("button", { name: "Drill down all levels" }));
+    await waitFor(() =>
+      expect(within(screen.getByTestId("pivot-grid")).getByText("Oslo")).toBeInTheDocument(),
+    );
+  });
+});
+
 describe("PivotStudio grid", () => {
   it("renders row members, column members and totals", async () => {
     setup();
