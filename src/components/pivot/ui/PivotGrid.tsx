@@ -437,7 +437,20 @@ export function PivotGrid({
           )}
           {showSortingControls && onSortChange && colLeaves.length > 0 && (
             <tr className="pivot-sort-row">
-              <th colSpan={headerCols} aria-hidden="true" />
+              <th
+                colSpan={headerCols}
+                scope="col"
+                className="text-left text-[11px] text-muted-foreground"
+              >
+                {layout === "flat" && multiSort ? (
+                  <span className="inline-flex items-center gap-1">
+                    <span aria-hidden="true">⇧</span>
+                    Shift-click a sort arrow to sort by several columns
+                  </span>
+                ) : (
+                  <span aria-hidden="true">&nbsp;</span>
+                )}
+              </th>
               {colLeaves.map((leaf, i) => (
                 <th key={keyOf(leaf.key)} scope="col" style={widths[i] ? { width: widths[i] } : undefined}>
                   <span className="flex items-center justify-end gap-1">
