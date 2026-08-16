@@ -106,7 +106,13 @@ export function applyFilters(rows: PivotRow[], filters: FilterDef[]): PivotRow[]
       });
     } else if (filter.kind === "condition") {
       out = out.filter((r) =>
-        matchesCondition(r[filter.field], filter.operator, filter.value, filter.value2),
+        matchesCondition(
+          r[filter.field],
+          filter.operator,
+          filter.value,
+          filter.value2,
+          filter.valueType,
+        ),
       );
     } else {
       const groups = new Map<string, PivotRow[]>();
