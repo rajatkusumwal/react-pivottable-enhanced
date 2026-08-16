@@ -176,7 +176,9 @@ describe("streaming huge CSV files", () => {
 
   it("parses values with the given dialect", async () => {
     const seen: PivotRow[] = [];
-    await streamCsvRows(["region;revenue\nNorth;1.234,50\n"], (batch) => seen.push(...batch), {
+    await streamCsvRows(["region;revenue\nNorth;1.234,50\n"], (batch) => {
+      seen.push(...batch);
+    }, {
       csv: { delimiter: ";", decimalSeparator: ",", thousandsSeparator: "." },
     });
     expect(seen[0]).toEqual({ region: "North", revenue: 1234.5 });
