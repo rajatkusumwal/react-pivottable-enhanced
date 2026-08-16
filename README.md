@@ -339,7 +339,10 @@ swap works without UI changes).
 compact / classic / flat layouts, subtotals and grand totals, expand and collapse,
 spreadsheet headers, repeated member labels, cell selection with the auto-calculation
 stats, keyboard navigation, clipboard copy, multi-column sorting, column drill and row
-windowing; `editing.test.tsx` covers the inline cell editing write-back. 116 tests in total.
+windowing; `editing.test.tsx` covers the inline cell editing write-back. Date and time
+conditional filters, group-condition (subquery) filters, the report-filter-area toggle and the
+chart filter controls are covered in `pivot-core.test.ts`, `PivotStudio.test.tsx` and
+`engines/mock-api.test.ts` (the last one over the REST contract). 134 tests in total.
 
 ### Backend integration tests (no server required)
 
