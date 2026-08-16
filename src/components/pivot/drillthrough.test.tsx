@@ -198,7 +198,41 @@ describe("drill-through dialog", () => {
     expect(onFieldsChange).toHaveBeenCalledWith(["region", "country", "year", "revenue"]);
   });
 
-  it("searches inside the drill-through field list", () => {
+  it("selects all columns in the drill-through field list", () => {
+    const onFieldsChange = vi.fn();
+    open({ onFieldsChange, fields: ["rep", "revenue"] });
+    fireEvent.click(screen.getByRole("button", { name: "Columns" }));
+    const list = screen.getByLabelText("Drill-through field list");
+    fireEvent.click(within(list).getByRole("button", { name: "Select all" }));
+    expect(onFieldsChange).toHaveBeenCalledWith(undefined);
+  });
+
+  it("deselects all columns in the drill-through field list", () => {
+    const onFieldsChange = vi.fn();
+    open({ onFieldsChange });
+    fireEvent.click(screen.getByRole("button", { name: "Columns" }));
+    const list = screen.getByLabelText("Drill-through field list");
+    fireEvent.click(within(list).getByRole("button", { name: "Deselect all" }));
+    expect(onFieldsChange).toHaveBeenCalledWith([]);
+  });
+
+  it("shows the full table again after selecting all", () => {
+    open({ fields: ["rep"] });
+    fireEvent.click(screen.getByRole("button", { name: "Columns" }));
+    const list = screen.getByLabelText("Drill-through field list");
+    fireEvent.click(within(list).getByRole("button", { name: "Select all" }));
+    const header = within(screen.getByTestId("drill-through-table")).getAllByRole("row")[0]!;
+    expect(header.textContent).toBe("regioncountryyearrevenue");
+  });
+
+  it("shows no columns after deselecting all", () => {
+    open();
+    fireEvent.click(screen.getByRole("button", { name: "Columns" }));
+    const list = screen.getByLabelText("Drill-through field list");
+    fireEvent.click(within(list).getByRole("button", { name: "Deselect all" }));
+    const header = within(screen.getByTestId("drill-through-table")).getAllByRole("row")[0]!;
+    expect(header.querySelectorAll("th")).toHaveLength(0);
+  });
     open({ onFieldsChange: vi.fn() });
     fireEvent.click(screen.getByRole("button", { name: "Columns" }));
     fireEvent.change(screen.getByLabelText("Search drill-through fields"), {
