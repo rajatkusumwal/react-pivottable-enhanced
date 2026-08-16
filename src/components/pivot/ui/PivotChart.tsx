@@ -128,9 +128,32 @@ export function PivotChart({
     </ul>
   );
 
+  /**
+   * Keyboard- and screen-reader-accessible drill-through for the chart: one
+   * control per plotted point, mirroring a click on the bar / slice itself.
+   */
+  const drillBar = onPointClick ? (
+    <ul className="sr-only" data-testid="chart-drill-points">
+      {data.map((point) =>
+        series.map((s) => (
+          <li key={`${point.name}-${s}`}>
+            <button
+              type="button"
+              data-testid={`chart-drill-${point.name}-${s}`}
+              onClick={() => onPointClick(point, s)}
+            >
+              {`Records behind ${point.name} · ${s}`}
+            </button>
+          </li>
+        )),
+      )}
+    </ul>
+  ) : null;
+
   return (
     <div className="w-full" data-testid="pivot-chart" data-chart-type={type}>
       {legendBar}
+      {drillBar}
       <ResponsiveContainer width="100%" height={300}>
         {type === "line" ? (
           <LineChart {...common}>

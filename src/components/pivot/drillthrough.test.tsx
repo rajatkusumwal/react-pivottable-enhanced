@@ -43,6 +43,11 @@ const query = (c: PivotConfig) => ({
   values: c.values,
   filters: c.filters,
   calculated: c.calculated,
+  showSubTotals: c.showSubTotals,
+  showGrandTotals: c.showGrandTotals,
+  layout: c.layout,
+  collapsed: c.collapsed,
+  locale: c.locale,
 });
 
 describe("drill-through slice", () => {
@@ -87,7 +92,7 @@ describe("engine contract", () => {
   });
 
   it("returns the slice and the uncapped total over the REST contract", async () => {
-    const api = createMockPivotApi(rows);
+    const api = createMockPivotApi({ rows });
     const fetchSpy = vi.fn(api.fetch);
     const engine = createBackendEngine({ baseUrl: "https://pivot.test/api", fetchImpl: fetchSpy });
     const c = cfg();
@@ -137,13 +142,13 @@ describe("drill-through from charts", () => {
   it("opens the records behind a chart bar", async () => {
     render(
       <PivotStudio
-        rows={rows}
+        data={rows}
         fields={fields}
         config={cfg({ chart: { visible: true, type: "bar", position: "bottom" } })}
       />,
     );
-    const bars = await screen.findAllByTestId("chart-bar-click");
-    fireEvent.click(bars[0]!);
+    const drill = await screen.findByTestId("chart-drill-East-2024");
+    fireEvent.click(drill);
     await waitFor(() => expect(screen.getByTestId("drill-through-table")).toBeTruthy());
   });
 });
