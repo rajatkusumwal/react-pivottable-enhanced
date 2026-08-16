@@ -516,6 +516,7 @@ const gridStudioOverrides: Record<string, Cell> = {
   "Show/hide field captions": y("Option"),
   "Drill up/down multilevel hierarchies": p("Expand/collapse row levels"),
   "Grand totals top or bottom (flat table)": y("Toolbar position selector"),
+  "Sort multiple columns in flat table": y("Shift-click sort controls"),
 };
 
 function studioCell(row: RawRow, base: Cell): Cell {
