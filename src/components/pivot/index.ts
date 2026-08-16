@@ -13,6 +13,8 @@ export { createLocalEngine, buildLocalResult, localDrillThrough, measureOf } fro
 export { createBackendClient } from "./engines/backend";
 export { createBackendEngine, createHybridEngine } from "./engines/backend";
 export type { BackendEngineOptions } from "./engines/backend";
+export { createMockPivotApi } from "./engines/mock-api";
+export type { MockPivotApi, MockPivotApiOptions } from "./engines/mock-api";
 export { applyCellEdit, isEditableAggregator } from "./editing";
 export type { CellEditRequest, CellEditResult } from "./editing";
 export { keyOf, emptyResult, KEY_SEP } from "./result";

@@ -130,7 +130,10 @@ All endpoints are JSON over POST.
   "collapsed": ["North"],
   "collapsedCols": ["Bikes"],
   "sort": { "by": 0, "direction": "desc" },
+  "sorts": [{ "by": 0, "direction": "desc" }, { "by": "rows", "direction": "asc" }],
   "locale": "en",
+  "limit": 500,
+  "offset": 0,
   "datasetId": "sales-2026"
 }
 ```
@@ -173,7 +176,11 @@ Rules the server must respect:
   leaf: keep it in `colHeaderRows` with `expandable: true`, `expanded: false` and
   `rowSpan` covering the remaining column levels, and drop its descendants from `colLeaves`.
   Parent members that still have visible children carry `expandable: true, expanded: true`.
-* `layout: "flat"` means one row per source record combination, no subtotals.
+* `layout: "flat"` means one row per source record combination, no subtotals. `sorts` is the
+  multi-column sort chain used by the flat layout (shift-click in the UI) and takes precedence
+  over `sort`; `by: "rows"` sorts row members, a number sorts by that leaf column.
+* `grandTotalsPosition` decides whether the `kind: "grand"` row is emitted first or last.
+* `limit` / `offset` page the source records before aggregation.
 
 #### `POST /api/pivot/drillthrough`
 
@@ -190,6 +197,28 @@ Returns `{ "rows": [ { "region": "North", ... } ] }` — the raw records behind 
 #### `GET /api/pivot/datasets/{id}/fields`
 
 Returns the same `fields` array so the field list can be built without downloading data.
+
+#### `POST /api/pivot/members`
+
+`{ "field": "country", "search": "ca", "limit": 200, "datasetId": "…" }` →
+`{ "members": ["Canada"], "total": 1 }` — powers the member filter popover on large datasets.
+
+#### `POST /api/pivot/edit` (inline cell editing)
+
+```jsonc
+{
+  "rowFields": ["region", "country"], "colFields": ["category"],
+  "rowKey": ["North", "USA"], "colKey": ["Bikes"],
+  "field": "revenue", "aggregator": "sum", "value": 500,
+  "datasetId": "sales-2026"
+}
+```
+
+Returns `{ "changed": true, "rowCount": 12345 }`. The server applies the same write-back rule
+as the browser: for `sum` the new value is spread across contributing records in proportion to
+their current share; for `average` / `min` / `max` / `median` / `first` / `last` / `product`
+every contributing record is set to the value; `count` / `distinctCount` are rejected with 422.
+Call it from `createBackendClient(...).applyEdit(request)`.
 
 ### Spring Boot + DuckDB sketch
 
@@ -248,7 +277,8 @@ swap works without UI changes).
 `src/components/pivot/ui/PivotGrid.test.tsx` covers the Flexmonster-style grid itself:
 compact / classic / flat layouts, subtotals and grand totals, expand and collapse,
 spreadsheet headers, repeated member labels, cell selection with the auto-calculation
-stats, keyboard navigation, clipboard copy and row windowing.
+stats, keyboard navigation, clipboard copy, multi-column sorting, column drill and row
+windowing; `editing.test.tsx` covers the inline cell editing write-back. 116 tests in total.
 
 ### Backend integration tests (no server required)
 
@@ -262,6 +292,28 @@ const fetchImpl = vi.fn(async () => new Response(JSON.stringify(cannedPivotResul
 const engine = createBackendEngine({ baseUrl: "https://api.test", datasetId: "ds", fetchImpl });
 const result = await engine.query(pivotQuery, []);
 ```
+
+#### Ready-made mock API
+
+`createMockPivotApi` implements every endpoint above in memory on top of the local engine, so
+the full grid can be driven over the REST contract with no server at all — useful in tests and
+for a backend-shaped demo:
+
+```ts
+import { createMockPivotApi, createBackendEngine, sampleData, sampleFields } from "@/components/pivot";
+
+const api = createMockPivotApi({ rows: sampleData, fields: sampleFields, datasetId: "sales" });
+const engine = createBackendEngine({ baseUrl: "https://api.test", datasetId: "sales", fetchImpl: api.fetch });
+
+<PivotStudio data={[]} fields={sampleFields} engine={engine} datasetId="sales" />;
+// api.requests -> every request body sent; api.datasets -> server-side rows after edits
+```
+
+`src/components/pivot/engines/mock-api.test.ts` runs every grid feature through it: compact /
+classic / flat layouts, subtotals and grand totals (including position), row and column drill
+(`collapsed` / `collapsedCols`), single and multi-column sorting, server-side filters, paging,
+aggregator switching, drill-through, field metadata, member search, dataset upload and inline
+cell edits. If your Spring Boot service passes the same assertions, the UI works unchanged.
 
 The mocked tests assert request URLs and methods, JSON bodies (including `datasetId`
 injection), auth headers, custom endpoint paths, multipart uploads, `PivotBackendError`
