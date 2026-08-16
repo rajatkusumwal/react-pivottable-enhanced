@@ -89,9 +89,34 @@ Hard / out of scope
 6. Add a threshold/hybrid switch so the component picks the backend for large datasets and the local engine for small ones.
 7. Layer tests: adapter unit tests, `PivotGrid` rendering tests, and end-to-end integration tests with a mock backend.
 
-## What to do about the demo tabs now
+## Remove Orb.js entirely
 
-Since the plan is moving toward a backend-powered grid, the current demo page is still useful as a client-side preview. Keep the react-pivottable demo tab but change the Orb.js tab to be informational, or retire it, because the real long-term value is the custom `PivotGrid` that can be backed by either engine. The comparison page should eventually score the custom grid + backend combo as the Flexmonster replacement rather than raw react-pivottable or raw Orb.js.
+Orb goes away in this work, so there is one engine, one demo, one story.
+
+- Delete `src/components/pivot/engines/OrbPanel.tsx`, the `orb` declarations in `src/types/pivot-libs.d.ts`, the `orb` dependency, and the `define: { global: "globalThis" }` Vite workaround that only existed for Orb.
+- Drop the `engine` prop from `PivotStudio` (or keep it accepting only the single value) and remove the Orb branch and its exports from `src/components/pivot/index.ts`.
+- Collapse `/demos` to a single pivot table panel with no tab strip; keep the sample data, the intro copy, and the link back to the comparison.
+- Move the demo onto the home page as one embedded pivot table section so there is a single place to try it, with the comparison matrix below it.
+- In `src/lib/pivot-comparison.ts`, remove the `orb` and `studioOrb` columns, leaving Flexmonster, react-pivottable (upstream) and our implementation; recompute scores and update the summary cards and grid column counts in `src/routes/index.tsx`.
+- Prune Orb-specific tests from `PivotStudio.test.tsx` and `pivot-core.test.ts`.
+
+## README: backend API and integration guide
+
+Rewrite `README.md` around the single engine plus the Spring Boot + DuckDB backend, covering:
+
+- Install and drop-in usage of `PivotStudio` with the local engine only.
+- The `PivotEngine` adapter interface and how to supply a custom one.
+- The REST contract, documented end to end:
+  - `POST /api/pivot/query` — request body carrying `rows`, `cols`, `values` (field + aggregator), `filters` (member, condition, top-N), `sort`, `expanded` levels, `limit`/`offset` for windowing; response is the `PivotResult` shape (row/column header trees, cell matrix, subtotals, grand totals, measure formats, query id).
+  - `POST /api/pivot/drillthrough` — cell coordinates or member path in, paged raw rows out.
+  - `GET /api/pivot/fields` — field metadata (name, caption, type) so the field list can populate without shipping data.
+  - `POST /api/pivot/members` — distinct members for a field, with search and paging, for the filter checklists.
+  - Error shape, paging semantics, and auth header expectations.
+- A worked DuckDB SQL sketch showing how a request maps to `GROUP BY GROUPING SETS` for subtotals, how top-N and conditional filters become `WHERE`/`QUALIFY`, and how sort-by-value maps to `ORDER BY`.
+- Spring Boot wiring notes: controller + DTOs mirroring the JSON contract, DuckDB JDBC connection, parameter binding to avoid SQL injection from field names (whitelist against the field catalogue), and response caching by query id.
+- The hybrid switch: how to configure the row-count threshold and `baseUrl` so small datasets stay client-side and large ones go to the backend.
+- A mock backend example for local development and tests.
+
 
 ## Trade-offs
 
