@@ -510,11 +510,7 @@ export function PivotStudio({
           rowCount={uploaded?.rows.length ?? data.length}
           isCustom={uploaded !== null}
           {...(onUploadToBackend ? { onUploadToBackend } : {})}
-          onReset={() => {
-            setUploaded(null);
-            saveSessionDataset(null);
-            update(createDefaultConfig(initialConfig));
-          }}
+          onReset={resetToSampleData}
           onLoad={(dataset) => {
             setUploaded(dataset);
             saveSessionDataset(dataset);
