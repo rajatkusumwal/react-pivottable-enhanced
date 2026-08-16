@@ -116,7 +116,14 @@ function ComparisonPage() {
             can do — {totalFeatures} things in total — and check whether the two most popular
             free tools can do the same.
           </p>
+          <Link
+            to="/demos"
+            className="mt-5 inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground"
+          >
+            Try the free tools yourself
+          </Link>
         </header>
+
 
         {/* At a glance */}
         <section aria-labelledby="glance" className="mt-10">
