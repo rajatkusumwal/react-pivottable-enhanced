@@ -92,6 +92,28 @@ describe("engine contract", () => {
     expect(out).toEqual([{ rep: "Ann", revenue: 100 }]);
   });
 
+  it("returns empty objects when fields are deselected", () => {
+    const c = cfg();
+    const out = localDrillThrough(rows, {
+      rowKey: ["West"],
+      colKey: ["2024"],
+      query: query(c),
+      fields: [],
+    });
+    expect(out.length).toBe(1);
+    expect(out[0]).toEqual({});
+  });
+
+  it("includes every source field when fields are omitted", () => {
+    const c = cfg();
+    const out = localDrillThrough(rows, {
+      rowKey: ["West"],
+      colKey: ["2024"],
+      query: query(c),
+    });
+    expect(Object.keys(out[0]!).sort()).toEqual(["country", "region", "rep", "revenue", "year"]);
+  });
+
   it("returns the slice and the uncapped total over the REST contract", async () => {
     const api = createMockPivotApi({ rows });
     const fetchSpy = vi.fn(api.fetch);
