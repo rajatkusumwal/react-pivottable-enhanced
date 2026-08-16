@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { applyCalculatedFields } from "./calculated";
 import { applyFilters } from "./filters";
+import { applyCellEdit } from "./editing";
 import { getLocale } from "./locales";
 import { secureRows, visibleFields, can } from "./security";
 import { buildChartData } from "./analysis";
@@ -43,6 +44,8 @@ export interface PivotStudioProps {
   showToolbar?: boolean;
   /** Show the "upload your own file" data source bar. */
   allowFileUpload?: boolean;
+  /** Notified when inline editing writes new values back into the records. */
+  onDataChange?: (rows: PivotRow[]) => void;
   /** Backend uploader; when given, uploads go to the service instead of memory. */
   onUploadToBackend?: (file: File) => Promise<{ datasetId: string; rowCount: number; fields: FieldDef[] }>;
   /** Dataset handle for backend queries. */
@@ -67,6 +70,7 @@ export function PivotStudio({
   showSidebar = true,
   showToolbar = true,
   allowFileUpload = false,
+  onDataChange,
   onUploadToBackend,
   datasetId,
   fieldsUi = "dialog",
@@ -78,6 +82,8 @@ export function PivotStudio({
   const [fieldsOpen, setFieldsOpen] = useState(false);
   const [selection, setSelection] = useState<SelectionStats | null>(null);
   const [uploaded, setUploaded] = useState<UploadedDataset | null>(null);
+  /** Records after inline edits; null while the source data is untouched. */
+  const [editedRows, setEditedRows] = useState<PivotRow[] | null>(null);
   const [result, setResult] = useState<PivotResult>(() => emptyResult(measureOf(config.values)));
   const [engineError, setEngineError] = useState("");
   const requestId = useRef(0);
@@ -88,7 +94,8 @@ export function PivotStudio({
   const allowDrillThrough = can(permissions, "drillThrough");
   const { strings } = getLocale(config.locale);
 
-  const activeData = uploaded?.rows.length ? uploaded.rows : data;
+  const sourceData = uploaded?.rows.length ? uploaded.rows : data;
+  const activeData = editedRows ?? sourceData;
   const activeFields = uploaded ? uploaded.fields : fields;
   const activeDatasetId = uploaded?.datasetId ?? datasetId;
 
@@ -146,6 +153,30 @@ export function PivotStudio({
       cancelled = true;
     };
   }, [adapter, query, derivedRows]);
+
+  useEffect(() => {
+    setEditedRows(null);
+  }, [data, uploaded]);
+
+  const handleCellEdit = useCallback(
+    (rowKey: string[], colKey: string[], value: number) => {
+      const measure = measureOf(config.values);
+      const outcome = applyCellEdit(activeData, {
+        rowFields: config.rows,
+        colFields: config.cols,
+        rowKey,
+        colKey,
+        field: measure.field,
+        aggregator: measure.aggregator,
+        value,
+      });
+      if (!outcome.changed) return setStatus(outcome.reason ?? "Cell not editable");
+      setEditedRows(outcome.rows);
+      onDataChange?.(outcome.rows);
+      setStatus("Cell updated");
+    },
+    [activeData, config.values, config.rows, config.cols, onDataChange],
+  );
 
   const chart = useMemo(() => buildChartData(derivedRows, config), [derivedRows, config]);
 
@@ -285,7 +316,8 @@ export function PivotStudio({
           <p className="px-1 py-2 text-xs text-muted-foreground">
             {derivedRows.length} {strings.records}
             {result.meta.source === "backend" && " · aggregated by your analytics service"}
-            {allowDrillThrough && " · click a number to see the records behind it"}
+            {allowDrillThrough && !config.editing && " · click a number to see the records behind it"}
+            {config.editing && !readOnly && " · double-click a number to edit it"}
           </p>
 
           {engineError && (
@@ -314,6 +346,8 @@ export function PivotStudio({
             onToggleColumnCollapse={toggleColumnCollapse}
             conditionalFormats={config.conditionalFormats}
             allowDrillThrough={allowDrillThrough}
+            editable={config.editing && !readOnly}
+            onCellEdit={handleCellEdit}
             onDrill={(rowKey, colKey, label) => void openDrill(rowKey, colKey, label)}
             onSelectionChange={setSelection}
             emptyLabel={strings.noData}
