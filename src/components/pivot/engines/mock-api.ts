@@ -91,8 +91,9 @@ export function createMockPivotApi(options: MockPivotApiOptions): MockPivotApi {
     if (path.endsWith("/drillthrough")) {
       const request = body as DrillThroughQuery;
       const source = applyFilters(rowsFor(request.query?.datasetId), request.query?.filters ?? []);
-      const found = localDrillThrough(source, request);
-      return json({ rows: request.limit ? found.slice(0, request.limit) : found });
+      const all = localDrillThrough(source, { ...request, limit: undefined });
+      const rows = localDrillThrough(source, request);
+      return json({ rows, total: all.length });
     }
 
     if (path.endsWith("/members")) {

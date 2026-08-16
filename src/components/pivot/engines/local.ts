@@ -7,7 +7,7 @@
  */
 import { naturalSort } from "react-pivottable/Utilities";
 import { aggregate, type PivotCellValue } from "../aggregators";
-import { applyDisplayMode } from "../analysis";
+import { applyDisplayMode, applyDrillSlice } from "../analysis";
 import { evaluateWithContext, isAggregateField, type TotalScope } from "../calculated";
 import { computeKpiStatus } from "../kpi";
 import type { AggregatorName, CalculatedField, KpiStatus, PivotRow, ValueDef } from "../types";
@@ -533,7 +533,7 @@ export function buildLocalResult(rows: PivotRow[], query: PivotQuery): PivotResu
 
 export function localDrillThrough(rows: PivotRow[], request: DrillThroughQuery): PivotRow[] {
   const { rowKey, colKey, query } = request;
-  return rows.filter((row) => {
+  const matched = rows.filter((row) => {
     for (let i = 0; i < rowKey.length; i++) {
       const field = query.rows[i];
       if (field && String(row[field] ?? "") !== rowKey[i]) return false;
@@ -543,6 +543,11 @@ export function localDrillThrough(rows: PivotRow[], request: DrillThroughQuery):
       if (field && String(row[field] ?? "") !== colKey[i]) return false;
     }
     return true;
+  });
+  return applyDrillSlice(matched, {
+    fields: request.fields,
+    sort: request.sort,
+    maxRows: request.limit,
   });
 }
 

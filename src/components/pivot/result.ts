@@ -137,7 +137,12 @@ export interface DrillThroughQuery {
   rowKey: string[];
   colKey: string[];
   query: PivotQuery;
+  /** Maximum number of records to return (drill-through row cap). */
   limit?: number;
+  /** Columns to return, in order. Empty/omitted = every source field. */
+  fields?: string[];
+  /** Server-side sorting of the returned records. */
+  sort?: { field: string; dir: "asc" | "desc" } | undefined;
 }
 
 /** Contract implemented by the local engine and by the REST backend engine. */
