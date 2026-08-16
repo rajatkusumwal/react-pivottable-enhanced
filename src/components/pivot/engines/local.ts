@@ -63,19 +63,6 @@ function flattenLeaves(node: TreeNode, out: TreeNode[] = []): TreeNode[] {
   return out;
 }
 
-function levelNodes(node: TreeNode, depth: number, out: TreeNode[][] = []): TreeNode[][] {
-  if (!node.children.length) return out;
-  out[depth] ??= [];
-  for (const child of node.children) {
-    out[depth]!.push(child);
-    levelNodes(child, depth + 1, out);
-  }
-  return out;
-}
-
-const leafCount = (node: TreeNode): number =>
-  node.children.length ? node.children.reduce((n, c) => n + leafCount(c), 0) : 1;
-
 export function measureOf(values: ValueDef[]): PivotMeasure {
   const value = values[0];
   return {
