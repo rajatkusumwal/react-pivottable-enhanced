@@ -175,6 +175,29 @@ describe("multilevel column drill", () => {
     const northRow = collapsed.rowHeaders.findIndex((h) => h.label === "North");
     expect(collapsed.cells[northRow]![0]).toBe(150);
   });
+
+  it("clamps stale full-depth spans after drilling up to the top level", () => {
+    const result = buildLocalResult(
+      data,
+      query({ ...colQuery, collapsedCols: ["Bikes", "Cars"] }),
+    );
+    result.colHeaderRows[0]?.forEach((header) => {
+      header.rowSpan = 2;
+    });
+
+    render(
+      <PivotGrid
+        result={result}
+        layout="compact"
+        locale="en-US"
+        theme={theme}
+        onToggleColumnCollapse={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText("Bikes").closest("th")).toHaveAttribute("rowspan", "1");
+    expect(screen.getByText("Cars").closest("th")).toHaveAttribute("rowspan", "1");
+  });
 });
 
 describe("header options", () => {
