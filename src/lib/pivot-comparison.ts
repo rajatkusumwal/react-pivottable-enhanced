@@ -46,9 +46,15 @@ export const products = [
     url: "https://nnajm.github.io/orb/index.html",
   },
   {
-    key: "studio" as const,
-    name: "Pivot Studio (this demo)",
-    subtitle: "Free • built on the two free engines",
+    key: "studioRpt" as const,
+    name: "Pivot Studio — react-pivottable tab",
+    subtitle: "Free • demo shell on react-pivottable",
+    url: "/demos",
+  },
+  {
+    key: "studioOrb" as const,
+    name: "Pivot Studio — Orb.js tab",
+    subtitle: "Free • demo shell on the Orb.js engine",
     url: "/demos",
   },
 ];
@@ -61,11 +67,13 @@ export const verdicts: Record<ProductKey, string> = {
   reactPivottable:
     "Free and quick to drop into a React app. Good for simple internal dashboards, but there is no Excel/PDF export, no toolbar and no help desk if you get stuck.",
   orb: "Free grid with drag-and-drop and subtotals, but no charts and no exports. The project has not been updated in years, so nobody is fixing bugs.",
-  studio:
-    "The ready-made setup you can try on the demos page: the two free engines wrapped with a toolbar, charts, exports, filters, calculated values and language packs. Closes most of the gap for free, but you maintain the code and there is no help desk.",
+  studioRpt:
+    "The demo's first tab: react-pivottable wrapped with our toolbar, charts, exports, filters, calculated values and language packs. It also adds classic and flat table layouts.",
+  studioOrb:
+    "The demo's second tab: the Orb.js calculation engine with a custom React grid, plus the same toolbar, charts, exports, filters and calculated values. Better at expanding/collapsing groups, but no classic/flat layouts.",
 };
 
-type RawRow = Omit<FeatureRow, "studio">;
+type RawRow = Omit<FeatureRow, "studioRpt" | "studioOrb">;
 type RawCategory = { id: string; name: string; rows: RawRow[] };
 
 const rawCategories: RawCategory[] = [
@@ -436,14 +444,10 @@ const rawCategories: RawCategory[] = [
  * What the Pivot Studio demo (see /demos) actually ships, feature by feature.
  * Anything not listed falls back to the best of the two underlying free engines.
  */
-const studioOverrides: Record<string, Cell> = {
+const sharedStudioOverrides: Record<string, Cell> = {
   // Grid
-  "Classic (tabular) pivot form": y("Layout switch"),
-  "Flat table form": y("Layout switch"),
-  "Show/hide subtotals": y("Toolbar option"),
   "Show/hide grand totals per rows/columns": y("Toolbar option"),
   "Grid title": y("title prop"),
-  "Highlight rows and columns": y("Hover highlight"),
   // Filters
   "Value filters (top/bottom N)": y("Top-N filter"),
   "Conditional filter for number fields": y(),
@@ -521,19 +525,42 @@ const studioOverrides: Record<string, Cell> = {
   "SLA / guaranteed response time": n(),
 };
 
-const rank: Record<Support, number> = { no: 0, partial: 1, yes: 2 };
+/** Extras that only the react-pivottable tab of the demo provides. */
+const rptStudioOverrides: Record<string, Cell> = {
+  "Classic (tabular) pivot form": y("Layout switch"),
+  "Flat table form": y("Layout switch"),
+  "Show/hide subtotals": p("Totals row only"),
+  "Expand and collapse values": n("Flat rendering"),
+  "Highlight rows and columns": y("Hover highlight"),
+};
 
-function studioCell(row: RawRow): Cell {
-  const override = studioOverrides[row.feature];
+/** Extras that only the Orb.js tab of the demo provides. */
+const orbStudioOverrides: Record<string, Cell> = {
+  "Classic (tabular) pivot form": n("Compact form only"),
+  "Flat table form": n("Compact form only"),
+  "Show/hide subtotals": y("Toolbar option"),
+  "Expand and collapse values": y("Collapsible subtotals"),
+  "Highlight rows and columns": y("Hover highlight"),
+  "Virtual grid rendering thousands of rows": p("Custom React grid, no virtualisation"),
+};
+
+function studioCell(
+  row: RawRow,
+  base: Cell,
+  engineOverrides: Record<string, Cell>,
+): Cell {
+  const override = engineOverrides[row.feature] ?? sharedStudioOverrides[row.feature];
   if (override) return override;
-  // Otherwise the demo inherits whichever free engine does it best.
-  const best = rank[row.reactPivottable.s] >= rank[row.orb.s] ? row.reactPivottable : row.orb;
-  return { s: best.s, ...(best.note ? { note: best.note } : {}) };
+  return { s: base.s, ...(base.note ? { note: base.note } : {}) };
 }
 
 export const categories: FeatureCategory[] = rawCategories.map((c) => ({
   ...c,
-  rows: c.rows.map((r) => ({ ...r, studio: studioCell(r) })),
+  rows: c.rows.map((r) => ({
+    ...r,
+    studioRpt: studioCell(r, r.reactPivottable, rptStudioOverrides),
+    studioOrb: studioCell(r, r.orb, orbStudioOverrides),
+  })),
 }));
 
 export const totalFeatures = categories.reduce((acc, c) => acc + c.rows.length, 0);
