@@ -31,7 +31,13 @@ function keepHmrSocketAlive(): Plugin {
   };
 }
 
+// Cloud builds target Cloudflare (the default). For a local demo, set
+// NITRO_PRESET=node-server so the build emits a plain Node server we can run
+// with `node dist/server/index.mjs` — `vite preview` cannot serve an SSR build.
+const localPreset = process.env["NITRO_PRESET"];
+
 export default defineConfig({
+  ...(localPreset ? { nitro: { preset: localPreset } } : {}),
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
