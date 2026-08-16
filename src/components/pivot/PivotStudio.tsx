@@ -4,28 +4,32 @@ import { applyFilters } from "./filters";
 import { getLocale } from "./locales";
 import { secureRows, visibleFields, can } from "./security";
 import { buildChartData } from "./analysis";
-import { exportMatrix, matrixFromTable, printMatrix, copyMatrix } from "./export";
+import { exportMatrix, matrixFromResult, printMatrix, copyMatrix } from "./export";
 import type { ExportFormat } from "./export";
 import { createDefaultConfig } from "./types";
 import type { FieldDef, Permissions, PivotConfig, PivotRow } from "./types";
+import { createLocalEngine, measureOf } from "./engines/local";
+import { keyOf, emptyResult } from "./result";
+import type { PivotEngineAdapter, PivotQuery, PivotResult } from "./result";
 import { PivotToolbar } from "./ui/PivotToolbar";
 import { PivotSidebar } from "./ui/PivotSidebar";
 import { PivotChart } from "./ui/PivotChart";
 import { DrillThroughDialog } from "./ui/DrillThroughDialog";
 import { FieldListDialog } from "./ui/FieldListDialog";
 import { GridFieldBar } from "./ui/GridFieldBar";
-import { ReactPivottablePanel } from "./engines/ReactPivottablePanel";
-import { OrbPanel } from "./engines/OrbPanel";
-
-export type PivotEngine = "react-pivottable" | "orb";
+import { PivotGrid } from "./ui/PivotGrid";
+import type { SelectionStats } from "./ui/PivotGrid";
+import { DataSourceBar, suggestConfig } from "./ui/DataSourceBar";
+import type { UploadedDataset } from "./ui/DataSourceBar";
+import { formatNumber } from "./format";
 
 export interface PivotStudioProps {
-  /** Records to analyse. */
+  /** Records to analyse (used by the local engine). */
   data: PivotRow[];
   /** Field metadata; inferred with `inferFields()` when omitted. */
   fields: FieldDef[];
-  /** Which open-source engine renders the grid. */
-  engine: PivotEngine;
+  /** Aggregation engine; defaults to the in-browser one. */
+  engine?: PivotEngineAdapter;
   /** Starting configuration (uncontrolled). */
   initialConfig?: Partial<PivotConfig>;
   /** Fully controlled configuration. */
@@ -37,6 +41,12 @@ export interface PivotStudioProps {
   /** Hide the left panel when the host app supplies its own controls. */
   showSidebar?: boolean;
   showToolbar?: boolean;
+  /** Show the "upload your own file" data source bar. */
+  allowFileUpload?: boolean;
+  /** Backend uploader; when given, uploads go to the service instead of memory. */
+  onUploadToBackend?: (file: File) => Promise<{ datasetId: string; rowCount: number; fields: FieldDef[] }>;
+  /** Dataset handle for backend queries. */
+  datasetId?: string;
   /**
    * "dialog" (default) reproduces Flexmonster: a field bar above the grid plus a
    * popup field list. "sidebar" keeps the docked panel.
@@ -56,19 +66,31 @@ export function PivotStudio({
   className = "",
   showSidebar = true,
   showToolbar = true,
+  allowFileUpload = false,
+  onUploadToBackend,
+  datasetId,
   fieldsUi = "dialog",
 }: PivotStudioProps) {
   const [internal, setInternal] = useState<PivotConfig>(() => createDefaultConfig(initialConfig));
   const config = controlled ?? internal;
-  const gridRef = useRef<HTMLDivElement>(null);
   const [drill, setDrill] = useState<{ title: string; rows: PivotRow[] } | null>(null);
   const [status, setStatus] = useState("");
   const [fieldsOpen, setFieldsOpen] = useState(false);
+  const [selection, setSelection] = useState<SelectionStats | null>(null);
+  const [uploaded, setUploaded] = useState<UploadedDataset | null>(null);
+  const [result, setResult] = useState<PivotResult>(() => emptyResult(measureOf(config.values)));
+  const [engineError, setEngineError] = useState("");
+  const requestId = useRef(0);
 
+  const adapter = useMemo(() => engine ?? createLocalEngine(), [engine]);
   const readOnly = !can(permissions, "edit");
   const allowExport = can(permissions, "export");
   const allowDrillThrough = can(permissions, "drillThrough");
   const { strings } = getLocale(config.locale);
+
+  const activeData = uploaded?.rows.length ? uploaded.rows : data;
+  const activeFields = uploaded ? uploaded.fields : fields;
+  const activeDatasetId = uploaded?.datasetId ?? datasetId;
 
   const update = useCallback(
     (patch: Partial<PivotConfig>) => {
@@ -79,12 +101,48 @@ export function PivotStudio({
     [config, controlled, onConfigChange],
   );
 
-  const safeFields = useMemo(() => visibleFields(fields, permissions), [fields, permissions]);
-  const baseRows = useMemo(() => secureRows(data, permissions), [data, permissions]);
+  const safeFields = useMemo(() => visibleFields(activeFields, permissions), [activeFields, permissions]);
+  const baseRows = useMemo(() => secureRows(activeData, permissions), [activeData, permissions]);
   const derivedRows = useMemo(
     () => applyFilters(applyCalculatedFields(baseRows, config.calculated), config.filters),
     [baseRows, config.calculated, config.filters],
   );
+
+  const query: PivotQuery = useMemo(
+    () => ({
+      rows: config.rows,
+      cols: config.cols,
+      values: config.values,
+      filters: config.filters,
+      showSubTotals: config.showSubTotals,
+      showGrandTotals: config.showGrandTotals,
+      layout: config.layout,
+      collapsed: config.collapsed,
+      sort: config.sort,
+      locale: config.locale,
+      datasetId: activeDatasetId,
+    }),
+    [config, activeDatasetId],
+  );
+
+  useEffect(() => {
+    const id = ++requestId.current;
+    let cancelled = false;
+    adapter
+      .query(query, derivedRows)
+      .then((next) => {
+        if (!cancelled && id === requestId.current) {
+          setResult(next);
+          setEngineError("");
+        }
+      })
+      .catch((e: unknown) => {
+        if (!cancelled) setEngineError(e instanceof Error ? e.message : "The pivot service failed");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [adapter, query, derivedRows]);
 
   const chart = useMemo(() => buildChartData(derivedRows, config), [derivedRows, config]);
 
@@ -94,19 +152,30 @@ export function PivotStudio({
     return () => clearTimeout(timer);
   }, [status]);
 
-  const getMatrix = () => {
-    const table = gridRef.current?.querySelector("table");
-    return table ? matrixFromTable(table as HTMLTableElement, title) : null;
-  };
+  const getMatrix = useCallback(
+    () => matrixFromResult(result, config.locale, title),
+    [result, config.locale, title],
+  );
 
   const handleExport = (format: ExportFormat) => {
     const matrix = getMatrix();
-    if (!matrix) return setStatus(strings.noData);
+    if (!matrix.body.length) return setStatus(strings.noData);
     exportMatrix(matrix, format);
     setStatus(`${strings.export}: ${format.toUpperCase()}`);
   };
 
-  const openDrill = (label: string, rows: PivotRow[]) => setDrill({ title: label, rows });
+  const openDrill = async (rowKey: string[], colKey: string[], label: string) => {
+    const rows = await adapter.drillThrough({ rowKey, colKey, query }, derivedRows);
+    setDrill({ title: label, rows });
+  };
+
+  const toggleCollapse = (key: string[]) => {
+    const id = keyOf(key);
+    const next = config.collapsed.includes(id)
+      ? config.collapsed.filter((k) => k !== id)
+      : [...config.collapsed, id];
+    update({ collapsed: next });
+  };
 
   return (
     <section className={`flex flex-col gap-3 ${className}`} aria-label={title}>
@@ -118,16 +187,30 @@ export function PivotStudio({
           readOnly={readOnly}
           onChange={update}
           onExport={handleExport}
-          onPrint={() => {
-            const matrix = getMatrix();
-            if (matrix) printMatrix(matrix);
-          }}
+          onPrint={() => printMatrix(getMatrix())}
           onCopy={async () => {
-            const matrix = getMatrix();
-            if (matrix && (await copyMatrix(matrix))) setStatus("Copied");
+            if (await copyMatrix(getMatrix())) setStatus("Copied");
           }}
           onReset={() => update(createDefaultConfig(initialConfig))}
           onOpenFields={fieldsUi === "dialog" ? () => setFieldsOpen(true) : undefined}
+        />
+      )}
+
+      {allowFileUpload && (
+        <DataSourceBar
+          currentName={uploaded?.name ?? "Sample data"}
+          rowCount={uploaded?.rows.length ?? data.length}
+          isCustom={uploaded !== null}
+          {...(onUploadToBackend ? { onUploadToBackend } : {})}
+          onReset={() => {
+            setUploaded(null);
+            update(createDefaultConfig(initialConfig));
+          }}
+          onLoad={(dataset) => {
+            setUploaded(dataset);
+            update({ ...createDefaultConfig(), ...suggestConfig(dataset.fields), locale: config.locale });
+            setStatus(`Loaded ${dataset.name}`);
+          }}
         />
       )}
 
@@ -156,26 +239,45 @@ export function PivotStudio({
           )}
           <p className="px-1 py-2 text-xs text-muted-foreground">
             {derivedRows.length} {strings.records}
+            {result.meta.source === "backend" && " · aggregated by your analytics service"}
             {allowDrillThrough && " · click a number to see the records behind it"}
           </p>
-          <div ref={gridRef} className="max-h-[70vh] overflow-auto">
-            {engine === "react-pivottable" ? (
-              <ReactPivottablePanel
-                rows={derivedRows}
-                config={config}
-                allowDrillThrough={allowDrillThrough}
-                onDrill={openDrill}
-              />
-            ) : (
-              <OrbPanel
-                rows={derivedRows}
-                config={config}
-                strings={strings}
-                allowDrillThrough={allowDrillThrough}
-                onDrill={openDrill}
-              />
-            )}
-          </div>
+
+          {engineError && (
+            <p role="alert" className="px-1 pb-2 text-xs text-destructive">
+              {engineError}
+            </p>
+          )}
+
+          <PivotGrid
+            result={result}
+            layout={config.layout}
+            locale={config.locale}
+            theme={config.theme}
+            title={title}
+            showFieldCaptions={config.showFieldCaptions}
+            showSpreadsheetHeaders={config.showSpreadsheetHeaders}
+            repeatMemberLabels={config.repeatMemberLabels}
+            showSortingControls={config.showSortingControls}
+            showRowTotals={config.showRowTotals}
+            sort={config.sort}
+            onSortChange={(sort) => update({ sort })}
+            onToggleCollapse={toggleCollapse}
+            conditionalFormats={config.conditionalFormats}
+            allowDrillThrough={allowDrillThrough}
+            onDrill={(rowKey, colKey, label) => void openDrill(rowKey, colKey, label)}
+            onSelectionChange={setSelection}
+            emptyLabel={strings.noData}
+          />
+
+          {selection && selection.count > 0 && (
+            <p data-testid="selection-bar" className="mt-2 px-1 text-xs text-muted-foreground">
+              {selection.count} cells · Sum {formatNumber(selection.sum, result.measure.format, config.locale)} ·
+              Average {formatNumber(selection.average, result.measure.format, config.locale)} · Min{" "}
+              {formatNumber(selection.min, result.measure.format, config.locale)} · Max{" "}
+              {formatNumber(selection.max, result.measure.format, config.locale)}
+            </p>
+          )}
 
           {config.chart.visible && (
             <div className="mt-3 border-t border-border pt-3">
@@ -187,13 +289,7 @@ export function PivotStudio({
                 emptyLabel={strings.noData}
                 onPointClick={
                   allowDrillThrough
-                    ? (point) => {
-                        const rowField = config.rows[0];
-                        const records = rowField
-                          ? derivedRows.filter((r) => String(r[rowField] ?? "") === point.name)
-                          : derivedRows;
-                        openDrill(String(point.name), records);
-                      }
+                    ? (point) => void openDrill([String(point.name)], [], String(point.name))
                     : undefined
                 }
               />

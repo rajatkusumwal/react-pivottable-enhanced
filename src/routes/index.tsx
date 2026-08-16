@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 
 const TITLE = "Pivot Table Tools Compared: Flexmonster vs Free Options";
 const DESCRIPTION =
-  "A plain-English comparison of the paid Flexmonster pivot table against two free options, react-pivottable and Orb.js — what each one can and cannot do.";
+  "A plain-English comparison of the paid Flexmonster pivot table against the free react-pivottable engine and our free Pivot Studio demo built on top of it.";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -34,9 +34,7 @@ export const Route = createFileRoute("/")({
 const plainNames: Record<ProductKey, { name: string; price: string }> = {
   flexmonster: { name: "Flexmonster", price: "Paid" },
   reactPivottable: { name: "react-pivottable", price: "Free" },
-  orb: { name: "Orb.js", price: "Free" },
-  studioRpt: { name: "Demo — react-pivottable tab", price: "Free" },
-  studioOrb: { name: "Demo — Orb.js tab", price: "Free" },
+  studio: { name: "Our free demo", price: "Free" },
 };
 
 const statusMeta = {
@@ -95,7 +93,7 @@ function ComparisonPage() {
             return false;
           }
           if (diffOnly) {
-            const s = new Set([r.flexmonster.s, r.reactPivottable.s, r.orb.s, r.studioRpt.s, r.studioOrb.s]);
+            const s = new Set([r.flexmonster.s, r.reactPivottable.s, r.studio.s]);
             if (s.size === 1) return false;
           }
           return true;
@@ -116,16 +114,16 @@ function ComparisonPage() {
           <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">
             A pivot table lets people slice and summarise data on a screen, like in Excel.
             Below we take everything the paid tool <strong className="font-medium text-foreground">Flexmonster</strong>{" "}
-            can do — {totalFeatures} things in total — and check whether the two most popular
-            free tools can do the same — plus the two{" "}
-            <strong className="font-medium text-foreground">Pivot Studio</strong> demo tabs on this
-            site, one built on each free engine, which add extra features on top.
+            can do — {totalFeatures} things in total — and check whether the leading free tool,
+            react-pivottable, can do the same — plus our free{" "}
+            <strong className="font-medium text-foreground">Pivot Studio</strong> demo on this site,
+            which builds a familiar Flexmonster-style experience on top of it.
           </p>
           <Link
             to="/demos"
             className="mt-5 inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground"
           >
-            Try the free tools yourself
+            Try the free demo yourself
           </Link>
         </header>
 
@@ -135,7 +133,7 @@ function ComparisonPage() {
           <h2 id="glance" className="text-xl font-semibold text-foreground">
             The short answer
           </h2>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {products.map((p) => {
               const key = p.key as ProductKey;
               const score = scoreFor(key);
@@ -161,7 +159,7 @@ function ComparisonPage() {
                   <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
                     {verdicts[key]}
                   </p>
-                  {key === "studioRpt" || key === "studioOrb" ? (
+                  {key === "studio" ? (
                     <Link
                       to="/demos"
                       className="mt-4 inline-block text-sm font-medium text-primary underline underline-offset-4"
@@ -269,7 +267,7 @@ function ComparisonPage() {
           <div className="mt-6 hidden overflow-hidden rounded-xl border border-border md:block">
             <table className="w-full border-collapse text-sm">
               <caption className="sr-only">
-                Feature support comparison between Flexmonster, react-pivottable, Orb.js and the two Pivot Studio demo tabs
+                Feature support comparison between Flexmonster, react-pivottable and our free Pivot Studio demo
               </caption>
               <thead>
                 <tr className="bg-surface-2">
@@ -369,7 +367,7 @@ function ComparisonPage() {
         <footer className="mt-12 border-t border-border pt-6 text-sm leading-relaxed text-muted-foreground">
           <p>
             Based on the official Flexmonster documentation and pricing pages, the react-pivottable
-            docs, and the Orb.js demo and code repository. Last checked 16 August 2026 — always
+            docs, and our own demo implementation. Last checked 16 August 2026 — always
             double-check with the vendor before buying.
           </p>
         </footer>

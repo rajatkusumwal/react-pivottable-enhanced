@@ -1,14 +1,34 @@
 /**
- * Pivot Studio — a drop-in pivot table UI built on the two open-source
- * engines (react-pivottable and orb.js) with a shared feature layer.
+ * Pivot Studio — a drop-in, Flexmonster-like pivot table UI.
+ *
+ * Aggregation runs in the browser by default and can be moved to a backend
+ * service (Spring Boot + DuckDB) by passing a different engine adapter.
  *
  *   import { PivotStudio, sampleData, sampleFields } from "@/components/pivot";
  */
 export { PivotStudio } from "./PivotStudio";
-export type { PivotStudioProps, PivotEngine } from "./PivotStudio";
+export type { PivotStudioProps } from "./PivotStudio";
 
-export { ReactPivottablePanel, createAggregatorBridge } from "./engines/ReactPivottablePanel";
-export { OrbPanel, buildOrbGrid, collectLeaves } from "./engines/OrbPanel";
+export { createLocalEngine, buildLocalResult, localDrillThrough, measureOf } from "./engines/local";
+export { createBackendClient } from "./engines/backend";
+export { createBackendEngine, createHybridEngine } from "./engines/backend";
+export type { BackendEngineOptions } from "./engines/backend";
+export { keyOf, emptyResult, KEY_SEP } from "./result";
+export type {
+  PivotEngineAdapter,
+  PivotQuery,
+  PivotResult,
+  PivotMeasure,
+  PivotLayout,
+  PivotSort,
+  HeaderNode,
+  DrillThroughQuery,
+} from "./result";
+
+export { PivotGrid } from "./ui/PivotGrid";
+export type { SelectionStats } from "./ui/PivotGrid";
+export { DataSourceBar, suggestConfig } from "./ui/DataSourceBar";
+export type { UploadedDataset } from "./ui/DataSourceBar";
 
 export { PivotToolbar } from "./ui/PivotToolbar";
 export { PivotSidebar } from "./ui/PivotSidebar";
@@ -39,6 +59,7 @@ export type { ChartPoint, DrillSelection } from "./analysis";
 export {
   exportMatrix,
   matrixFromTable,
+  matrixFromResult,
   printMatrix,
   copyMatrix,
   toCsv,

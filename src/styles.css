@@ -215,3 +215,78 @@
     background: color-mix(in oklab, var(--pivot-accent, var(--color-primary)) 12%, transparent);
   }
 }
+
+/* Custom PivotGrid renderer. */
+@layer components {
+  .pivot-table {
+    table-layout: auto;
+  }
+
+  .pivot-caption {
+    caption-side: top;
+    text-align: left;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    color: var(--color-foreground);
+  }
+
+  .pivot-fm thead th {
+    position: relative;
+    white-space: nowrap;
+  }
+
+  .pivot-fm .pivot-sheet-headers th,
+  .pivot-fm .pivot-sort-row th {
+    background: var(--pivot-total-bg, oklch(0.98 0.004 250));
+    font-weight: 500;
+    text-align: center;
+    color: var(--color-muted-foreground);
+  }
+
+  .pivot-fm .pivot-row-header {
+    background: var(--pivot-header-bg, oklch(0.96 0.006 250));
+    font-weight: 500;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .pivot-fm .pivot-row-header[data-kind="subtotal"],
+  .pivot-fm .pivot-row-header[data-kind="grand"] {
+    font-weight: 700;
+    background: var(--pivot-total-bg, oklch(0.98 0.004 250));
+  }
+
+  .pivot-fm tr[data-kind="subtotal"] td,
+  .pivot-fm tr[data-kind="grand"] td {
+    font-weight: 700;
+    background: var(--pivot-total-bg, oklch(0.98 0.004 250));
+  }
+
+  .pivot-fm td.pivot-value {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    height: 28px;
+    cursor: pointer;
+  }
+
+  .pivot-fm td.pivot-selected {
+    background: color-mix(in oklab, var(--pivot-accent, var(--color-primary)) 18%, transparent);
+  }
+
+  .pivot-fm tr.pivot-stripe td.pivot-value {
+    background: color-mix(in oklab, var(--color-muted) 35%, transparent);
+  }
+
+  .pivot-fm tr.pivot-row-hover td,
+  .pivot-fm td.pivot-col-hover {
+    background: color-mix(in oklab, var(--pivot-accent, var(--color-primary)) 8%, transparent);
+  }
+
+  .pivot-resize-handle {
+    display: inline-block;
+    width: 6px;
+    height: 14px;
+    cursor: col-resize;
+    border-right: 2px solid var(--color-border);
+  }
+}

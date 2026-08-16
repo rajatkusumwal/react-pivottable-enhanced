@@ -1,8 +1,9 @@
 /**
  * Shared, engine-agnostic types for the pivot components.
- * Both the react-pivottable and the Orb.js panels consume the same config,
- * so an app can switch engines without changing its state.
+ * The same config drives the local engine and the REST backend engine, so an
+ * app can move aggregation server-side without changing its state.
  */
+import type { PivotLayout, PivotSort } from "./result";
 
 export type PivotValue = string | number | boolean | null | undefined;
 export type PivotRow = Record<string, PivotValue>;
@@ -146,8 +147,18 @@ export interface PivotConfig {
   calculated: CalculatedField[];
   conditionalFormats: ConditionalFormatRule[];
   showGrandTotals: boolean;
+  /** Grand total column on the right of every row. */
+  showRowTotals: boolean;
   showSubTotals: boolean;
   expandAll: boolean;
+  layout: PivotLayout;
+  /** Collapsed row member paths (joined with \u0000). */
+  collapsed: string[];
+  sort?: PivotSort | undefined;
+  showFieldCaptions: boolean;
+  showSpreadsheetHeaders: boolean;
+  repeatMemberLabels: boolean;
+  showSortingControls: boolean;
   locale: string;
   theme: PivotTheme;
   chart: { visible: boolean; type: ChartType };
@@ -171,8 +182,15 @@ export function createDefaultConfig(partial: Partial<PivotConfig> = {}): PivotCo
     calculated: [],
     conditionalFormats: [],
     showGrandTotals: true,
+    showRowTotals: true,
     showSubTotals: true,
     expandAll: true,
+    layout: "compact",
+    collapsed: [],
+    showFieldCaptions: true,
+    showSpreadsheetHeaders: false,
+    repeatMemberLabels: false,
+    showSortingControls: true,
     locale: "en",
     theme: defaultTheme,
     chart: { visible: false, type: "bar" },
