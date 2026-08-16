@@ -42,7 +42,7 @@ export function DrillThroughDialog({
   canExport = true,
   decoration = {},
   onStatus,
-  fields = [],
+  fields,
   onFieldsChange,
   maxRows,
   total,
@@ -55,8 +55,9 @@ export function DrillThroughDialog({
 
   const allColumns = useMemo(() => drillColumns(rows), [rows]);
   const columns = useMemo(() => {
-    const picked = fields.filter((f) => allColumns.includes(f));
-    return picked.length ? picked : allColumns;
+    if (fields === undefined) return allColumns;
+    if (fields.length === 0) return [];
+    return fields.filter((f) => allColumns.includes(f));
   }, [fields, allColumns]);
   const visible = useMemo(
     () => applyDrillSlice(rows, { fields: columns, sort: localSort }),
