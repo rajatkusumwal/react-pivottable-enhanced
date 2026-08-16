@@ -4,6 +4,7 @@
  * The service owns grouping, subtotals, filtering and paging; the browser only
  * renders the returned `PivotResult`. See README.md for the full API contract.
  */
+import { MEMBER_PAGE_SIZE } from "../constants";
 import type { CellEditRequest } from "../editing";
 import type { FieldDef, PivotRow } from "../types";
 import type {
