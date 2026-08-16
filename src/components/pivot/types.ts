@@ -52,8 +52,18 @@ export type ValueDisplayMode =
   | "percentOfGrandTotal"
   | "percentOfRowTotal"
   | "percentOfColumnTotal"
+  | "percentOfParentRowTotal"
+  | "percentOfParentColumnTotal"
+  | "differenceOfRow"
+  | "differenceOfColumn"
+  | "percentDifferenceOfRow"
+  | "percentDifferenceOfColumn"
+  | "runningTotalOfRow"
+  | "runningTotalOfColumn"
+  /** Alias of `runningTotalOfRow`, kept for older reports. */
   | "runningTotal"
   | "index";
+
 
 export interface NumberFormat {
   decimals?: number;
