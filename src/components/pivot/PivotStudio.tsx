@@ -20,6 +20,7 @@ import { PivotToolbar } from "./ui/PivotToolbar";
 import { PivotSidebar } from "./ui/PivotSidebar";
 import { PivotChart } from "./ui/PivotChart";
 import { ChartFilterBar } from "./ui/ChartFilterBar";
+import { ChartDrillBar } from "./ui/ChartDrillBar";
 import { DrillThroughDialog } from "./ui/DrillThroughDialog";
 import { FieldListDialog } from "./ui/FieldListDialog";
 import { FormatDialog } from "./ui/FormatDialog";
@@ -202,6 +203,47 @@ export function PivotStudio({
 
 
   const chart = useMemo(() => buildChartData(derivedRows, config), [derivedRows, config]);
+
+  const patchChart = useCallback(
+    (patch: Partial<PivotConfig["chart"]>) => update({ chart: { ...config.chart, ...patch } }),
+    [config.chart, update],
+  );
+
+  /** Axis label click: drill one level deeper, or filter the report at the last level. */
+  const handleCategoryClick = useCallback(
+    (category: string) => {
+      if (chart.canDrillCategory) {
+        patchChart({ drillRows: [...chart.categoryPath, category] });
+        return;
+      }
+      const field = chart.categoryField;
+      if (!field || readOnly) return;
+      const others = config.filters.filter((f) => !(f.kind === "values" && f.field === field));
+      update({
+        filters: [...others, { kind: "values", field, mode: "include", members: [category] }],
+      });
+      setStatus(`Filtered to ${category}`);
+    },
+    [chart, config.filters, patchChart, readOnly, update],
+  );
+
+  /** Legend click: drill the legend one level deeper, or hide/show the series. */
+  const handleSeriesClick = useCallback(
+    (series: string) => {
+      if (chart.canDrillSeries) {
+        patchChart({ drillCols: [...chart.seriesPath, series] });
+        return;
+      }
+      const hidden = config.chart.hiddenSeries ?? [];
+      patchChart({
+        hiddenSeries: hidden.includes(series)
+          ? hidden.filter((s) => s !== series)
+          : [...hidden, series],
+      });
+    },
+    [chart, config.chart.hiddenSeries, patchChart],
+  );
+
 
   useEffect(() => {
     if (!status) return;
@@ -471,6 +513,16 @@ export function PivotStudio({
               onOpenFields={() => setFieldsOpen(true)}
             />
           )}
+          <div
+            data-testid="pivot-panes"
+            data-split={config.chart.visible && config.chart.position === "right" ? "true" : "false"}
+            className={
+              config.chart.visible && config.chart.position === "right"
+                ? "flex flex-col gap-3 xl:flex-row"
+                : ""
+            }
+          >
+            <div className="min-w-0 flex-1">
           {(config.rows.length > 1 || config.cols.length > 1) && config.layout !== "flat" && (
             <div className="flex flex-wrap items-center gap-1.5 px-1 pt-1">
               <button
@@ -542,9 +594,17 @@ export function PivotStudio({
               {formatNumber(selection.max, result.measure.format, config.locale)}
             </p>
           )}
+            </div>
 
           {config.chart.visible && (
-            <div className="mt-3 border-t border-border pt-3">
+            <div
+              data-testid="pivot-chart-pane"
+              className={
+                config.chart.position === "right"
+                  ? "min-w-0 border-t border-border pt-3 xl:w-[45%] xl:border-l xl:border-t-0 xl:pl-3 xl:pt-0"
+                  : "mt-3 border-t border-border pt-3"
+              }
+            >
               {config.showChartFilters && (
                 <ChartFilterBar
                   strings={strings}
@@ -554,12 +614,26 @@ export function PivotStudio({
                   onChange={update}
                 />
               )}
+              <ChartDrillBar
+                categoryPath={chart.categoryPath}
+                seriesPath={chart.seriesPath}
+                categoryField={chart.categoryField}
+                seriesField={chart.seriesField}
+                onCategoryUp={(level) => patchChart({ drillRows: chart.categoryPath.slice(0, level) })}
+                onSeriesUp={(level) => patchChart({ drillCols: chart.seriesPath.slice(0, level) })}
+                hint="Click an axis label to drill down · click a legend entry to expand or hide a series"
+              />
               <PivotChart
                 data={chart.data}
                 series={chart.series}
+                allSeries={chart.allSeries}
+                hiddenSeries={config.chart.hiddenSeries ?? []}
+                lineSeries={config.chart.lineSeries ?? []}
                 type={config.chart.type}
                 accent={config.theme.accent}
                 emptyLabel={strings.noData}
+                onCategoryClick={handleCategoryClick}
+                onSeriesClick={handleSeriesClick}
                 onPointClick={
                   allowDrillThrough
                     ? (point) => void openDrill([String(point.name)], [], String(point.name))
@@ -568,7 +642,9 @@ export function PivotStudio({
               />
             </div>
           )}
+          </div>
         </div>
+
       </div>
 
       <p role="status" aria-live="polite" className="min-h-4 text-xs text-muted-foreground">

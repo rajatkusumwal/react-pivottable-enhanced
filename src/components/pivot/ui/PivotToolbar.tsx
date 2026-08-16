@@ -122,24 +122,47 @@ export function PivotToolbar({
       </div>
 
       {config.chart.visible && (
-        <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <span className="sr-only">Chart type</span>
-          <select
-            aria-label="Chart type"
-            value={config.chart.type}
-            onChange={(e) =>
-              onChange({ chart: { ...config.chart, type: e.target.value as PivotConfig["chart"]["type"] } })
-            }
-            className={select}
-          >
-            <option value="bar">Bars</option>
-            <option value="stackedBar">Stacked bars</option>
-            <option value="line">Line</option>
-            <option value="area">Area</option>
-            <option value="pie">Pie</option>
-          </select>
-        </label>
+        <>
+          <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <span className="sr-only">Chart type</span>
+            <select
+              aria-label="Chart type"
+              value={config.chart.type}
+              onChange={(e) =>
+                onChange({ chart: { ...config.chart, type: e.target.value as PivotConfig["chart"]["type"] } })
+              }
+              className={select}
+            >
+              <option value="bar">Columns</option>
+              <option value="stackedBar">Stacked columns</option>
+              <option value="columnLine">Columns + line</option>
+              <option value="line">Line</option>
+              <option value="area">Area</option>
+              <option value="pie">Pie</option>
+            </select>
+          </label>
+          <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <span className="sr-only">Chart position</span>
+            <select
+              aria-label="Chart position"
+              value={config.chart.position ?? "bottom"}
+              onChange={(e) =>
+                onChange({
+                  chart: {
+                    ...config.chart,
+                    position: e.target.value as NonNullable<PivotConfig["chart"]["position"]>,
+                  },
+                })
+              }
+              className={select}
+            >
+              <option value="bottom">Chart below grid</option>
+              <option value="right">Split view (side by side)</option>
+            </select>
+          </label>
+        </>
       )}
+
 
       <span className="mx-1 h-5 w-px bg-border" aria-hidden="true" />
 
