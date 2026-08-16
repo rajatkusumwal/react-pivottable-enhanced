@@ -12,6 +12,7 @@ import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { useDraggable } from "@dnd-kit/core";
 import { GripVertical, Layers, Plus, Sigma } from "lucide-react";
 import { aggregatorLabels, aggregatorsForType } from "../aggregators";
+import { displayModeLabels } from "../analysis";
 
 import { validateFormula } from "../calculated";
 import { areaOfField, moveField, reorderField } from "../dnd";
@@ -264,11 +265,12 @@ export function FieldListPanel({
         const type = v.type ?? fieldByName.get(v.field)?.type ?? "number";
         const slot = config.values.filter((x, j) => x.field === v.field && j < i).length;
         const suffix = slot ? ` (${slot + 1})` : "";
+        const def = fieldByName.get(v.field);
         return (
         <FieldChip
           key={`${v.field}-${i}`}
           id={chipId("values", v.field, i)}
-          label={v.caption ?? labelOf(v.field)}
+          label={`${config.showAggregationIcon ? "\u03a3 " : ""}${v.caption ?? labelOf(v.field)}`}
           hint={aggregatorLabels[v.aggregator] ?? v.aggregator}
           disabled={readOnly}
           dragDisabled={dragDisabled}
@@ -282,7 +284,7 @@ export function FieldListPanel({
             value={v.aggregator}
             onChange={(e) => updateValue(i, { aggregator: e.target.value })}
           >
-            {aggregatorsForType(type).map((name) => (
+            {aggregatorsForType(type, def?.aggregators).map((name) => (
               <option key={String(name)} value={String(name)}>
                 {aggregatorLabels[String(name)] ?? String(name)}
               </option>
@@ -298,12 +300,11 @@ export function FieldListPanel({
               updateValue(i, { displayMode: e.target.value as NonNullable<ValueDef["displayMode"]> })
             }
           >
-            <option value="raw">Actual value</option>
-            <option value="percentOfGrandTotal">% of grand total</option>
-            <option value="percentOfRowTotal">% of row</option>
-            <option value="percentOfColumnTotal">% of column</option>
-            <option value="runningTotal">Running total</option>
-            <option value="index">Index</option>
+            {Object.entries(displayModeLabels).map(([mode, label]) => (
+              <option key={mode} value={mode}>
+                {label}
+              </option>
+            ))}
           </select>
         </FieldChip>
         );
