@@ -114,6 +114,12 @@ export function PivotToolbar({
         </select>
       </label>
 
+      {config.layout === "flat" && (
+        <span className="text-[11px] text-muted-foreground">
+          Shift-click a sort arrow to sort by several columns
+        </span>
+      )}
+
       <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
         <input
           type="checkbox"
