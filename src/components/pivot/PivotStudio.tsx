@@ -12,6 +12,8 @@ import { PivotToolbar } from "./ui/PivotToolbar";
 import { PivotSidebar } from "./ui/PivotSidebar";
 import { PivotChart } from "./ui/PivotChart";
 import { DrillThroughDialog } from "./ui/DrillThroughDialog";
+import { FieldListDialog } from "./ui/FieldListDialog";
+import { GridFieldBar } from "./ui/GridFieldBar";
 import { ReactPivottablePanel } from "./engines/ReactPivottablePanel";
 import { OrbPanel } from "./engines/OrbPanel";
 
@@ -35,6 +37,11 @@ export interface PivotStudioProps {
   /** Hide the left panel when the host app supplies its own controls. */
   showSidebar?: boolean;
   showToolbar?: boolean;
+  /**
+   * "dialog" (default) reproduces Flexmonster: a field bar above the grid plus a
+   * popup field list. "sidebar" keeps the docked panel.
+   */
+  fieldsUi?: "dialog" | "sidebar";
 }
 
 export function PivotStudio({
@@ -49,12 +56,14 @@ export function PivotStudio({
   className = "",
   showSidebar = true,
   showToolbar = true,
+  fieldsUi = "dialog",
 }: PivotStudioProps) {
   const [internal, setInternal] = useState<PivotConfig>(() => createDefaultConfig(initialConfig));
   const config = controlled ?? internal;
   const gridRef = useRef<HTMLDivElement>(null);
   const [drill, setDrill] = useState<{ title: string; rows: PivotRow[] } | null>(null);
   const [status, setStatus] = useState("");
+  const [fieldsOpen, setFieldsOpen] = useState(false);
 
   const readOnly = !can(permissions, "edit");
   const allowExport = can(permissions, "export");
@@ -118,11 +127,12 @@ export function PivotStudio({
             if (matrix && (await copyMatrix(matrix))) setStatus("Copied");
           }}
           onReset={() => update(createDefaultConfig(initialConfig))}
+          onOpenFields={fieldsUi === "dialog" ? () => setFieldsOpen(true) : undefined}
         />
       )}
 
       <div className="flex flex-col gap-3 lg:flex-row">
-        {showSidebar && (
+        {showSidebar && fieldsUi === "sidebar" && (
           <PivotSidebar
             strings={strings}
             fields={safeFields}
@@ -133,8 +143,18 @@ export function PivotStudio({
           />
         )}
 
-        <div className="min-w-0 flex-1 rounded-xl border border-border bg-card p-2">
-          <p className="px-1 pb-2 text-xs text-muted-foreground">
+        <div className="min-w-0 flex-1 rounded-md border border-border bg-card p-2">
+          {fieldsUi === "dialog" && (
+            <GridFieldBar
+              strings={strings}
+              config={config}
+              rows={baseRows}
+              readOnly={readOnly}
+              onChange={update}
+              onOpenFields={() => setFieldsOpen(true)}
+            />
+          )}
+          <p className="px-1 py-2 text-xs text-muted-foreground">
             {derivedRows.length} {strings.records}
             {allowDrillThrough && " · click a number to see the records behind it"}
           </p>
@@ -185,6 +205,17 @@ export function PivotStudio({
       <p role="status" aria-live="polite" className="min-h-4 text-xs text-muted-foreground">
         {status}
       </p>
+
+      <FieldListDialog
+        open={fieldsOpen}
+        strings={strings}
+        fields={safeFields}
+        rows={baseRows}
+        config={config}
+        readOnly={readOnly}
+        onChange={update}
+        onClose={() => setFieldsOpen(false)}
+      />
 
       <DrillThroughDialog
         open={drill !== null}
