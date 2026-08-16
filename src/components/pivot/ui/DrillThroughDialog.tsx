@@ -84,7 +84,7 @@ export function DrillThroughDialog({
     const next = current.includes(field)
       ? current.filter((f) => f !== field)
       : [...allColumns.filter((f) => current.includes(f) || f === field)];
-    onFieldsChange?.(next.length === allColumns.length ? [] : next);
+    onFieldsChange?.(next.length === allColumns.length ? undefined : next);
   };
 
   return (
