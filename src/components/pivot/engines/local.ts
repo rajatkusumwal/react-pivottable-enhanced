@@ -214,6 +214,17 @@ export function buildLocalResult(rows: PivotRow[], query: PivotQuery): PivotResu
   };
   if (query.cols.length) walkCols(colTree, 0);
   for (let d = 0; d < colHeaderRows.length; d++) colHeaderRows[d] ??= [];
+  // Collapsed members must only span the header rows actually rendered, not the
+  // full field depth — otherwise drilling up leaves phantom columns on the right.
+  const renderedColDepth = colHeaderRows.length;
+  for (const level of colHeaderRows) {
+    for (const header of level) {
+      if ((header.rowSpan ?? 1) > 1) {
+        header.rowSpan = Math.max(renderedColDepth - header.depth, 1);
+      }
+    }
+  }
+
 
   /** Base columns before the measures are multiplied in. */
   const baseColumns: { key: string[]; indexes: Set<number> | null }[] = query.cols.length
