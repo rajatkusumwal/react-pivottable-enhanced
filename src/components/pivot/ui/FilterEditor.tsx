@@ -122,8 +122,15 @@ export function FilterEditor({
           value={field}
           disabled={readOnly}
           onChange={(e) => {
-            setField(e.target.value);
+            const next = e.target.value;
+            setField(next);
             setMembers([]);
+            const nextIsDate = fields.find((f) => f.name === next)?.type === "date";
+            if (nextIsDate !== isDateField) {
+              setValue(nextIsDate ? "" : "0");
+              setValue2(nextIsDate ? "" : "0");
+              if (nextIsDate && !dateOperatorLabels[operator]) setOperator("gt");
+            }
           }}
         >
           {fields.map((f) => (
