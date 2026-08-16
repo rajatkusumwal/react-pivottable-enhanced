@@ -139,6 +139,18 @@ export function PivotGrid({
   const totalColumns = colLeaves.length + (showRowTotals ? measureCount : 0);
   const windowed = rowHeaders.length > WINDOW_THRESHOLD;
 
+  /**
+   * A backend (or an in-flight result produced before drill-up) may retain a
+   * rowSpan based on the configured hierarchy depth. Clamp it to the header
+   * rows that are actually present so the browser's table-placement algorithm
+   * cannot push sort/total cells into phantom columns on the right.
+   */
+  const visibleColumnRowSpan = useCallback(
+    (node: HeaderNode) =>
+      Math.max(1, Math.min(node.rowSpan ?? 1, result.colHeaderRows.length - node.depth)),
+    [result.colHeaderRows.length],
+  );
+
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -474,7 +486,7 @@ export function PivotGrid({
                   <th
                     key={`${node.key.join("/")}-${i}`}
                     colSpan={node.span}
-                    rowSpan={node.rowSpan ?? 1}
+                    rowSpan={visibleColumnRowSpan(node)}
                     scope="col"
                   >
                     {node.expandable && onToggleColumnCollapse ? (
