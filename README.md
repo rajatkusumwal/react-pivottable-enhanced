@@ -89,8 +89,20 @@ other than Tailwind tokens (`--color-border`, `--color-card`, …) and `@/lib/ut
 * **Field list** — drag-and-drop between Filters / Columns / Rows / Measures (`@dnd-kit`).
   Drag & drop can be switched off with `config.dragAndDrop: false` (or the toolbar
   checkbox); the select menus keep every action available without dragging.
+  Fields are grouped by `FieldDef.folder`, and fields sharing a `FieldDef.hierarchy` are
+  nested under it and badged with their `FieldDef.level` (L1, L2 …). You can add a single
+  sublevel or use **Add all levels** to add the whole drill path to Rows. The panel also has
+  a search box (matching field, folder and hierarchy names), **Expand all** / **Collapse all**
+  and a sort selector (data order, A → Z, Z → A).
+* **Multiple measures** — `config.values` accepts any number of measures and the grid renders
+  one leaf column per (column member x measure). The same field can appear several times with
+  different aggregations (drop it on Measures again). Measures carry `type`, so string, date
+  and time fields work as values too: they offer count, distinct count, min, max, first and
+  last, and render as text (ISO dates and `HH:mm` times compare correctly).
 * **Aggregations** — sum, count, distinct count, average, median, min, max, product,
   population/sample stdev, percent-of-total; add your own with `registerAggregator()`.
+  `aggregatorsForType(type)` returns the aggregations valid for a field type and drives the
+  measure menus.
 * **Calculated values** — safe formula parser (no `eval`), e.g. `revenue - cost`.
 * **Charts** — Recharts bar / stacked / line / area / pie with click-to-drill.
 * **Drill-through** — click any number to inspect the source records.
