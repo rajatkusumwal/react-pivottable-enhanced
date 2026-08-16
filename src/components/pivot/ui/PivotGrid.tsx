@@ -343,8 +343,9 @@ export function PivotGrid({
           {showFieldCaptions && (result.rowFields.length > 0 || result.colFields.length > 0) && (
             <tr className="pivot-caption-row">
               <th colSpan={headerCols} scope="col" className="text-left">
-                {result.rowFields.join(" / ") || " "}
+                {result.colHeaderRows.length ? " " : result.rowFields.join(" / ") || " "}
               </th>
+
               <th colSpan={totalColumns} scope="col" className="text-left">
                 {result.colFields.length
                   ? `${result.colFields.join(" / ")} — ${result.measure.caption}`
