@@ -29,6 +29,35 @@ export function parseDate(value: unknown): number {
   return Number.NaN;
 }
 
+const timeLike = /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/;
+const isoTimePart = /[T ](\d{2}:\d{2}(?::\d{2})?)/;
+
+/**
+ * Parses clock times ("09:30", "09:30:15") and the time part of an ISO
+ * timestamp into seconds since midnight. Returns NaN when there is no time.
+ */
+export function parseTime(value: unknown): number {
+  const text =
+    value instanceof Date
+      ? value.toISOString().slice(11, 19)
+      : typeof value === "string"
+        ? (value.trim().match(isoTimePart)?.[1] ?? value.trim())
+        : typeof value === "number" && Number.isFinite(value)
+          ? null
+          : null;
+  if (text === null) {
+    // Numbers are read as seconds since midnight already.
+    return typeof value === "number" && Number.isFinite(value) ? value : Number.NaN;
+  }
+  const m = timeLike.exec(text);
+  if (!m) return Number.NaN;
+  const h = Number(m[1]);
+  const min = Number(m[2]);
+  const sec = Number(m[3] ?? 0);
+  if (h > 23 || min > 59 || sec > 59) return Number.NaN;
+  return h * 3600 + min * 60 + sec;
+}
+
 const dateOperators: ConditionOperator[] = ["gt", "gte", "lt", "lte", "eq", "neq", "between"];
 
 /** Plain-English wording used when a condition runs on the date timeline. */
@@ -41,6 +70,22 @@ export const dateOperatorLabels: Partial<Record<ConditionOperator, string>> = {
   neq: "is not on",
   between: "is between",
 };
+
+/** Plain-English wording used when a condition runs on the clock. */
+export const timeOperatorLabels: Partial<Record<ConditionOperator, string>> = {
+  gt: "is after",
+  gte: "is at or after",
+  lt: "is before",
+  lte: "is at or before",
+  eq: "is at",
+  neq: "is not at",
+  between: "is between",
+};
+
+/** True when the condition should be evaluated on the clock (seconds of day). */
+function useTimes(valueType: ConditionValueType | undefined, operator: ConditionOperator): boolean {
+  return valueType === "time" && dateOperators.includes(operator);
+}
 
 /** True when the condition should be evaluated on the date timeline. */
 function useDates(
@@ -66,15 +111,18 @@ export function matchesCondition(
 ): boolean {
   const text = String(raw ?? "").toLowerCase();
   const needle = String(value ?? "").toLowerCase();
-  const asDates = useDates(valueType, operator, raw, value);
-  const num = asDates ? parseDate(raw) : Number(raw);
-  const target = asDates ? parseDate(value) : Number(value);
-  if (asDates && (Number.isNaN(num) || Number.isNaN(target))) return false;
-  if (asDates && (operator === "eq" || operator === "neq")) {
+  const asTimes = useTimes(valueType, operator);
+  const asDates = !asTimes && useDates(valueType, operator, raw, value);
+  const scale = asTimes ? parseTime : parseDate;
+  const scaled = asTimes || asDates;
+  const num = scaled ? scale(raw) : Number(raw);
+  const target = scaled ? scale(value) : Number(value);
+  if (scaled && (Number.isNaN(num) || Number.isNaN(target))) return false;
+  if (scaled && (operator === "eq" || operator === "neq")) {
     return operator === "eq" ? num === target : num !== target;
   }
-  if (asDates && operator === "between") {
-    const upper = parseDate(value2 as string | number);
+  if (scaled && operator === "between") {
+    const upper = scale(value2 as string | number);
     return !Number.isNaN(upper) && num >= target && num <= upper;
   }
   switch (operator) {
@@ -105,7 +153,18 @@ export function matchesCondition(
   }
 }
 
-/** Applies value, conditional and top/bottom-N filters in order. */
+function groupBy(rows: PivotRow[], field: string): Map<string, PivotRow[]> {
+  const groups = new Map<string, PivotRow[]>();
+  for (const r of rows) {
+    const key = String(r[field]);
+    const bucket = groups.get(key);
+    if (bucket) bucket.push(r);
+    else groups.set(key, [r]);
+  }
+  return groups;
+}
+
+/** Applies value, conditional, subquery and top/bottom-N filters in order. */
 export function applyFilters(rows: PivotRow[], filters: FilterDef[]): PivotRow[] {
   let out = rows;
   for (const filter of filters) {
@@ -127,6 +186,23 @@ export function applyFilters(rows: PivotRow[], filters: FilterDef[]): PivotRow[]
           filter.valueType,
         ),
       );
+    } else if (filter.kind === "subquery") {
+      // Nested aggregation per member, then a HAVING-style comparison.
+      const groups = groupBy(out, filter.field);
+      const keep = new Set(
+        [...groups.entries()]
+          .filter(([, group]) =>
+            matchesCondition(
+              aggregate(filter.aggregator, group, filter.measure) ?? 0,
+              filter.operator,
+              filter.value,
+              filter.value2,
+              "number",
+            ),
+          )
+          .map(([key]) => key),
+      );
+      out = out.filter((r) => keep.has(String(r[filter.field])));
     } else {
       const groups = new Map<string, PivotRow[]>();
       for (const r of out) {
@@ -161,8 +237,15 @@ export function describeFilter(filter: FilterDef): string {
     const words =
       filter.valueType === "date"
         ? dateOperatorLabels[filter.operator]
-        : undefined;
+        : filter.valueType === "time"
+          ? timeOperatorLabels[filter.operator]
+          : undefined;
     return `${filter.field} ${words ?? filter.operator} ${filter.value}${
+      filter.value2 !== undefined ? ` – ${filter.value2}` : ""
+    }`;
+  }
+  if (filter.kind === "subquery") {
+    return `${filter.field} where ${filter.aggregator} of ${filter.measure} ${filter.operator} ${filter.value}${
       filter.value2 !== undefined ? ` – ${filter.value2}` : ""
     }`;
   }
