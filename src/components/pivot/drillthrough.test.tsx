@@ -237,7 +237,7 @@ describe("drill-through dialog", () => {
     const list = screen.getByLabelText("Drill-through field list");
     fireEvent.click(within(list).getByRole("button", { name: "Select all" }));
     const header = within(screen.getByTestId("drill-through-table")).getAllByRole("row")[0]!;
-    expect(header.textContent).toBe("regioncountryyearrevenue");
+    expect(header.textContent).toBe("regioncountryyearrevenuerep");
   });
 
   it("shows no columns after deselecting all", () => {
