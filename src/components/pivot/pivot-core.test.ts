@@ -503,10 +503,11 @@ describe("multiple measures", () => {
     });
     expect(result.measures).toHaveLength(3);
     // 2 categories x 3 measures
-    expect(result.columns).toHaveLength(6);
-    const north = result.rows.find((r) => r.label === "North");
-    expect(north?.cells[0]).toBe(100); // sum of Bikes
-    expect(north?.cells[1]).toBe(100); // average of Bikes
-    expect(north?.cells[2]).toBe(1); // distinct categories
+    expect(result.colLeaves).toHaveLength(6);
+    expect(result.measureIndexByLeaf).toEqual([0, 1, 2, 0, 1, 2]);
+    const north = result.rowHeaders.findIndex((h) => h.label === "North");
+    expect(result.cells[north]?.[0]).toBe(100); // sum of Bikes
+    expect(result.cells[north]?.[1]).toBe(100); // average of Bikes
+    expect(result.cells[north]?.[2]).toBe(1); // distinct categories
   });
 });
