@@ -47,10 +47,6 @@ export interface PivotGridProps {
   onToggleCollapse?: (key: string[]) => void;
   /** Drill down / up on a column member hierarchy. */
   onToggleColumnCollapse?: (key: string[]) => void;
-  /** Expands every level on both axes. */
-  onExpandAll?: () => void;
-  /** Drills up to the top level on both axes. */
-  onCollapseAll?: () => void;
   conditionalFormats?: ConditionalFormatRule[];
   allowDrillThrough?: boolean;
   onDrill?: (rowKey: string[], colKey: string[], label: string) => void;
@@ -100,8 +96,6 @@ export function PivotGrid({
   onSortsChange,
   onToggleCollapse,
   onToggleColumnCollapse,
-  onExpandAll,
-  onCollapseAll,
   conditionalFormats = [],
   allowDrillThrough = true,
   onDrill,

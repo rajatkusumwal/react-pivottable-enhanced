@@ -261,6 +261,27 @@ export function PivotStudio({
               onOpenFields={() => setFieldsOpen(true)}
             />
           )}
+          {(config.rows.length > 1 || config.cols.length > 1) && config.layout !== "flat" && (
+            <div className="flex flex-wrap items-center gap-1.5 px-1 pt-1">
+              <button
+                type="button"
+                className="rounded border border-border bg-card px-2 py-1 text-xs hover:bg-accent"
+                onClick={expandAll}
+              >
+                Drill down all levels
+              </button>
+              <button
+                type="button"
+                className="rounded border border-border bg-card px-2 py-1 text-xs hover:bg-accent"
+                onClick={collapseAll}
+              >
+                Drill up to top level
+              </button>
+              <span className="text-xs text-muted-foreground">
+                or use the arrows in row and column headers
+              </span>
+            </div>
+          )}
           <p className="px-1 py-2 text-xs text-muted-foreground">
             {derivedRows.length} {strings.records}
             {result.meta.source === "backend" && " · aggregated by your analytics service"}
@@ -291,8 +312,6 @@ export function PivotStudio({
             onSortsChange={(sorts) => update({ sorts, sort: sorts[0] })}
             onToggleCollapse={toggleCollapse}
             onToggleColumnCollapse={toggleColumnCollapse}
-            onExpandAll={expandAll}
-            onCollapseAll={collapseAll}
             conditionalFormats={config.conditionalFormats}
             allowDrillThrough={allowDrillThrough}
             onDrill={(rowKey, colKey, label) => void openDrill(rowKey, colKey, label)}
