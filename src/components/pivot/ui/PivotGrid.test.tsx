@@ -190,7 +190,7 @@ describe("multilevel column drill", () => {
         result={result}
         layout="compact"
         locale="en-US"
-        theme={theme}
+        theme={defaultTheme}
         onToggleColumnCollapse={vi.fn()}
       />,
     );
