@@ -37,7 +37,14 @@ function keepHmrSocketAlive(): Plugin {
 const localPreset = process.env["NITRO_PRESET"];
 
 export default defineConfig({
-  ...(localPreset ? { nitro: { preset: localPreset } } : {}),
+  ...(localPreset
+    ? {
+        nitro: {
+          preset: localPreset,
+          output: { dir: "dist", serverDir: "dist/server", publicDir: "dist/client" },
+        },
+      }
+    : {}),
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
