@@ -286,7 +286,7 @@ export function FieldListPanel({
       <DropArea
         area="filters"
         title="Report filters"
-        hint="Drop a field here to filter the whole report"
+        hint={dragDisabled ? "Use the menus in the field list to add fields" : "Drop a field here to filter the whole report"}
         itemIds={config.filters.map((f) => chipId("filters", f.field))}
       >
         {chipsFor("filters")}
@@ -294,7 +294,7 @@ export function FieldListPanel({
       <DropArea
         area="cols"
         title={strings.columns}
-        hint="Drop fields to build the columns"
+        hint={dragDisabled ? "Use the menus in the field list to add fields" : "Drop fields to build the columns"}
         itemIds={config.cols.map((n) => chipId("cols", n))}
       >
         {chipsFor("cols")}
@@ -302,7 +302,7 @@ export function FieldListPanel({
       <DropArea
         area="rows"
         title={strings.rows}
-        hint="Drop fields to build the rows"
+        hint={dragDisabled ? "Use the menus in the field list to add fields" : "Drop fields to build the rows"}
         itemIds={config.rows.map((n) => chipId("rows", n))}
       >
         {chipsFor("rows")}
@@ -310,7 +310,7 @@ export function FieldListPanel({
       <DropArea
         area="values"
         title="Measures"
-        hint="Drop a number field to summarise it"
+        hint={dragDisabled ? "Use the menus in the field list to add fields" : "Drop a number field to summarise it"}
         itemIds={config.values.map((v) => chipId("values", v.field))}
       >
         {chipsFor("values")}
