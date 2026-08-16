@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { useState } from "react";
 import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import { applyDrillSlice, chartDrillKeys, drillColumns } from "./analysis";
 import { localDrillThrough } from "./engines/local";
