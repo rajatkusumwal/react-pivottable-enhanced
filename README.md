@@ -123,7 +123,15 @@ All endpoints are JSON over POST.
   "values": [{ "field": "revenue", "aggregator": "sum", "caption": "Revenue" }],
   "filters": [
     { "kind": "values", "field": "region", "mode": "include", "members": ["North"] },
-    { "kind": "condition", "field": "revenue", "operator": "gt", "value": 1000 }
+    { "kind": "condition", "field": "revenue", "operator": "gt", "value": 1000 },
+    {
+      "kind": "condition",
+      "field": "orderDate",
+      "operator": "between",
+      "value": "2024-02-01",
+      "value2": "2024-02-28",
+      "valueType": "date"
+    }
   ],
   "showSubTotals": true,
   "showGrandTotals": true,
