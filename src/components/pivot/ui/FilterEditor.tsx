@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Plus, X } from "lucide-react";
-import { uniqueMembers } from "../filters";
+import { dateOperatorLabels, uniqueMembers } from "../filters";
 import type { PivotStrings } from "../locales";
 import type { ConditionOperator, FieldDef, FilterDef, PivotRow } from "../types";
 
@@ -57,10 +57,25 @@ export function FilterEditor({
     [rows, field],
   );
 
+  const isDateField = fields.find((f) => f.name === field)?.type === "date";
+  const shownOperators = isDateField
+    ? operators
+        .filter((o) => dateOperatorLabels[o.value])
+        .map((o) => ({ value: o.value, label: dateOperatorLabels[o.value] as string }))
+    : operators;
+
   const submit = () => {
     if (!field) return;
     if (kind === "values") onAdd({ kind: "values", field, mode: "include", members });
-    else if (kind === "condition") onAdd({ kind: "condition", field, operator, value, value2 });
+    else if (kind === "condition")
+      onAdd({
+        kind: "condition",
+        field,
+        operator: isDateField && !dateOperatorLabels[operator] ? "gt" : operator,
+        value,
+        value2,
+        valueType: isDateField ? "date" : "auto",
+      });
     else onAdd({ kind: "top", field, measure, aggregator: "sum", direction: "top", count });
   };
 
@@ -107,8 +122,15 @@ export function FilterEditor({
           value={field}
           disabled={readOnly}
           onChange={(e) => {
-            setField(e.target.value);
+            const next = e.target.value;
+            setField(next);
             setMembers([]);
+            const nextIsDate = fields.find((f) => f.name === next)?.type === "date";
+            if (nextIsDate !== isDateField) {
+              setValue(nextIsDate ? "" : "0");
+              setValue2(nextIsDate ? "" : "0");
+              if (nextIsDate && !dateOperatorLabels[operator]) setOperator("gt");
+            }
           }}
         >
           {fields.map((f) => (
@@ -144,7 +166,7 @@ export function FilterEditor({
               disabled={readOnly}
               onChange={(e) => setOperator(e.target.value as ConditionOperator)}
             >
-              {operators.map((o) => (
+              {shownOperators.map((o) => (
                 <option key={o.value} value={o.value}>
                   {o.label}
                 </option>
@@ -152,6 +174,7 @@ export function FilterEditor({
             </select>
             <input
               className={small}
+              type={isDateField ? "date" : "text"}
               aria-label="Filter value"
               value={value}
               disabled={readOnly}
@@ -160,6 +183,7 @@ export function FilterEditor({
             {operator === "between" && (
               <input
                 className={`col-span-2 ${small}`}
+                type={isDateField ? "date" : "text"}
                 aria-label="Second value"
                 value={value2}
                 disabled={readOnly}

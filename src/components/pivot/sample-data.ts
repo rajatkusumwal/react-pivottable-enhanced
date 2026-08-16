@@ -241,7 +241,7 @@ export function generateSalesData(count = 600, seed = 42): PivotRow[] {
 export const sampleFields: FieldDef[] = [
   { name: "id", caption: "Record id", type: "number", folder: "Order" },
   { name: "orderId", caption: "Order id", type: "string", folder: "Order" },
-  { name: "orderDate", caption: "Order date", type: "string", folder: "Time" },
+  { name: "orderDate", caption: "Order date", type: "date", folder: "Time" },
   { name: "year", caption: "Year", type: "number", folder: "Time" },
   { name: "half", caption: "Half year", type: "string", folder: "Time" },
   { name: "quarter", caption: "Quarter", type: "string", folder: "Time" },

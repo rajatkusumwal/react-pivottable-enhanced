@@ -421,7 +421,7 @@ const sharedStudioOverrides: Record<string, Cell> = {
   "Value filters (top/bottom N)": y("Top-N filter"),
   "Conditional filter for number fields": y(),
   "Conditional filter for string fields": y(),
-  "Conditional filter for date fields": p("Text/number conditions only"),
+  "Conditional filter for date fields": y("Date picker + before/after/between"),
   "Selection (member checkbox) filter": y(),
   "Search box inside the filter": y(),
   "Report filter (page) area": y("Filters area in the sidebar"),

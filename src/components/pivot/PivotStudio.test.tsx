@@ -128,6 +128,36 @@ describe("PivotStudio grid", () => {
     await waitFor(() => expect(screen.getByText(/3 records/)).toBeInTheDocument());
   });
 
+  it("offers date operators and filters by a date condition", async () => {
+    const user = userEvent.setup();
+    setup({
+      data: [
+        { region: "North", category: "Bikes", orderDate: "2024-01-05", revenue: 100 },
+        { region: "North", category: "Clothing", orderDate: "2024-02-10", revenue: 200 },
+        { region: "South", category: "Bikes", orderDate: "2024-03-20", revenue: 300 },
+      ],
+      fields: [
+        { name: "region", caption: "Region", type: "string" as const },
+        { name: "category", caption: "Category", type: "string" as const },
+        { name: "orderDate", caption: "Order date", type: "date" as const },
+        { name: "revenue", caption: "Revenue", type: "number" as const },
+      ],
+    });
+    await user.selectOptions(screen.getByLabelText("Filter type"), "condition");
+    await user.selectOptions(screen.getByLabelText("Filter field"), "orderDate");
+    const operator = screen.getByLabelText("Operator") as HTMLSelectElement;
+    expect(
+      Array.from(operator.options).map((o) => o.textContent),
+    ).toContain("is on or after");
+    const valueInput = screen.getByLabelText("Filter value") as HTMLInputElement;
+    expect(valueInput.type).toBe("date");
+    await user.selectOptions(operator, "gte");
+    await user.clear(valueInput);
+    await user.type(valueInput, "2024-02-01");
+    await user.click(screen.getByRole("button", { name: /add filter/i }));
+    await waitFor(() => expect(screen.getByText(/2 records/)).toBeInTheDocument());
+  });
+
   it("creates a calculated value that can be summarised", async () => {
     const user = userEvent.setup();
     setup();

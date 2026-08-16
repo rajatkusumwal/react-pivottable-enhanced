@@ -1,16 +1,82 @@
 import { aggregate } from "./aggregators";
-import type { ConditionOperator, FilterDef, PivotRow, PivotValue } from "./types";
+import type {
+  ConditionOperator,
+  ConditionValueType,
+  FilterDef,
+  PivotRow,
+  PivotValue,
+} from "./types";
+
+const DAY = 86_400_000;
+const isoLike = /^\d{4}-\d{2}-\d{2}([T ].*)?$/;
+
+/**
+ * Parses ISO strings ("2024-03-01", full ISO timestamps), epoch numbers and Date
+ * instances into a UTC-midnight timestamp so comparisons happen at day granularity.
+ * Returns NaN when the value is not a date.
+ */
+export function parseDate(value: unknown): number {
+  if (value instanceof Date) return Math.floor(value.getTime() / DAY) * DAY;
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return Math.floor(value / DAY) * DAY;
+  }
+  if (typeof value === "string") {
+    const text = value.trim();
+    if (!isoLike.test(text)) return Number.NaN;
+    const ms = Date.parse(text.length === 10 ? `${text}T00:00:00Z` : text);
+    return Number.isNaN(ms) ? Number.NaN : Math.floor(ms / DAY) * DAY;
+  }
+  return Number.NaN;
+}
+
+const dateOperators: ConditionOperator[] = ["gt", "gte", "lt", "lte", "eq", "neq", "between"];
+
+/** Plain-English wording used when a condition runs on the date timeline. */
+export const dateOperatorLabels: Partial<Record<ConditionOperator, string>> = {
+  gt: "is after",
+  gte: "is on or after",
+  lt: "is before",
+  lte: "is on or before",
+  eq: "is on",
+  neq: "is not on",
+  between: "is between",
+};
+
+/** True when the condition should be evaluated on the date timeline. */
+function useDates(
+  valueType: ConditionValueType | undefined,
+  operator: ConditionOperator,
+  raw: PivotValue,
+  value: string | number,
+): boolean {
+  if (!dateOperators.includes(operator)) return false;
+  if (valueType === "date") return true;
+  if (valueType && valueType !== "auto") return false;
+  // In auto mode only ISO-like text counts, so plain numbers stay numeric.
+  const isoText = (v: unknown) => typeof v === "string" && !Number.isNaN(parseDate(v));
+  return isoText(raw) && isoText(value);
+}
 
 export function matchesCondition(
   raw: PivotValue,
   operator: ConditionOperator,
   value: string | number,
   value2?: string | number,
+  valueType?: ConditionValueType,
 ): boolean {
   const text = String(raw ?? "").toLowerCase();
   const needle = String(value ?? "").toLowerCase();
-  const num = Number(raw);
-  const target = Number(value);
+  const asDates = useDates(valueType, operator, raw, value);
+  const num = asDates ? parseDate(raw) : Number(raw);
+  const target = asDates ? parseDate(value) : Number(value);
+  if (asDates && (Number.isNaN(num) || Number.isNaN(target))) return false;
+  if (asDates && (operator === "eq" || operator === "neq")) {
+    return operator === "eq" ? num === target : num !== target;
+  }
+  if (asDates && operator === "between") {
+    const upper = parseDate(value2 as string | number);
+    return !Number.isNaN(upper) && num >= target && num <= upper;
+  }
   switch (operator) {
     case "gt":
       return num > target;
@@ -53,7 +119,13 @@ export function applyFilters(rows: PivotRow[], filters: FilterDef[]): PivotRow[]
       });
     } else if (filter.kind === "condition") {
       out = out.filter((r) =>
-        matchesCondition(r[filter.field], filter.operator, filter.value, filter.value2),
+        matchesCondition(
+          r[filter.field],
+          filter.operator,
+          filter.value,
+          filter.value2,
+          filter.valueType,
+        ),
       );
     } else {
       const groups = new Map<string, PivotRow[]>();
@@ -86,7 +158,11 @@ export function describeFilter(filter: FilterDef): string {
     return `${filter.field}: ${filter.mode === "include" ? "only" : "not"} ${filter.members.length} value(s)`;
   }
   if (filter.kind === "condition") {
-    return `${filter.field} ${filter.operator} ${filter.value}${
+    const words =
+      filter.valueType === "date"
+        ? dateOperatorLabels[filter.operator]
+        : undefined;
+    return `${filter.field} ${words ?? filter.operator} ${filter.value}${
       filter.value2 !== undefined ? ` – ${filter.value2}` : ""
     }`;
   }

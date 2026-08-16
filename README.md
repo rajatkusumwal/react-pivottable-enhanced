@@ -73,8 +73,10 @@ other than Tailwind tokens (`--color-border`, `--color-card`, …) and `@/lib/ut
   double-click a value cell, type a number, press Enter; the change is written back to the
   underlying records, spread proportionally for `sum` measures, and `onDataChange` fires with
   the updated rows).
-* **Filters** — member checkbox filters with search, conditional filters (number/text),
-  top/bottom N, report-filter chips above the grid.
+* **Filters** — member checkbox filters with search, conditional filters (number/text/date),
+  top/bottom N, report-filter chips above the grid. Picking a field typed `date` in the
+  filter editor switches it to a date picker with date wording ("is before", "is on or
+  after", "is between", …) and sets `valueType: "date"` on the filter.
 * **Field list** — drag-and-drop between Filters / Columns / Rows / Measures (`@dnd-kit`).
   Drag & drop can be switched off with `config.dragAndDrop: false` (or the toolbar
   checkbox); the select menus keep every action available without dragging.
@@ -121,7 +123,15 @@ All endpoints are JSON over POST.
   "values": [{ "field": "revenue", "aggregator": "sum", "caption": "Revenue" }],
   "filters": [
     { "kind": "values", "field": "region", "mode": "include", "members": ["North"] },
-    { "kind": "condition", "field": "revenue", "operator": "gt", "value": 1000 }
+    { "kind": "condition", "field": "revenue", "operator": "gt", "value": 1000 },
+    {
+      "kind": "condition",
+      "field": "orderDate",
+      "operator": "between",
+      "value": "2024-02-01",
+      "value2": "2024-02-28",
+      "valueType": "date"
+    }
   ],
   "showSubTotals": true,
   "showGrandTotals": true,
@@ -181,6 +191,15 @@ Rules the server must respect:
   over `sort`; `by: "rows"` sorts row members, a number sorts by that leaf column.
 * `grandTotalsPosition` decides whether the `kind: "grand"` row is emitted first or last.
 * `limit` / `offset` page the source records before aggregation.
+* Condition filters carry an optional `valueType` (`"auto" | "number" | "text" | "date"`).
+  With `"date"` the server must compare on the date timeline at **day granularity** —
+  parse ISO dates (`2024-02-01`) and timestamps (`2024-02-01T18:45:00Z`), truncate both
+  sides to UTC midnight, and treat unparseable values as non-matching. In SQL/DuckDB that is
+  `CAST(field AS DATE) >= DATE '2024-02-01'` (and `BETWEEN … AND …` for `between`).
+  Date operators map to: `lt` is before, `lte` is on or before, `gt` is after,
+  `gte` is on or after, `eq` is on, `neq` is not on, `between` is between (inclusive).
+  With `"auto"` (or omitted), values are treated as dates only when both sides are
+  ISO-like text; plain numbers stay numeric.
 
 #### `POST /api/pivot/drillthrough`
 
