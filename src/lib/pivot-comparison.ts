@@ -474,8 +474,12 @@ const sharedStudioOverrides: Record<string, Cell> = {
   "Chart title and legend options": y(),
   // Drill-through
   "Drill-through view for grid cells": y("Click a cell"),
+  "Drill-through from charts": y("Click a bar, point or slice"),
   "Enable/disable drill-through": y("Permission flag"),
-  "Configure the drill-through slice": p("Shows all source columns"),
+  "Field List inside drill-through": y("Columns button with search"),
+  "Configure the drill-through slice": y("drillThrough.fields"),
+  "Sort columns in drill-through": y("Click a column header"),
+  "Limit maximum drill-through rows": y("drillThrough.maxRows, toolbar preset"),
   // Toolbar
   "Built-in toolbar": y(),
   "Save the report": y("Report JSON"),

@@ -183,7 +183,27 @@ other than Tailwind tokens (`--color-border`, `--color-card`, …) and `@/lib/ut
     seriesField, canDrillCategory, canDrillSeries, categoryPath, seriesPath }`, so a backend
     can build the same payload: send `chart.drillRows` / `drillCols` as extra equality filters
     and `rows[drillRows.length]` / `cols[drillCols.length]` as the group-by fields.
-* **Drill-through** — click any number to inspect the source records. The dialog has its own
+* **Drill-through** — click any number, or any bar / point / slice in the chart, to inspect the
+  source records. Chart drill-through keeps the axis and legend drill path, so a click on the
+  second level drills through `[region, country] × [year, quarter]`. The dialog has a built-in
+  field list ("Columns", with search) to pick the slice, sortable column headers and a row cap:
+
+  ```ts
+  config.drillThrough = {
+    fields: ["orderId", "customer", "revenue"], // [] = every source field
+    maxRows: 1000,                              // hard cap, toolbar preset
+    sort: { field: "revenue", dir: "desc" },    // initial column sort
+  };
+  ```
+
+  The same options travel over the REST contract — `POST /drillthrough` accepts
+  `{ rowKey, colKey, query, fields?, sort?, limit? }` and answers
+  `{ rows, total }` (`total` = matches before the cap, used for the "N of M" note).
+  `applyDrillSlice(rows, { fields, sort, maxRows })` is exported so a backend adapter can
+  reproduce the projection, sorting and cap exactly; `chartDrillKeys(chartData, category,
+  series)` turns a chart click into `{ rowKey, colKey, label }`.
+
+  The dialog has its own
   **Export…**, **Print** and **Copy** controls (respecting `permissions.allowExport`), so the
   records behind a cell can leave the app as CSV/TSV/Excel/HTML/JSON:
 
@@ -554,6 +574,11 @@ windowing; `editing.test.tsx` covers the inline cell editing write-back. Date an
 conditional filters, group-condition (subquery) filters, the report-filter-area toggle and the
 chart filter controls are covered in `pivot-core.test.ts`, `PivotStudio.test.tsx` and
 `engines/mock-api.test.ts` (the last one over the REST contract).
+
+`drillthrough.test.tsx` covers drill-through end to end: the slice helpers (projection,
+sorting, row cap), the local engine and the REST contract (including the uncapped `total`),
+chart drill keys and clicking through from the chart, plus the dialog's column sorting and
+built-in field list.
 
 `charts.test.tsx` covers the chart layer: stacked columns, the combined column + line chart,
 axis and legend drill (including the drill breadcrumbs), legend series hiding, axis-click

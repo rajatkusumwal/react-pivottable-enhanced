@@ -100,6 +100,61 @@ export function buildChartData(rows: PivotRow[], config: PivotConfig): ChartData
 }
 
 
+/**
+ * Turns a chart click into the drill-through keys the engine expects.
+ * The axis drill path plus the clicked category form the row key; the legend
+ * drill path plus the clicked series form the column key (series are only real
+ * column members when the report has column fields).
+ */
+export function chartDrillKeys(
+  chart: Pick<ChartData, "categoryPath" | "seriesPath" | "categoryField" | "seriesField">,
+  category: string,
+  series?: string,
+): { rowKey: string[]; colKey: string[]; label: string } {
+  const rowKey = chart.categoryField ? [...chart.categoryPath, category] : [...chart.categoryPath];
+  const colKey =
+    chart.seriesField && series ? [...chart.seriesPath, series] : [...chart.seriesPath];
+  const label = [...rowKey, ...colKey].filter(Boolean).join(" · ") || category;
+  return { rowKey, colKey, label };
+}
+
+/** Columns available in a drill-through record set. */
+export function drillColumns(rows: PivotRow[]): string[] {
+  return [...new Set(rows.flatMap((r) => Object.keys(r)))];
+}
+
+/**
+ * Applies the drill-through slice: column projection, sorting and the row cap.
+ * Shared by the local engine, the mock REST API and the dialog.
+ */
+export function applyDrillSlice(
+  rows: PivotRow[],
+  slice: { fields?: string[] | undefined; sort?: { field: string; dir: "asc" | "desc" } | undefined; maxRows?: number | undefined } = {},
+): PivotRow[] {
+  let out = rows;
+  const sort = slice.sort;
+  if (sort?.field) {
+    const dir = sort.dir === "desc" ? -1 : 1;
+    out = [...out].sort((a, b) => {
+      const x = a[sort.field];
+      const y = b[sort.field];
+      if (typeof x === "number" && typeof y === "number") return (x - y) * dir;
+      return String(x ?? "").localeCompare(String(y ?? "")) * dir;
+    });
+  }
+  const fields = slice.fields?.filter(Boolean) ?? [];
+  if (fields.length) {
+    out = out.map((r) => {
+      const picked: PivotRow = {};
+      for (const f of fields) picked[f] = r[f] as PivotRow[string];
+      return picked;
+    });
+  }
+  const max = slice.maxRows;
+  if (typeof max === "number" && max >= 0 && out.length > max) out = out.slice(0, max);
+  return out;
+}
+
 export interface DrillSelection {
   rowField?: string | undefined;
   rowValue?: string | undefined;

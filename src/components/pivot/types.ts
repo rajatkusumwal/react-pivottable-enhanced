@@ -240,6 +240,16 @@ export interface ChartConfig {
   lineSeries?: string[];
 }
 
+/** Drill-through slice: which columns come back, how they are sorted and capped. */
+export interface DrillThroughConfig {
+  /** Columns shown in the drill-through view, in order. Empty = every source field. */
+  fields?: string[];
+  /** Hard cap on the number of records fetched and shown. */
+  maxRows?: number;
+  /** Initial column sorting inside the drill-through view. */
+  sort?: { field: string; dir: "asc" | "desc" } | undefined;
+}
+
 export interface Permissions {
   /** Only these fields may be used (when provided). */
   allowedFields?: string[];
@@ -301,6 +311,8 @@ export interface PivotConfig {
   locale: string;
   theme: PivotTheme;
   chart: ChartConfig;
+  /** Drill-through slice configuration (columns, sorting, row cap). */
+  drillThrough: DrillThroughConfig;
 }
 
 
@@ -350,6 +362,7 @@ export function createDefaultConfig(partial: Partial<PivotConfig> = {}): PivotCo
       drillCols: [],
       hiddenSeries: [],
     },
+    drillThrough: { fields: [], maxRows: 1000 },
     ...partial,
   };
 }

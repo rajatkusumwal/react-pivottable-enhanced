@@ -1,6 +1,8 @@
-import { Copy, Download, Printer, X } from "lucide-react";
+import { useMemo, useState } from "react";
+import { ArrowDown, ArrowUp, Columns3, Copy, Download, Printer, X } from "lucide-react";
 import type { PivotStrings } from "../locales";
 import type { PivotRow } from "../types";
+import { applyDrillSlice, drillColumns } from "../analysis";
 import { copyMatrix, exportMatrix, matrixFromRows, printMatrix } from "../export";
 import type { ExportDecoration, ExportFormat } from "../export";
 
@@ -15,6 +17,17 @@ export interface DrillThroughDialogProps {
   /** Header & footer printed on the drill-through export. */
   decoration?: ExportDecoration;
   onStatus?: (message: string) => void;
+  /** Columns of the configured slice; empty = every field in the records. */
+  fields?: string[];
+  /** Persists a change made with the drill-through field list. */
+  onFieldsChange?: ((fields: string[]) => void) | undefined;
+  /** Row cap applied when the records were fetched. */
+  maxRows?: number;
+  /** Total number of matching records before the cap (when the engine reports it). */
+  total?: number;
+  /** Initial column sorting. */
+  sort?: { field: string; dir: "asc" | "desc" } | undefined;
+  onSortChange?: (sort: { field: string; dir: "asc" | "desc" } | undefined) => void;
 }
 
 const btn =
@@ -29,10 +42,49 @@ export function DrillThroughDialog({
   canExport = true,
   decoration = {},
   onStatus,
+  fields = [],
+  onFieldsChange,
+  maxRows,
+  total,
+  sort,
+  onSortChange,
 }: DrillThroughDialogProps) {
+  const [localSort, setLocalSort] = useState(sort);
+  const [fieldsOpen, setFieldsOpen] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const allColumns = useMemo(() => drillColumns(rows), [rows]);
+  const columns = useMemo(() => {
+    const picked = fields.filter((f) => allColumns.includes(f));
+    return picked.length ? picked : allColumns;
+  }, [fields, allColumns]);
+  const visible = useMemo(
+    () => applyDrillSlice(rows, { fields: columns, sort: localSort }),
+    [rows, columns, localSort],
+  );
+
   if (!open) return null;
-  const columns = [...new Set(rows.flatMap((r) => Object.keys(r)))];
-  const matrix = () => matrixFromRows(rows, `${title || "Drill-through"}`, decoration);
+
+  const matrix = () => matrixFromRows(visible, `${title || "Drill-through"}`, decoration);
+
+  const toggleSort = (field: string) => {
+    const next: { field: string; dir: "asc" | "desc" } | undefined =
+      localSort?.field !== field
+        ? { field, dir: "asc" }
+        : localSort.dir === "asc"
+          ? { field, dir: "desc" }
+          : undefined;
+    setLocalSort(next);
+    onSortChange?.(next);
+  };
+
+  const toggleField = (field: string) => {
+    const current = columns;
+    const next = current.includes(field)
+      ? current.filter((f) => f !== field)
+      : [...allColumns.filter((f) => current.includes(f) || f === field)];
+    onFieldsChange?.(next.length === allColumns.length ? [] : next);
+  };
 
   return (
     <div
@@ -51,9 +103,62 @@ export function DrillThroughDialog({
             <h2 className="text-sm font-semibold">{title}</h2>
             <p className="text-xs text-muted-foreground">
               {rows.length} {strings.records}
+              {typeof total === "number" && total > rows.length ? ` of ${total}` : ""}
+              {typeof maxRows === "number" && rows.length >= maxRows
+                ? ` · limited to ${maxRows}`
+                : ""}
+              {` · ${columns.length} of ${allColumns.length} columns`}
             </p>
           </div>
           <div className="flex items-center gap-1.5">
+            <div className="relative">
+              <button
+                type="button"
+                className={btn}
+                aria-expanded={fieldsOpen}
+                onClick={() => setFieldsOpen((v) => !v)}
+              >
+                <Columns3 className="h-3.5 w-3.5" aria-hidden="true" />
+                Columns
+              </button>
+              {fieldsOpen && (
+                <div
+                  className="absolute right-0 z-10 mt-1 w-64 rounded-lg border border-border bg-card p-2 shadow-lg"
+                  aria-label="Drill-through field list"
+                  role="group"
+                >
+                  <input
+                    className="mb-2 w-full rounded border border-border bg-background px-2 py-1 text-xs"
+                    placeholder={`${strings.search}…`}
+                    aria-label="Search drill-through fields"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                  <div className="mb-2 flex gap-2 text-xs">
+                    <button type="button" className="underline" onClick={() => onFieldsChange?.([])}>
+                      Show all
+                    </button>
+                  </div>
+                  <ul className="max-h-56 space-y-1 overflow-auto">
+                    {allColumns
+                      .filter((c) => c.toLowerCase().includes(search.toLowerCase()))
+                      .map((c) => (
+                        <li key={c}>
+                          <label className="flex items-center gap-2 text-xs">
+                            <input
+                              type="checkbox"
+                              checked={columns.includes(c)}
+                              disabled={!onFieldsChange}
+                              onChange={() => toggleField(c)}
+                            />
+                            {c}
+                          </label>
+                        </li>
+                      ))}
+                  </ul>
+                </div>
+              )}
+            </div>
             {canExport && (
               <>
                 <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -114,14 +219,27 @@ export function DrillThroughDialog({
               <thead className="sticky top-0 bg-secondary">
                 <tr>
                   {columns.map((c) => (
-                    <th key={c} className="border-b border-border px-3 py-2 text-left font-semibold">
-                      {c}
+                    <th key={c} className="border-b border-border px-0 py-0 text-left font-semibold">
+                      <button
+                        type="button"
+                        className="flex w-full items-center gap-1 px-3 py-2 text-left hover:bg-accent"
+                        aria-label={`Sort by ${c}`}
+                        onClick={() => toggleSort(c)}
+                      >
+                        {c}
+                        {localSort?.field === c &&
+                          (localSort.dir === "asc" ? (
+                            <ArrowUp className="h-3 w-3" aria-hidden="true" />
+                          ) : (
+                            <ArrowDown className="h-3 w-3" aria-hidden="true" />
+                          ))}
+                      </button>
                     </th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {rows.slice(0, 500).map((row, i) => (
+                {visible.map((row, i) => (
                   <tr key={i} className={i % 2 ? "bg-secondary/40" : ""}>
                     {columns.map((c) => (
                       <td key={c} className="border-b border-border px-3 py-1.5">
