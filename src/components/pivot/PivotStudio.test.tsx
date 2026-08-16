@@ -447,7 +447,7 @@ describe("PivotStudio field list and measures", () => {
     renderHier();
     await user.click(screen.getByLabelText("Add all levels of Geography to rows"));
     await waitFor(() =>
-      expect(screen.getByTestId("grid-field-bar")).toHaveTextContent("City"),
+      expect(screen.getByTestId("field-chip-chip:rows:city")).toBeInTheDocument(),
     );
   });
 
@@ -455,7 +455,10 @@ describe("PivotStudio field list and measures", () => {
     const user = userEvent.setup();
     renderHier();
     await user.selectOptions(screen.getByLabelText("Place City"), "rows");
-    await waitFor(() => expect(screen.getByTestId("grid-field-bar")).toHaveTextContent("city"));
+    await waitFor(() =>
+      expect(screen.getByTestId("field-chip-chip:rows:city")).toBeInTheDocument(),
+    );
+    expect(screen.getByTestId("field-chip-chip:rows:region")).toBeInTheDocument();
   });
 
   it("searches the field list and collapses every group", async () => {
@@ -500,10 +503,9 @@ describe("PivotStudio field list and measures", () => {
         fieldsUi="sidebar"
       />,
     );
-    const bar = screen.getByTestId("grid-field-bar");
-    expect(bar).toHaveTextContent("Sum of revenue");
-    expect(bar).toHaveTextContent("Average of revenue");
-    expect(bar).toHaveTextContent("Distinct count of city");
+    expect(screen.getByTestId("field-chip-chip:values:revenue#0")).toBeInTheDocument();
+    expect(screen.getByTestId("field-chip-chip:values:revenue#1")).toBeInTheDocument();
+    expect(screen.getByTestId("field-chip-chip:values:city#2")).toBeInTheDocument();
     // The same field twice gets its own aggregation menu.
     expect(screen.getByLabelText("Aggregation for revenue")).toBeInTheDocument();
     expect(screen.getByLabelText("Aggregation for revenue (2)")).toBeInTheDocument();
