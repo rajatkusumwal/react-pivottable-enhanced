@@ -120,6 +120,7 @@ export function PivotStudio({
       layout: config.layout,
       collapsed: config.collapsed,
       sort: config.sort,
+      sorts: config.layout === "flat" ? config.sorts : undefined,
       locale: config.locale,
       datasetId: activeDatasetId,
     }),
@@ -262,7 +263,10 @@ export function PivotStudio({
             showSortingControls={config.showSortingControls}
             showRowTotals={config.showRowTotals}
             sort={config.sort}
-            onSortChange={(sort) => update({ sort })}
+            sorts={config.layout === "flat" ? config.sorts : undefined}
+            multiSort={config.layout === "flat"}
+            onSortChange={(sort) => update({ sort, sorts: sort ? [sort] : [] })}
+            onSortsChange={(sorts) => update({ sorts, sort: sorts[0] })}
             onToggleCollapse={toggleCollapse}
             conditionalFormats={config.conditionalFormats}
             allowDrillThrough={allowDrillThrough}

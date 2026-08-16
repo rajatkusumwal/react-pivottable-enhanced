@@ -18,6 +18,7 @@ import {
   type PivotMeasure,
   type PivotQuery,
   type PivotResult,
+  type PivotSort,
 } from "../result";
 
 interface TreeNode {
@@ -141,22 +142,33 @@ export function buildLocalResult(rows: PivotRow[], query: PivotQuery): PivotResu
       ? cellValue(rows, indexes, null, measure)
       : cellValue(rows, indexes, colIndexSets[colIndex] ?? null, measure);
 
-  const sortChildren = (children: TreeNode[]) => {
-    if (!query.sort) return children;
-    const dir = query.sort.direction === "asc" ? 1 : -1;
-    const list = [...children];
-    if (query.sort.by === "rows") list.sort((a, b) => dir * sortMembers(a.label, b.label));
-    else {
-      const col = query.sort.by;
-      list.sort(
-        (a, b) =>
-          dir *
-          ((columnValue(a.rowIndexes, col) ?? -Infinity) -
-            (columnValue(b.rowIndexes, col) ?? -Infinity)),
-      );
-    }
-    return list;
+  /** Multi-column sort: `sorts` wins, otherwise the single `sort`. */
+  const activeSorts = query.sorts?.length ? query.sorts : query.sort ? [query.sort] : [];
+
+  const compareBy = (a: TreeNode, b: TreeNode, sort: PivotSort, label: (n: TreeNode) => string) => {
+    const dir = sort.direction === "asc" ? 1 : -1;
+    if (sort.by === "rows") return dir * sortMembers(label(a), label(b));
+    return (
+      dir *
+      ((columnValue(a.rowIndexes, sort.by) ?? -Infinity) -
+        (columnValue(b.rowIndexes, sort.by) ?? -Infinity))
+    );
   };
+
+  const sortNodes = (nodes: TreeNode[], sorts: PivotSort[], label: (n: TreeNode) => string) => {
+    if (!sorts.length) return nodes;
+    return [...nodes].sort((a, b) => {
+      for (const sort of sorts) {
+        const cmp = compareBy(a, b, sort, label);
+        if (cmp !== 0) return cmp;
+      }
+      return 0;
+    });
+  };
+
+  // Nested layouts sort each level by the primary sort only.
+  const sortChildren = (children: TreeNode[]) =>
+    sortNodes(children, activeSorts.slice(0, 1), (n) => n.label);
 
   const walk = (node: TreeNode, depth: number) => {
     for (const child of sortChildren(node.children)) {
@@ -196,7 +208,8 @@ export function buildLocalResult(rows: PivotRow[], query: PivotQuery): PivotResu
   };
 
   if (flat) {
-    for (const leaf of query.rows.length ? flattenLeaves(rowTree) : []) {
+    const leaves = query.rows.length ? flattenLeaves(rowTree) : [];
+    for (const leaf of sortNodes(leaves, activeSorts, (n) => n.path.join(" / "))) {
       rowNodes.push({
         header: {
           key: leaf.path,

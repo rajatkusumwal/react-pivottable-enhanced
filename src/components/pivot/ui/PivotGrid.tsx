@@ -38,7 +38,12 @@ export interface PivotGridProps {
   showSortingControls?: boolean;
   showRowTotals?: boolean;
   sort?: PivotSort | undefined;
+  /** Active multi-column sort (flat layout). */
+  sorts?: PivotSort[] | undefined;
+  /** Enables shift-click to add a column to the sort. */
+  multiSort?: boolean;
   onSortChange?: (sort: PivotSort | undefined) => void;
+  onSortsChange?: (sorts: PivotSort[]) => void;
   onToggleCollapse?: (key: string[]) => void;
   conditionalFormats?: ConditionalFormatRule[];
   allowDrillThrough?: boolean;
@@ -83,7 +88,10 @@ export function PivotGrid({
   showSortingControls = true,
   showRowTotals = true,
   sort,
+  sorts,
+  multiSort = false,
   onSortChange,
+  onSortsChange,
   onToggleCollapse,
   conditionalFormats = [],
   allowDrillThrough = true,
@@ -212,11 +220,37 @@ export function PivotGrid({
     window.addEventListener("mouseup", onUp);
   };
 
-  const toggleSort = (by: PivotSort["by"]) => {
+  const activeSorts: PivotSort[] = sorts?.length ? sorts : sort ? [sort] : [];
+  const sortIndexOf = (by: PivotSort["by"]) => activeSorts.findIndex((s) => s.by === by);
+  const sortFor = (by: PivotSort["by"]) => activeSorts.find((s) => s.by === by);
+
+  const toggleSort = (by: PivotSort["by"], additive = false) => {
+    // Shift-click in the flat layout appends the column to the sort order.
+    if (additive && multiSort && onSortsChange) {
+      const index = sortIndexOf(by);
+      if (index === -1) {
+        onSortsChange([...activeSorts, { by, direction: "asc" }]);
+        return;
+      }
+      const current = activeSorts[index]!;
+      const next = [...activeSorts];
+      if (current.direction === "asc") next[index] = { by, direction: "desc" };
+      else next.splice(index, 1);
+      onSortsChange(next);
+      return;
+    }
     if (!onSortChange) return;
-    if (sort?.by === by) {
-      onSortChange(sort.direction === "asc" ? { by, direction: "desc" } : undefined);
+    const current = sortFor(by);
+    if (current && activeSorts.length === 1) {
+      onSortChange(current.direction === "asc" ? { by, direction: "desc" } : undefined);
     } else onSortChange({ by, direction: "asc" });
+  };
+
+  const sortGlyph = (by: PivotSort["by"]) => {
+    const index = sortIndexOf(by);
+    if (index === -1) return "↕";
+    const arrow = activeSorts[index]!.direction === "asc" ? "▲" : "▼";
+    return activeSorts.length > 1 ? `${arrow}${index + 1}` : arrow;
   };
 
   const formatCell = (value: number | null) =>
@@ -364,9 +398,13 @@ export function PivotGrid({
                     className="pivot-corner sticky left-0 z-20 text-left"
                   >
                     {showSortingControls && onSortChange ? (
-                      <button type="button" onClick={() => toggleSort("rows")} className="font-medium">
+                      <button
+                        type="button"
+                        onClick={(e) => toggleSort("rows", e.shiftKey)}
+                        className="font-medium"
+                      >
                         {result.rowFields.join(" / ") || result.measure.caption}
-                        {sort?.by === "rows" ? (sort.direction === "asc" ? " ▲" : " ▼") : ""}
+                        {sortIndexOf("rows") === -1 ? "" : ` ${sortGlyph("rows")}`}
                       </button>
                     ) : (
                       (result.rowFields.join(" / ") || result.measure.caption)
@@ -405,11 +443,13 @@ export function PivotGrid({
                   <span className="flex items-center justify-end gap-1">
                     <button
                       type="button"
-                      aria-label={`Sort by ${leaf.label}`}
-                      onClick={() => toggleSort(i)}
+                      aria-label={
+                        multiSort ? `Sort by ${leaf.label} (shift-click to add)` : `Sort by ${leaf.label}`
+                      }
+                      onClick={(e) => toggleSort(i, e.shiftKey)}
                       className="text-[10px] text-muted-foreground hover:text-foreground"
                     >
-                      {sort?.by === i ? (sort.direction === "asc" ? "▲" : "▼") : "↕"}
+                      {sortGlyph(i)}
                     </button>
                     <span
                       role="separator"
