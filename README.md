@@ -46,6 +46,23 @@ define: { global: "globalThis" }
 | `config` / `onConfigChange` | `PivotConfig` | Fully controlled mode |
 | `permissions` | `Permissions` | Export / drill-through / edit / field masking |
 | `showSidebar`, `showToolbar` | `boolean` | Hide chrome if the host app supplies its own |
+| `fieldsUi` | `"dialog" \| "sidebar"` | `"dialog"` (default) gives the Flexmonster look: a field bar above the grid plus a popup field list. `"sidebar"` docks the panel on the left |
+
+### Flexmonster-style field list
+
+Users coming from Flexmonster get the familiar layout out of the box:
+
+- a toolbar **Fields** button and an in-grid field bar showing Report filters / Columns / Rows / Measures;
+- a popup field list with a searchable source list and four drop zones;
+- drag & drop of fields between zones (powered by `@dnd-kit`), plus a keyboard/select fallback on every field;
+- member checklists on filter chips ("Select all" + search), aggregation and "show value as" menus on each measure;
+- a compact grid skin (`.pivot-fm`) with 1px grid lines and grey headers, applied to both engines.
+
+```tsx
+<PivotStudio engine="react-pivottable" data={rows} fields={fields} fieldsUi="dialog" />
+```
+
+Lower-level pieces are exported too: `FieldListPanel`, `FieldListDialog`, `GridFieldBar`, `FieldChip`, `DropArea`, `MemberFilterPopover`, and the pure helpers `moveField`, `reorderField`, `removeField`, `areaOfField`.
 | `title`, `className` | `string` | Presentation |
 
 ## Feature map
