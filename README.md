@@ -153,7 +153,36 @@ other than Tailwind tokens (`--color-border`, `--color-card`, …) and `@/lib/ut
     },
   ];
   ```
-* **Charts** — Recharts bar / stacked / line / area / pie with click-to-drill.
+* **Charts** — Recharts columns / stacked columns / columns + line / line / area / pie with
+  click-to-drill, a drillable axis and legend, chart-level filtering and a split view:
+
+  ```ts
+  config.chart = {
+    visible: true,
+    type: "stackedBar",     // "bar" | "stackedBar" | "columnLine" | "line" | "area" | "pie"
+    position: "right",      // "bottom" (default) or "right" = split view, grid + chart together
+    drillRows: ["West"],    // axis drilled into the 2nd row field, filtered to West
+    drillCols: [],          // legend drill path along config.cols
+    hiddenSeries: ["2025"], // series hidden from the legend (chart-only filtering)
+    lineSeries: ["Target"], // series drawn as lines in the "columnLine" chart
+  };
+  ```
+
+  * **Drillable axis / legend** — the axis walks `config.rows` and the legend walks
+    `config.cols`. Clicking an axis label pushes that member onto `chart.drillRows` and shows
+    the next level; clicking a legend entry does the same for `chart.drillCols`. The
+    breadcrumb bar above the chart (`ChartDrillBar`) walks back up.
+  * **Interactive filtering** — at the deepest legend level a legend click toggles the series
+    in `chart.hiddenSeries` (chart only, report untouched); at the deepest axis level an axis
+    click writes a `values` filter for that field into `config.filters`, so the grid, exports
+    and the backend query follow. The member filter buttons above the chart
+    (`config.showChartFilters`) do the same explicitly.
+  * **Split view** — `chart.position: "right"` renders grid and chart side by side (stacked on
+    small screens); the toolbar exposes it as "Split view (side by side)".
+  * `buildChartData(rows, config)` returns `{ data, series, allSeries, categoryField,
+    seriesField, canDrillCategory, canDrillSeries, categoryPath, seriesPath }`, so a backend
+    can build the same payload: send `chart.drillRows` / `drillCols` as extra equality filters
+    and `rows[drillRows.length]` / `cols[drillCols.length]` as the group-by fields.
 * **Drill-through** — click any number to inspect the source records. The dialog has its own
   **Export…**, **Print** and **Copy** controls (respecting `permissions.allowExport`), so the
   records behind a cell can leave the app as CSV/TSV/Excel/HTML/JSON:
@@ -525,6 +554,10 @@ windowing; `editing.test.tsx` covers the inline cell editing write-back. Date an
 conditional filters, group-condition (subquery) filters, the report-filter-area toggle and the
 chart filter controls are covered in `pivot-core.test.ts`, `PivotStudio.test.tsx` and
 `engines/mock-api.test.ts` (the last one over the REST contract).
+
+`charts.test.tsx` covers the chart layer: stacked columns, the combined column + line chart,
+axis and legend drill (including the drill breadcrumbs), legend series hiding, axis-click
+report filtering and the grid + chart split view.
 
 `report-link.test.ts` covers report sharing (encode/decode round-trip, URL building, corrupt
 tokens) and `reporting-ui.test.tsx` covers the reporting UX end to end: export headers and
