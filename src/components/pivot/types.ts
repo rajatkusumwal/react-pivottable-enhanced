@@ -264,6 +264,8 @@ export function createDefaultConfig(partial: Partial<PivotConfig> = {}): PivotCo
     showSortingControls: true,
     showReportFilterArea: true,
     showChartFilters: true,
+    showAggregationIcon: true,
+
     dragAndDrop: true,
     editing: false,
     locale: "en",
