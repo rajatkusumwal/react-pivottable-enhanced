@@ -2,7 +2,7 @@
   "name": "inhouse-grid-monster-site",
   "version": "1.0.0",
   "private": true,
-  "description": "Demo site and documentation for inhouse-grid-monster, a Flexmonster-like React pivot table component.",
+  "description": "Demo site and documentation for inhouse-grid-monster; the pivot table library source lives in standalone/src/pivot.",
   "license": "MIT",
   "sideEffects": false,
   "type": "module",
@@ -16,6 +16,8 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:package": "vitest run --config vitest.package.config.ts",
+    "lib:build": "cd standalone && vite build && tsc -p tsconfig.build.json && node scripts/copy-css.mjs",
+    "lib:typecheck": "tsc -p standalone/tsconfig.build.json --noEmit",
     "test:watch": "vitest",
     "format": "prettier --write ."
   },
