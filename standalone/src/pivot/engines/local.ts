@@ -77,7 +77,7 @@ const measureFromValue = (value: ValueDef): PivotMeasure => ({
 });
 
 /** Every measure in report order; the same field may appear with several aggregations. */
-export function measuresOf(values: ValueDef[]): PivotMeasure[] {
+function measuresOf(values: ValueDef[]): PivotMeasure[] {
   if (!values.length) {
     return [{ field: "", caption: "Count", aggregator: "count", type: "number" }];
   }
@@ -560,4 +560,3 @@ export function createLocalEngine(): PivotEngineAdapter {
   };
 }
 
-export { KEY_SEP };

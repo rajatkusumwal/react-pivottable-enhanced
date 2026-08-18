@@ -15,7 +15,7 @@ const isoLike = /^\d{4}-\d{2}-\d{2}([T ].*)?$/;
  * instances into a UTC-midnight timestamp so comparisons happen at day granularity.
  * Returns NaN when the value is not a date.
  */
-export function parseDate(value: unknown): number {
+function parseDate(value: unknown): number {
   if (value instanceof Date) return Math.floor(value.getTime() / DAY) * DAY;
   if (typeof value === "number" && Number.isFinite(value)) {
     return Math.floor(value / DAY) * DAY;
