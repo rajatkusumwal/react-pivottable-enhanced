@@ -23,21 +23,25 @@ const y = (note?: string): Cell => ({ s: "yes", ...(note ? { note } : {}) });
 const p = (note?: string): Cell => ({ s: "partial", ...(note ? { note } : {}) });
 const n = (note?: string): Cell => ({ s: "no", ...(note ? { note } : {}) });
 
-export const products = [
+export const products: {
+  key: "commercial" | "reactPivottable" | "studio";
+  name: string;
+  subtitle: string;
+  url?: string;
+}[] = [
   {
-    key: "commercial" as const,
+    key: "commercial",
     name: "Commercial pivot table",
     subtitle: "Commercial • from $799/yr",
-    url: "https://www.commercial.com/technical-specifications/",
   },
   {
-    key: "reactPivottable" as const,
+    key: "reactPivottable",
     name: "react-pivottable",
     subtitle: "Open source • MIT",
     url: "https://react-pivottable.js.org/",
   },
   {
-    key: "studio" as const,
+    key: "studio",
     name: "inhouse-grid-monster",
     subtitle: "Free • in-house React grid",
     url: "/demos",
