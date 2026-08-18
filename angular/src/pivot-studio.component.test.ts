@@ -187,7 +187,10 @@ describe("<pivot-studio>", () => {
   it("maps every React prop onto an input or an output", () => {
     const reactProps = propNamesOf(
       readFileSync(
-        resolve(dirname(fileURLToPath(import.meta.url)), "../../standalone/src/pivot/PivotStudio.tsx"),
+        resolve(
+          dirname(fileURLToPath(import.meta.url)),
+          "../../standalone/src/pivot/PivotStudio.tsx",
+        ),
         "utf-8",
       ),
     );
@@ -210,4 +213,3 @@ function propNamesOf(source: string): string[] {
   const body = source.split("export interface PivotStudioProps {")[1]?.split("\n}")[0] ?? "";
   return [...body.matchAll(/^ {2}(\w+)\??:/gm)].map((m) => m[1] as string);
 }
-
