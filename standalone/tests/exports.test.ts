@@ -53,14 +53,19 @@ describe("package entry point", () => {
   });
 
   it("produces a usable default config", () => {
-    const config = pkg.createDefaultConfig(pkg.sampleFields);
-    expect(config.fields.length).toBe(pkg.sampleFields.length);
-    expect(Array.isArray(config.rows)).toBe(true);
+    const config = pkg.createDefaultConfig({ rows: ["region"] });
+    expect(config.rows).toEqual(["region"]);
+    expect(config.layout).toBe("compact");
+    expect(Array.isArray(config.values)).toBe(true);
   });
 
   it("computes a result from sample data through the local engine", async () => {
     const engine = pkg.createLocalEngine();
-    const config = pkg.createDefaultConfig(pkg.sampleFields);
+    const config = pkg.createDefaultConfig({
+      rows: ["region"],
+      cols: ["category"],
+      values: [{ field: "revenue", aggregator: "sum" }],
+    });
     const result = await engine.query(queryFrom(config), pkg.sampleData);
     expect(result.rowHeaders.length).toBeGreaterThan(0);
     expect(result.meta.source).toBe("local");
@@ -68,7 +73,11 @@ describe("package entry point", () => {
 
   it("survives an empty dataset without throwing", async () => {
     const engine = pkg.createLocalEngine();
-    const config = pkg.createDefaultConfig(pkg.sampleFields);
+    const config = pkg.createDefaultConfig({
+      rows: ["region"],
+      cols: ["category"],
+      values: [{ field: "revenue", aggregator: "sum" }],
+    });
     const result = await engine.query(queryFrom(config), []);
     expect(result.cells).toBeDefined();
     expect(result.sourceCount).toBe(0);
@@ -78,7 +87,7 @@ describe("package entry point", () => {
 function queryFrom(config: pkg.PivotConfig): pkg.PivotQuery {
   return {
     rows: config.rows,
-    cols: config.columns,
+    cols: config.cols,
     values: config.values,
     filters: config.filters,
     showSubTotals: true,
