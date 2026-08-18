@@ -67,7 +67,9 @@ describe("local engine performance", () => {
 
   it(`filters 100k rows in under ${FILTER_100K_MS}ms`, () => {
     const { value, ms } = timed(() =>
-      applyFilters(rows, [{ field: "region", operator: "eq", value: "North" }]),
+      applyFilters(rows, [
+        { kind: "values", field: "region", mode: "include", members: ["North"] },
+      ]),
     );
     expect(value.length).toBe(25_000);
     expect(ms).toBeLessThan(FILTER_100K_MS);
