@@ -141,8 +141,10 @@ const toc = [
   ["props", "Props"],
   ["backend", "Backend aggregation"],
   ["ssr", "Next.js / SSR"],
+  ["angular", "Angular"],
   ["publish", "Publish your own copy"],
 ];
+
 
 /** Report configs used by the live examples below; each one matches its code sample. */
 const exampleConfigs = {
