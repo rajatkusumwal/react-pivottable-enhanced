@@ -13,7 +13,12 @@ export const distDir = join(packageDir, "dist");
 let running: Promise<void> | undefined;
 
 function run(command: string, args: string[]) {
-  execFileSync(command, args, { cwd: packageDir, stdio: "pipe" });
+  execFileSync(command, args, {
+    cwd: packageDir,
+    stdio: "pipe",
+    // Vitest sets NODE_ENV=test, which would give us a dev (jsxDEV) bundle.
+    env: { ...process.env, NODE_ENV: "production" },
+  });
 }
 
 /** sync -> emit declarations -> bundle -> copy CSS (mirrors `npm run build`). */
@@ -21,7 +26,7 @@ export function buildPackage(): Promise<void> {
   running ??= (async () => {
     run(process.execPath, [join(packageDir, "scripts", "sync-from-app.mjs")]);
     // vite build empties dist/, so it must run before the declarations land.
-    run("bunx", ["vite", "build"]);
+    run("bunx", ["vite", "build", "--mode", "production"]);
     run("bunx", ["tsc", "-p", "tsconfig.build.json"]);
     run(process.execPath, [join(packageDir, "scripts", "copy-css.mjs")]);
   })();
