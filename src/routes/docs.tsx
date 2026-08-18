@@ -333,10 +333,95 @@ function DocsPage() {
         </nav>
 
         <div className="mt-10 space-y-10">
-          <Section id="install" title="1. Install">
-            <p>One command. Everything the grid needs comes with it.</p>
-            <Code>npm i react-pivottable-enhanced</Code>
-            <table className="mt-4 w-full border-collapse text-sm">
+          <Section id="install" title="1. Install it in your app">
+            <p>
+              Pick your framework. Both tabs install the same pivot table and give you the same
+              screen — Angular just goes through a thin wrapper component.
+            </p>
+            <FrameworkTabs
+              value={framework}
+              onChange={setFramework}
+              labelledBy="install-framework-tabs"
+            />
+
+            {framework === "react" ? (
+              <div id="panel-react" role="tabpanel" aria-labelledby="tab-react">
+                <Code>npm i react-pivottable-enhanced</Code>
+                <Code label="Reports.tsx">{`import { PivotStudio, sampleData, sampleFields } from "react-pivottable-enhanced";
+import "react-pivottable-enhanced/styles.css";
+
+export function Reports() {
+  return (
+    <PivotStudio
+      data={sampleData}
+      fields={sampleFields}
+      title="Sales report"
+      onConfigChange={(config) => localStorage.setItem("layout", JSON.stringify(config))}
+    />
+  );
+}`}</Code>
+                <p>
+                  React 18.2+ or 19 works. The stylesheet import is the only styling step if you are
+                  not on Tailwind.
+                </p>
+              </div>
+            ) : (
+              <div id="panel-angular" role="tabpanel" aria-labelledby="tab-angular">
+                <Code>
+                  npm i react-pivottable-enhanced-angular react-pivottable-enhanced react react-dom
+                </Code>
+                <Code label="reports.component.ts">{`import { Component } from "@angular/core";
+import { PivotStudioComponent, sampleData, sampleFields } from "react-pivottable-enhanced-angular";
+
+@Component({
+  standalone: true,
+  imports: [PivotStudioComponent],
+  selector: "app-reports",
+  template: \`
+    <pivot-studio
+      [data]="data"
+      [fields]="fields"
+      title="Sales report"
+      (configChange)="saveLayout($event)"
+    ></pivot-studio>
+  \`,
+})
+export class ReportsComponent {
+  data = sampleData;
+  fields = sampleFields;
+  saveLayout(config: unknown) {
+    localStorage.setItem("layout", JSON.stringify(config));
+  }
+}`}</Code>
+                <p>
+                  Add the stylesheet once in <code>angular.json</code> under <code>styles</code>:{" "}
+                  <code>node_modules/react-pivottable-enhanced/dist/pivot-theme.css</code>.
+                </p>
+              </div>
+            )}
+
+            <figure className="mt-5 overflow-hidden rounded-xl border border-border bg-card">
+              <img
+                src={pivotScreenshot}
+                alt={
+                  framework === "react"
+                    ? "The pivot table rendered in a React app: toolbar, field areas and a grid of revenue by region and quarter"
+                    : "The same pivot table rendered inside an Angular app through the pivot-studio component"
+                }
+                width={1240}
+                height={385}
+                loading="lazy"
+                className="w-full"
+              />
+              <figcaption className="border-t border-border px-4 py-2 text-xs text-muted-foreground">
+                {framework === "react"
+                  ? "What the snippet above renders in a React app."
+                  : "The same screen in Angular — identical toolbar, fields and grid, because it is the same component."}
+              </figcaption>
+            </figure>
+
+            <h3 className="mt-6 text-base font-semibold text-foreground">What comes with it</h3>
+            <table className="mt-2 w-full border-collapse text-sm">
               <caption className="sr-only">Runtime dependencies and what they are used for</caption>
               <thead>
                 <tr className="border-b border-border text-left">
@@ -357,9 +442,20 @@ function DocsPage() {
                     <td className="py-2 text-muted-foreground">{use}</td>
                   </tr>
                 ))}
+                {framework === "angular" ? (
+                  <tr className="border-b border-border/60 align-top">
+                    <th scope="row" className="py-2 pr-4 text-left font-normal text-foreground">
+                      <code>@angular/core, @angular/common (16+)</code>
+                    </th>
+                    <td className="py-2 text-muted-foreground">
+                      peer dependencies — your Angular app is used
+                    </td>
+                  </tr>
+                ) : null}
               </tbody>
             </table>
           </Section>
+
 
           <Section id="quick-start" title="2. Quick start">
             <p>Render the component with your rows. That is the whole integration.</p>
