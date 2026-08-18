@@ -666,6 +666,7 @@ export class ReportsComponent {
           </Section>
 
           <Section id="publish" title="9. Publish your own copy">
+            <p>
 
               To ship a private build, the <code>standalone/</code> folder in this repo is the
               package: it syncs the component source, emits types and bundles ESM with React kept
