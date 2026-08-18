@@ -13,7 +13,8 @@
   "sideEffects": false,
   "type": "module",
   "workspaces": [
-    "standalone"
+    "standalone",
+    "angular"
   ],
   "scripts": {
     "dev": "vite dev",
@@ -28,6 +29,8 @@
     "test:package": "vitest run --config vitest.package.config.ts",
     "lib:build": "cd standalone && vite build && tsc -p tsconfig.build.json && node scripts/copy-css.mjs",
     "lib:typecheck": "tsc -p standalone/tsconfig.build.json --noEmit",
+    "angular:build": "cd angular && tsc -p tsconfig.build.json",
+    "angular:typecheck": "tsc -p angular/tsconfig.build.json --noEmit",
     "test:watch": "vitest",
     "format": "prettier --write ."
   },
