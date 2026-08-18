@@ -22,6 +22,7 @@ export default defineConfig({
       "src/**/*.test.{ts,tsx}",
       "standalone/src/**/*.test.{ts,tsx}",
       "standalone/tests/package.test.ts",
+      "angular/src/**/*.test.ts",
     ],
     css: false,
     coverage: {
