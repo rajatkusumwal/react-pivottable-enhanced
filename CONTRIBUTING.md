@@ -63,7 +63,7 @@ bunx vitest run --config vitest.package.config.ts   # packaging tests
    - the normal case,
    - an edge case (empty input, one row, blanks/nulls),
    - the worst case (bad types, missing fields).
-   `standalone/src/pivot/edge-cases.test.ts` is the house style.
+     `standalone/src/pivot/edge-cases.test.ts` is the house style.
 5. If the change is user-visible, update `standalone/README.md` and the feature
    matrix in `src/lib/pivot-comparison.ts`.
 6. Run `bun run test`, `bunx tsgo --noEmit` and `bun run format` before opening
