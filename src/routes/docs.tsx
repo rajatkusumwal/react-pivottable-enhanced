@@ -239,7 +239,7 @@ function LiveExample({
       </div>
 
       {tab === "preview" ? (
-        <div className="mt-3">
+        <div className="mt-3 min-w-0 max-w-full overflow-x-auto">
           {mounted ? (
             children
           ) : (
