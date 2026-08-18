@@ -18,8 +18,7 @@ const toBase64 = (text: string): string => {
   for (const b of bytes) binary += String.fromCharCode(b);
   return typeof btoa === "function"
     ? btoa(binary)
-    : // eslint-disable-next-line no-undef
-      Buffer.from(text, "utf-8").toString("base64");
+    : Buffer.from(text, "utf-8").toString("base64");
 };
 
 const fromBase64 = (base64: string): string => {
@@ -28,7 +27,6 @@ const fromBase64 = (base64: string): string => {
     const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
     return new TextDecoder().decode(bytes);
   }
-  // eslint-disable-next-line no-undef
   return Buffer.from(base64, "base64").toString("utf-8");
 };
 

@@ -83,12 +83,12 @@ export const timeOperatorLabels: Partial<Record<ConditionOperator, string>> = {
 };
 
 /** True when the condition should be evaluated on the clock (seconds of day). */
-function useTimes(valueType: ConditionValueType | undefined, operator: ConditionOperator): boolean {
+function comparesAsTime(valueType: ConditionValueType | undefined, operator: ConditionOperator): boolean {
   return valueType === "time" && dateOperators.includes(operator);
 }
 
 /** True when the condition should be evaluated on the date timeline. */
-function useDates(
+function comparesAsDate(
   valueType: ConditionValueType | undefined,
   operator: ConditionOperator,
   raw: PivotValue,
@@ -111,8 +111,8 @@ export function matchesCondition(
 ): boolean {
   const text = String(raw ?? "").toLowerCase();
   const needle = String(value ?? "").toLowerCase();
-  const asTimes = useTimes(valueType, operator);
-  const asDates = !asTimes && useDates(valueType, operator, raw, value);
+  const asTimes = comparesAsTime(valueType, operator);
+  const asDates = !asTimes && comparesAsDate(valueType, operator, raw, value);
   const scale = asTimes ? parseTime : parseDate;
   const scaled = asTimes || asDates;
   const num = scaled ? scale(raw) : Number(raw);
