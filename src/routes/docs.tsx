@@ -1,7 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowLeft } from "lucide-react";
-import { PivotStudio, createDefaultConfig, sampleData, sampleFields } from "react-pivottable-enhanced";
+import {
+  PivotStudio,
+  createDefaultConfig,
+  sampleData,
+  sampleFields,
+} from "react-pivottable-enhanced";
 
 const TITLE = "react-pivottable-enhanced Docs: Install the React Pivot Table in Minutes";
 const DESCRIPTION =
@@ -295,7 +300,9 @@ function DocsPage() {
             Add the pivot table to your app
           </h1>
           <p className="mt-3 text-lg leading-relaxed text-muted-foreground">
-            <code className="rounded bg-surface px-1.5 py-0.5 text-base">react-pivottable-enhanced</code>{" "}
+            <code className="rounded bg-surface px-1.5 py-0.5 text-base">
+              react-pivottable-enhanced
+            </code>{" "}
             is one npm package and one CSS import. It ships five small runtime dependencies, uses
             Tailwind classes for layout, and needs no router, component library or backend.
           </p>
@@ -527,9 +534,9 @@ const config = createDefaultConfig({
 @source "../node_modules/react-pivottable-enhanced/dist";
 @import "react-pivottable-enhanced/styles.css";`}</Code>
             <p>
-              On Tailwind v3, add <code>./node_modules/react-pivottable-enhanced/dist/**/*.js</code> to{" "}
-              <code>content</code> and map the same token names in <code>theme.extend.colors</code>{" "}
-              — the package README has the exact block to paste.
+              On Tailwind v3, add <code>./node_modules/react-pivottable-enhanced/dist/**/*.js</code>{" "}
+              to <code>content</code> and map the same token names in{" "}
+              <code>theme.extend.colors</code> — the package README has the exact block to paste.
             </p>
           </Section>
 

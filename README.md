@@ -640,7 +640,11 @@ Results are tagged `meta.source: "backend"` and `meta.queryId: <id>`.
 ### Server-side aggregation of large datasets (1GB+)
 
 ```ts
-import { createServerAggregationEngine, shouldOffload, streamCsvRows } from "react-pivottable-enhanced";
+import {
+  createServerAggregationEngine,
+  shouldOffload,
+  streamCsvRows,
+} from "react-pivottable-enhanced";
 
 // Every query is answered by the service; records never reach the browser.
 const engine = createServerAggregationEngine({
@@ -826,11 +830,18 @@ Useful commands:
 
 ```bash
 bun run dev      # start the demo app
-bun run test     # run the whole suite once (vitest)
+bun run test     # run the whole suite once (vitest) — 341 tests
+bun run test:coverage # same, with coverage thresholds enforced
 bun run test:package  # slow: build the npm package and test the artifact
 bun run lint     # eslint + prettier rules
 bun run format   # rewrite files with prettier
 ```
+
+The suite covers core pivoting, edge cases, the grid UI, charts, drill-through,
+exports, the REST backend contract _and its failure paths_, accessibility and
+keyboard navigation, 100k-row performance budgets and reload persistence. See
+"What the suite covers" in [standalone/README.md](./standalone/README.md) for the
+file-by-file map.
 
 ### Testing the npm package
 
