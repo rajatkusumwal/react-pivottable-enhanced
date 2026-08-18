@@ -53,7 +53,9 @@ export function createMockPivotApi(options: MockPivotApiOptions): MockPivotApi {
   const run = (query: PivotQuery): PivotResult => {
     const source = applyFilters(rowsFor(query.datasetId), query.filters ?? []);
     const paged =
-      query.limit != null ? source.slice(query.offset ?? 0, (query.offset ?? 0) + query.limit) : source;
+      query.limit != null
+        ? source.slice(query.offset ?? 0, (query.offset ?? 0) + query.limit)
+        : source;
     const result = buildLocalResult(paged, query);
     return { ...result, meta: { source: "backend", queryId: `mock-${requests.length}` } };
   };
@@ -67,7 +69,10 @@ export function createMockPivotApi(options: MockPivotApiOptions): MockPivotApi {
     if (raw instanceof FormData) {
       uploads += 1;
       const id = `upload-${uploads}`;
-      datasets.set(id, initial.map((r) => ({ ...r })));
+      datasets.set(
+        id,
+        initial.map((r) => ({ ...r })),
+      );
       requests.push({ path, body: "multipart" });
       return json({ datasetId: id, rowCount: initial.length, fields });
     }
@@ -104,12 +109,20 @@ export function createMockPivotApi(options: MockPivotApiOptions): MockPivotApi {
       if (!uri) return json({ message: "uri is required" }, 400);
       uploads += 1;
       const id = `remote-${uploads}`;
-      datasets.set(id, initial.map((r) => ({ ...r })));
+      datasets.set(
+        id,
+        initial.map((r) => ({ ...r })),
+      );
       return json({ datasetId: id, rowCount: initial.length, fields });
     }
 
     if (path.endsWith("/members")) {
-      const { field, search = "", limit = MEMBER_PAGE_SIZE, datasetId } = body as {
+      const {
+        field,
+        search = "",
+        limit = MEMBER_PAGE_SIZE,
+        datasetId,
+      } = body as {
         field: string;
         search?: string;
         limit?: number;
@@ -140,7 +153,10 @@ export function createMockPivotApi(options: MockPivotApiOptions): MockPivotApi {
     datasets,
     reset() {
       datasets.clear();
-      datasets.set(mainId, initial.map((r) => ({ ...r })));
+      datasets.set(
+        mainId,
+        initial.map((r) => ({ ...r })),
+      );
       requests.length = 0;
       uploads = 0;
     },

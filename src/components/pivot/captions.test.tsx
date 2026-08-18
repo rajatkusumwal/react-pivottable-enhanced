@@ -37,9 +37,9 @@ describe("field captions", () => {
   });
 
   it("labels measures from their own caption first", () => {
-    expect(measureCaption({ field: "revenue", aggregator: "sum", caption: "Total sales" }, fields)).toBe(
-      "Total sales",
-    );
+    expect(
+      measureCaption({ field: "revenue", aggregator: "sum", caption: "Total sales" }, fields),
+    ).toBe("Total sales");
     expect(measureCaption({ field: "region", aggregator: "count" }, fields)).toBe("Region");
   });
 

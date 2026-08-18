@@ -65,7 +65,9 @@ export function FieldChip({
         )}
         {icon}
         <span className="min-w-0 flex-1 truncate font-medium text-foreground">{label}</span>
-        {hint && <span className="shrink-0 text-[10px] uppercase text-muted-foreground">{hint}</span>}
+        {hint && (
+          <span className="shrink-0 text-[10px] uppercase text-muted-foreground">{hint}</span>
+        )}
         {onFilter && (
           <button
             type="button"

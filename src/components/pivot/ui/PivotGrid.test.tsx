@@ -166,10 +166,7 @@ describe("multilevel column drill", () => {
 
   it("aggregates a collapsed column into a single leaf", () => {
     const expanded = buildLocalResult(data, query(colQuery));
-    const collapsed = buildLocalResult(
-      data,
-      query({ ...colQuery, collapsedCols: ["Bikes"] }),
-    );
+    const collapsed = buildLocalResult(data, query({ ...colQuery, collapsedCols: ["Bikes"] }));
     expect(collapsed.colLeaves.length).toBe(expanded.colLeaves.length - 2);
     expect(collapsed.colLeaves[0]!.label).toBe("Bikes");
     const northRow = collapsed.rowHeaders.findIndex((h) => h.label === "North");
@@ -290,9 +287,7 @@ describe("large results", () => {
       revenue: i,
     }));
     const result = buildLocalResult(many, query({ rows: ["region"], showSubTotals: false }));
-    render(
-      <PivotGrid result={result} layout="compact" locale="en" theme={defaultTheme} />,
-    );
+    render(<PivotGrid result={result} layout="compact" locale="en" theme={defaultTheme} />);
     const rendered = screen.getByTestId("pivot-grid").querySelectorAll("tbody tr");
     expect(result.rowHeaders.length).toBeGreaterThan(500);
     expect(rendered.length).toBeLessThan(result.rowHeaders.length);

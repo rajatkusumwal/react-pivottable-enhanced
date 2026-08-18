@@ -115,8 +115,6 @@
   --sidebar-ring: oklch(0.52 0.13 245);
 }
 
-
-
 .dark {
   --background: oklch(0.129 0.042 264.695);
   --foreground: oklch(0.984 0.003 247.858);
@@ -164,7 +162,6 @@
     -webkit-font-smoothing: antialiased;
   }
 }
-
 
 /* Flexmonster-like grid skin shared by both engines. */
 @layer components {

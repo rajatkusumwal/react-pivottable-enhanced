@@ -7,6 +7,7 @@ A single comparison page that lists Flexmonster's feature set down the left (Y a
 Replace the placeholder home page (`/`) with a comparison matrix page.
 
 **Layout**
+
 - Header: title, one-line intro, last-reviewed note, and links to each product's site.
 - Sticky comparison table:
   - Y axis (rows): Flexmonster feature names, grouped into collapsible/labelled category sections.
@@ -24,6 +25,7 @@ Grid, Filters, Field List, Aggregation functions, Calculated values, Pivot chart
 Roughly 120-150 individual feature rows across those groups, covering the full Flexmonster spec list rather than a highlights subset.
 
 **Comparison accuracy**
+
 - Flexmonster column: sourced from the official technical-specifications matrix.
 - react-pivottable: supports drag-and-drop pivot UI, aggregators, sorting, table/heatmap renderers, and Plotly chart renderers via an add-on; no export, no toolbar, no server-side data sources, no drill-through, no conditional formatting.
 - Orb.js: pivot grid with drag-and-drop, subtotals/grand totals, expand/collapse, sorting, filtering, basic themes, and Excel export via a plugin; no charts, no calculated fields UI, no server-side sources; project is unmaintained.

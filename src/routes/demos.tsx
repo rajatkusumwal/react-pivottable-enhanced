@@ -28,9 +28,21 @@ const startConfig = createDefaultConfig({
   collapsed: [],
   collapsedCols: [],
   values: [
-    { field: "revenue", aggregator: "sum", caption: "Revenue", format: { decimals: 0, currency: "USD" } },
+    {
+      field: "revenue",
+      aggregator: "sum",
+      caption: "Revenue",
+      format: { decimals: 0, currency: "USD" },
+    },
   ],
-  chart: { visible: false, type: "stackedBar", position: "bottom", drillRows: [], drillCols: [], hiddenSeries: [] },
+  chart: {
+    visible: false,
+    type: "stackedBar",
+    position: "bottom",
+    drillRows: [],
+    drillCols: [],
+    hiddenSeries: [],
+  },
 });
 
 function DemosPage() {
@@ -54,14 +66,13 @@ function DemosPage() {
           Install it in your app
         </Link>
 
-
         <h1 className="mt-6 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
           Try the free pivot table yourself
         </h1>
         <p className="mt-3 max-w-3xl text-lg leading-relaxed text-muted-foreground">
           This is the open-source engine dressed up to feel like the paid tool your team already
-          knows: drag fields around, expand rows, filter members, chart it side by side with the grid and export it. Load your
-          own CSV or JSON file too — it stays in your browser.
+          knows: drag fields around, expand rows, filter members, chart it side by side with the
+          grid and export it. Load your own CSV or JSON file too — it stays in your browser.
         </p>
 
         <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">

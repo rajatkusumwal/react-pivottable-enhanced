@@ -70,14 +70,12 @@ export function matrixFromRows(
   };
 }
 
-
 export interface ExportMatrix extends ExportDecoration {
   title: string;
   /** Header rows (may be more than one for nested columns). */
   head: string[][];
   body: string[][];
 }
-
 
 /** Reads a rendered <table> into a plain matrix so any engine can be exported. */
 export function matrixFromTable(table: HTMLTableElement, title = "Pivot table"): ExportMatrix {
@@ -95,7 +93,9 @@ export function matrixFromTable(table: HTMLTableElement, title = "Pivot table"):
 }
 
 const escapeCsv = (v: string, delimiter: string) =>
-  new RegExp(`["\n\r${delimiter === "\t" ? "\\t" : delimiter.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}]`).test(v)
+  new RegExp(
+    `["\n\r${delimiter === "\t" ? "\\t" : delimiter.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}]`,
+  ).test(v)
     ? `"${v.replace(/"/g, '""')}"`
     : v;
 
@@ -163,7 +163,6 @@ export function toHtml(matrix: ExportMatrix): string {
     matrix.title,
   )}</h1><table><thead>${head}</thead><tbody>${body}</tbody></table>${footer}</body></html>`;
 }
-
 
 export function toJson(matrix: ExportMatrix): string {
   return JSON.stringify(matrix, null, 2);

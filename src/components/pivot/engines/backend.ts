@@ -7,12 +7,7 @@
 import { MEMBER_PAGE_SIZE } from "../constants";
 import type { CellEditRequest } from "../editing";
 import type { FieldDef, PivotRow } from "../types";
-import type {
-  DrillThroughQuery,
-  PivotEngineAdapter,
-  PivotQuery,
-  PivotResult,
-} from "../result";
+import type { DrillThroughQuery, PivotEngineAdapter, PivotQuery, PivotResult } from "../result";
 import { createLocalEngine } from "./local";
 
 export interface BackendEngineOptions {
@@ -88,7 +83,12 @@ export function createBackendClient(options: BackendEngineOptions) {
         `${paths.fields}${datasetId ? `?datasetId=${encodeURIComponent(datasetId)}` : ""}`,
         { method: "GET" },
       ),
-    members: (field: string, search = "", limit = MEMBER_PAGE_SIZE, datasetId = options.datasetId) =>
+    members: (
+      field: string,
+      search = "",
+      limit = MEMBER_PAGE_SIZE,
+      datasetId = options.datasetId,
+    ) =>
       call<{ members: string[]; total: number }>(paths.members, {
         method: "POST",
         body: JSON.stringify({ field, search, limit, datasetId }),

@@ -77,19 +77,19 @@ override any of them in your own CSS to re-skin the grid.
 
 ## Props
 
-| Prop                 | Type                                | Default    | What it does                                        |
-| -------------------- | ----------------------------------- | ---------- | --------------------------------------------------- |
-| `data`               | `PivotRow[]`                        | —          | Records to analyse (local engine)                    |
-| `fields`             | `FieldDef[]`                        | —          | Field metadata; `inferFields(rows)` can build it     |
-| `initialConfig`      | `Partial<PivotConfig>`              | —          | Starting report (uncontrolled)                       |
-| `config` / `onConfigChange` | `PivotConfig` / callback     | —          | Fully controlled report state                        |
-| `engine`             | `PivotEngineAdapter`                | local      | Swap in backend aggregation                          |
-| `fieldsUi`           | `"dialog" \| "sidebar"`             | `"dialog"` | Flexmonster popup field list, or a docked panel      |
-| `showToolbar` / `showSidebar` | `boolean`                  | `true`     | Hide chrome when the host supplies its own           |
-| `allowFileUpload`    | `boolean`                           | `true`     | Show the CSV/JSON drop bar                           |
-| `permissions`        | `Permissions`                       | all on     | Turn off export, drill-through, editing, …           |
-| `onDataChange`       | `(rows) => void`                    | —          | Inline cell edits written back                       |
-| `title`, `className` | `string`                            | —          | Header text and wrapper class                        |
+| Prop                          | Type                     | Default    | What it does                                     |
+| ----------------------------- | ------------------------ | ---------- | ------------------------------------------------ |
+| `data`                        | `PivotRow[]`             | —          | Records to analyse (local engine)                |
+| `fields`                      | `FieldDef[]`             | —          | Field metadata; `inferFields(rows)` can build it |
+| `initialConfig`               | `Partial<PivotConfig>`   | —          | Starting report (uncontrolled)                   |
+| `config` / `onConfigChange`   | `PivotConfig` / callback | —          | Fully controlled report state                    |
+| `engine`                      | `PivotEngineAdapter`     | local      | Swap in backend aggregation                      |
+| `fieldsUi`                    | `"dialog" \| "sidebar"`  | `"dialog"` | Flexmonster popup field list, or a docked panel  |
+| `showToolbar` / `showSidebar` | `boolean`                | `true`     | Hide chrome when the host supplies its own       |
+| `allowFileUpload`             | `boolean`                | `true`     | Show the CSV/JSON drop bar                       |
+| `permissions`                 | `Permissions`            | all on     | Turn off export, drill-through, editing, …       |
+| `onDataChange`                | `(rows) => void`         | —          | Inline cell edits written back                   |
+| `title`, `className`          | `string`                 | —          | Header text and wrapper class                    |
 
 ## Backend aggregation
 

@@ -4,9 +4,19 @@
   "private": false,
   "license": "MIT",
   "description": "Flexmonster-like pivot table for React: drag & drop fields, filters, calculated values, charts, drill-through and export. Styled with Tailwind, no UI framework required.",
-  "keywords": ["react", "pivot-table", "pivot", "grid", "tailwind", "analytics", "olap"],
+  "keywords": [
+    "react",
+    "pivot-table",
+    "pivot",
+    "grid",
+    "tailwind",
+    "analytics",
+    "olap"
+  ],
   "type": "module",
-  "sideEffects": ["*.css"],
+  "sideEffects": [
+    "*.css"
+  ],
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -18,7 +28,11 @@
     "./styles.css": "./dist/pivot-theme.css",
     "./package.json": "./package.json"
   },
-  "files": ["dist", "src", "README.md"],
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
   "scripts": {
     "sync": "node scripts/sync-from-app.mjs",
     "build": "npm run sync && vite build && tsc -p tsconfig.build.json && node scripts/copy-css.mjs",

@@ -130,7 +130,11 @@ describe("backend client contract", () => {
       url = u;
       return jsonResponse({ fields: [{ name: "revenue", caption: "Revenue", type: "number" }] });
     });
-    const client = createBackendClient({ baseUrl: "https://api.test", datasetId: "a b", fetchImpl });
+    const client = createBackendClient({
+      baseUrl: "https://api.test",
+      datasetId: "a b",
+      fetchImpl,
+    });
     const { fields } = await client.fields();
     expect(url).toBe("https://api.test/api/pivot/fields?datasetId=a%20b");
     expect(fields[0]!.name).toBe("revenue");

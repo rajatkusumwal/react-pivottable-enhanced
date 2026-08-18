@@ -225,10 +225,12 @@ export function buildLocalResult(rows: PivotRow[], query: PivotQuery): PivotResu
     }
   }
 
-
   /** Base columns before the measures are multiplied in. */
   const baseColumns: { key: string[]; indexes: Set<number> | null }[] = query.cols.length
-    ? colLeafNodes.map((n, i) => ({ key: baseLeaves[i]?.key ?? n.path, indexes: new Set(n.rowIndexes) }))
+    ? colLeafNodes.map((n, i) => ({
+        key: baseLeaves[i]?.key ?? n.path,
+        indexes: new Set(n.rowIndexes),
+      }))
     : measureCount > 1
       ? [{ key: [], indexes: null }]
       : [];
@@ -462,7 +464,8 @@ export function buildLocalResult(rows: PivotRow[], query: PivotQuery): PivotResu
                 : {}),
               running: running[mi] as number,
               runningColumn: runningColumn[leafIndex] as number,
-              prevInRow: baseIndex > 0 ? num(rawCells[rowIndex]?.[leafIndex - measureCount] ?? null) : null,
+              prevInRow:
+                baseIndex > 0 ? num(rawCells[rowIndex]?.[leafIndex - measureCount] ?? null) : null,
               prevInColumn: rowIndex > 0 ? num(rawCells[rowIndex - 1]?.[leafIndex] ?? null) : null,
             },
             mode,
@@ -472,7 +475,6 @@ export function buildLocalResult(rows: PivotRow[], query: PivotQuery): PivotResu
     });
     return out;
   });
-
 
   // ---- KPI statuses --------------------------------------------------------
   const goalValue = (
@@ -529,7 +531,6 @@ export function buildLocalResult(rows: PivotRow[], query: PivotQuery): PivotResu
     meta: { source: "local" },
   };
 }
-
 
 export function localDrillThrough(rows: PivotRow[], request: DrillThroughQuery): PivotRow[] {
   const { rowKey, colKey, query } = request;

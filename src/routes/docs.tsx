@@ -241,10 +241,9 @@ const config = createDefaultConfig({
 @source "../node_modules/inhouse-grid-monster/dist";
 @import "inhouse-grid-monster/styles.css";`}</Code>
             <p>
-              On Tailwind v3, add{" "}
-              <code>./node_modules/inhouse-grid-monster/dist/**/*.js</code> to <code>content</code>{" "}
-              and map the same token names in <code>theme.extend.colors</code> — the package README
-              has the exact block to paste.
+              On Tailwind v3, add <code>./node_modules/inhouse-grid-monster/dist/**/*.js</code> to{" "}
+              <code>content</code> and map the same token names in <code>theme.extend.colors</code>{" "}
+              — the package README has the exact block to paste.
             </p>
           </Section>
 

@@ -65,7 +65,11 @@ describe("grand-total-aware formulas", () => {
       baseQuery({
         values: [{ field: "ofCol", aggregator: "sum" }],
         calculated: [
-          { name: "ofCol", formula: "[revenue] / columnTotal([revenue]) * 100", scope: "aggregate" },
+          {
+            name: "ofCol",
+            formula: "[revenue] / columnTotal([revenue]) * 100",
+            scope: "aggregate",
+          },
         ],
       }),
     );

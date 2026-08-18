@@ -80,7 +80,9 @@ export function buildChartData(rows: PivotRow[], config: PivotConfig): ChartData
       : scoped;
     const point: ChartPoint = { name: category };
     for (const s of series) {
-      const subset = colField ? inCategory.filter((r) => String(r[colField] ?? "") === s) : inCategory;
+      const subset = colField
+        ? inCategory.filter((r) => String(r[colField] ?? "") === s)
+        : inCategory;
       point[s] = aggregate(value.aggregator, subset, value.field) ?? 0;
     }
     return point;
@@ -98,7 +100,6 @@ export function buildChartData(rows: PivotRow[], config: PivotConfig): ChartData
     seriesPath,
   };
 }
-
 
 /**
  * Turns a chart click into the drill-through keys the engine expects.
@@ -129,7 +130,11 @@ export function drillColumns(rows: PivotRow[]): string[] {
  */
 export function applyDrillSlice(
   rows: PivotRow[],
-  slice: { fields?: string[] | undefined; sort?: { field: string; dir: "asc" | "desc" } | undefined; maxRows?: number | undefined } = {},
+  slice: {
+    fields?: string[] | undefined;
+    sort?: { field: string; dir: "asc" | "desc" } | undefined;
+    maxRows?: number | undefined;
+  } = {},
 ): PivotRow[] {
   let out = rows;
   const sort = slice.sort;
@@ -169,8 +174,10 @@ export interface DrillSelection {
 /** Records behind a single cell — the drill-through data set. */
 export function drillThroughRows(rows: PivotRow[], selection: DrillSelection): PivotRow[] {
   return rows.filter((r) => {
-    if (selection.rowField && String(r[selection.rowField] ?? "") !== selection.rowValue) return false;
-    if (selection.colField && String(r[selection.colField] ?? "") !== selection.colValue) return false;
+    if (selection.rowField && String(r[selection.rowField] ?? "") !== selection.rowValue)
+      return false;
+    if (selection.colField && String(r[selection.colField] ?? "") !== selection.colValue)
+      return false;
     return true;
   });
 }
@@ -180,7 +187,6 @@ export function grandTotal(rows: PivotRow[], value: ValueDef): number | null {
   const total = aggregate(value.aggregator, rows, value.field, value.type);
   return typeof total === "number" ? total : null;
 }
-
 
 /** Everything a "show values as" transform can reference for one cell. */
 export interface DisplayModeContext {
@@ -265,4 +271,3 @@ export const displayModeLabels: Record<string, string> = {
   runningTotalOfColumn: "Running total (column)",
   index: "Index",
 };
-

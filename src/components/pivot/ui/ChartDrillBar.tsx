@@ -43,7 +43,11 @@ export function ChartDrillBar({
       {path.map((member, i) => (
         <span key={`${member}-${i}`} className="inline-flex items-center gap-1">
           <ChevronRight className="h-3 w-3" aria-hidden="true" />
-          <button type="button" className="rounded px-1 hover:bg-accent" onClick={() => onUp(i + 1)}>
+          <button
+            type="button"
+            className="rounded px-1 hover:bg-accent"
+            onClick={() => onUp(i + 1)}
+          >
             {member}
           </button>
         </span>

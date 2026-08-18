@@ -60,7 +60,9 @@ export function PivotChart({
 }: PivotChartProps) {
   if (!data.length || !series.length) {
     return (
-      <div className="flex h-72 items-center justify-center text-sm text-muted-foreground">{emptyLabel}</div>
+      <div className="flex h-72 items-center justify-center text-sm text-muted-foreground">
+        {emptyLabel}
+      </div>
     );
   }
 
@@ -83,7 +85,10 @@ export function PivotChart({
    * one level deeper, or hides/shows the series at the deepest level.
    */
   const legendBar = (
-    <ul className="flex flex-wrap items-center justify-center gap-3 pb-1 text-xs" data-testid="chart-legend">
+    <ul
+      className="flex flex-wrap items-center justify-center gap-3 pb-1 text-xs"
+      data-testid="chart-legend"
+    >
       {legendSeries.map((s, i) => {
         const isHidden = hiddenSeries.includes(s);
         return (
@@ -112,7 +117,10 @@ export function PivotChart({
 
   /** Clickable axis labels — the drillable category axis. */
   const axisBar = (
-    <ul className="flex flex-wrap items-center justify-center gap-2 pt-1 text-xs" data-testid="chart-axis-labels">
+    <ul
+      className="flex flex-wrap items-center justify-center gap-2 pt-1 text-xs"
+      data-testid="chart-axis-labels"
+    >
       {data.map((point) => (
         <li key={point.name}>
           <button
@@ -162,7 +170,12 @@ export function PivotChart({
             <YAxis fontSize={12} />
             <Tooltip />
             {series.map((s, i) => (
-              <Line key={s} type="monotone" dataKey={s} stroke={palette(accent, i, series.length)} />
+              <Line
+                key={s}
+                type="monotone"
+                dataKey={s}
+                stroke={palette(accent, i, series.length)}
+              />
             ))}
           </LineChart>
         ) : type === "area" ? (

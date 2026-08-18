@@ -17,7 +17,7 @@ export function areaOfField(config: PivotConfig, name: string): PivotArea {
   return "fields";
 }
 
-const insert = <T,>(list: T[], item: T, index?: number): T[] => {
+const insert = <T>(list: T[], item: T, index?: number): T[] => {
   const next = [...list];
   next.splice(index === undefined || index < 0 ? next.length : index, 0, item);
   return next;
@@ -75,7 +75,6 @@ export function moveField(
   return patch;
 }
 
-
 /** Removes a field from every area of the report. */
 export function removeField(config: PivotConfig, name: string): Partial<PivotConfig> {
   return moveField(config, name, "fields");
@@ -88,7 +87,7 @@ export function reorderField(
   from: number,
   to: number,
 ): Partial<PivotConfig> {
-  const move = <T,>(list: T[]): T[] => {
+  const move = <T>(list: T[]): T[] => {
     const next = [...list];
     const [item] = next.splice(from, 1);
     if (item === undefined) return list;

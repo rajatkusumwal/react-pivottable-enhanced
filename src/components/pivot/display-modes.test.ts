@@ -67,7 +67,10 @@ describe("show values as — parent totals", () => {
   });
 
   it("falls back to the plain row/column total when there is no parent level", () => {
-    const result = buildLocalResult(rows, queryWith("percentOfParentRowTotal", { rows: ["region"] }));
+    const result = buildLocalResult(
+      rows,
+      queryWith("percentOfParentRowTotal", { rows: ["region"] }),
+    );
     const north = rowOf(["North"], result);
     // North Q1 = 200 of North total 600
     expect(result.cells[north]?.[0]).toBeCloseTo(33.33, 1);
@@ -91,7 +94,10 @@ describe("show values as — differences and running totals", () => {
   it("shows the difference and percent difference against the row above", () => {
     // A single row field keeps the comparison between sibling members.
     const diff = buildLocalResult(rows, queryWith("differenceOfColumn", { rows: ["country"] }));
-    const pct = buildLocalResult(rows, queryWith("percentDifferenceOfColumn", { rows: ["country"] }));
+    const pct = buildLocalResult(
+      rows,
+      queryWith("percentDifferenceOfColumn", { rows: ["country"] }),
+    );
     // Members sort as ES, IE, UK.
     expect(diff.cells[0]?.[0]).toBeNull(); // first row has nothing above it
     // IE Q2 = 100 against ES Q2 = 200
@@ -115,7 +121,6 @@ describe("show values as — differences and running totals", () => {
 
     // Parent rows take part: North (200), IE (100), UK (100).
     expect(downColumn.cells[rowOf(["North", "UK"], downColumn)]?.[0]).toBe(400);
-
   });
 
   it("keeps runningTotal working as an alias of the row running total", () => {

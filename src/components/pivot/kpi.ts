@@ -35,9 +35,7 @@ export const KPI_ICONS: Record<KpiStatus["state"], string> = {
 };
 
 /** Collects the KPI metadata the engine needs from the field list. */
-export function kpisFromFields(
-  fields: { name: string; kpi?: KpiDef }[],
-): Record<string, KpiDef> {
+export function kpisFromFields(fields: { name: string; kpi?: KpiDef }[]): Record<string, KpiDef> {
   const out: Record<string, KpiDef> = {};
   for (const field of fields) if (field.kpi) out[field.name] = field.kpi;
   return out;

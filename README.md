@@ -51,29 +51,29 @@ other than Tailwind tokens (`--color-border`, `--color-card`, …) and `@/lib/ut
 
 ### Props
 
-| Prop | Type | Purpose |
-| --- | --- | --- |
-| `data` | `PivotRow[]` | Records for the local engine |
-| `fields` | `FieldDef[]` | Captions, types, folders, hierarchy metadata (`inferFields()` helps) |
-| `engine` | `PivotEngineAdapter` | Aggregation engine; defaults to the local one |
-| `initialConfig` / `config` + `onConfigChange` | `PivotConfig` | Uncontrolled or controlled state |
-| `permissions` | `Permissions` | `readOnly`, `allowExport`, `allowDrillThrough`, `deniedFields`, `maskedFields`, `rowFilter` |
-| `fieldsUi` | `"dialog" \| "sidebar"` | Flexmonster-style popup (default) or docked panel |
-| `allowFileUpload` | `boolean` | Show the CSV/JSON upload bar |
-| `onUploadToBackend` | `(file) => Promise<{ datasetId, rowCount, fields }>` | Send uploads to your service instead of memory |
-| `datasetId` | `string` | Dataset handle passed to the backend engine |
-| `showToolbar` / `showSidebar` / `title` / `className` | | Presentation |
+| Prop                                                  | Type                                                 | Purpose                                                                                     |
+| ----------------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `data`                                                | `PivotRow[]`                                         | Records for the local engine                                                                |
+| `fields`                                              | `FieldDef[]`                                         | Captions, types, folders, hierarchy metadata (`inferFields()` helps)                        |
+| `engine`                                              | `PivotEngineAdapter`                                 | Aggregation engine; defaults to the local one                                               |
+| `initialConfig` / `config` + `onConfigChange`         | `PivotConfig`                                        | Uncontrolled or controlled state                                                            |
+| `permissions`                                         | `Permissions`                                        | `readOnly`, `allowExport`, `allowDrillThrough`, `deniedFields`, `maskedFields`, `rowFilter` |
+| `fieldsUi`                                            | `"dialog" \| "sidebar"`                              | Flexmonster-style popup (default) or docked panel                                           |
+| `allowFileUpload`                                     | `boolean`                                            | Show the CSV/JSON upload bar                                                                |
+| `onUploadToBackend`                                   | `(file) => Promise<{ datasetId, rowCount, fields }>` | Send uploads to your service instead of memory                                              |
+| `datasetId`                                           | `string`                                             | Dataset handle passed to the backend engine                                                 |
+| `showToolbar` / `showSidebar` / `title` / `className` |                                                      | Presentation                                                                                |
 
 ### Feature map
 
-* **Grid** — compact / classic / flat layouts, subtotals, grand totals, expand & collapse,
+- **Grid** — compact / classic / flat layouts, subtotals, grand totals, expand & collapse,
   column resize, cell selection with a sum/avg/min/max bar, keyboard navigation, row & column
   hover highlight, spreadsheet headers, windowed rendering for large results,
   inline cell editing (`config.editing: true` or the "Edit cells" toolbar checkbox —
   double-click a value cell, type a number, press Enter; the change is written back to the
   underlying records, spread proportionally for `sum` measures, and `onDataChange` fires with
   the updated rows).
-* **Filters** — member checkbox filters with search, conditional filters
+- **Filters** — member checkbox filters with search, conditional filters
   (number/text/date/time), top/bottom N, group conditions (subqueries), report-filter chips
   above the grid. Picking a field typed `date` in the filter editor switches it to a date
   picker with date wording ("is before", "is on or after", "is between", …) and sets
@@ -83,10 +83,10 @@ other than Tailwind tokens (`--color-border`, `--color-card`, …) and `@/lib/ut
   The **group condition** filter type adds `{ kind: "subquery" }`: keep only the members of a
   field whose nested aggregate passes a test (e.g. regions whose `sum(revenue) > 500`),
   which the backend runs as a SQL subquery.
-* **Filter surfaces** — `config.showReportFilterArea` (toolbar "Filter area") shows or hides
+- **Filter surfaces** — `config.showReportFilterArea` (toolbar "Filter area") shows or hides
   the report-filter strip above the grid; `config.showChartFilters` (toolbar "Chart filters")
   shows per-field member filter buttons above the chart that write back into `config.filters`.
-* **Field list** — drag-and-drop between Filters / Columns / Rows / Measures (`@dnd-kit`).
+- **Field list** — drag-and-drop between Filters / Columns / Rows / Measures (`@dnd-kit`).
   Drag & drop can be switched off with `config.dragAndDrop: false` (or the toolbar
   checkbox); the select menus keep every action available without dragging.
   Fields are grouped by `FieldDef.folder`, and fields sharing a `FieldDef.hierarchy` are
@@ -94,26 +94,26 @@ other than Tailwind tokens (`--color-border`, `--color-card`, …) and `@/lib/ut
   sublevel or use **Add all levels** to add the whole drill path to Rows. The panel also has
   a search box (matching field, folder and hierarchy names), **Expand all** / **Collapse all**
   and a sort selector (data order, A → Z, Z → A).
-* **Multiple measures** — `config.values` accepts any number of measures and the grid renders
+- **Multiple measures** — `config.values` accepts any number of measures and the grid renders
   one leaf column per (column member x measure). The same field can appear several times with
   different aggregations (drop it on Measures again). Measures carry `type`, so string, date
   and time fields work as values too: they offer count, distinct count, min, max, first and
   last, and render as text (ISO dates and `HH:mm` times compare correctly).
-* **Aggregations** — sum, count, distinct count, average, median, min, max, product,
+- **Aggregations** — sum, count, distinct count, average, median, min, max, product,
   population/sample stdev, percent-of-total; add your own with `registerAggregator()`.
   `aggregatorsForType(type, allowed?)` returns the aggregations valid for a field type and
   drives the measure menus. Restrict them per field with `FieldDef.aggregators`, e.g.
   `{ name: "unitPrice", type: "number", aggregators: ["average", "min", "max"] }` hides Sum.
   The Σ icon on measure chips can be hidden with `config.showAggregationIcon: false`
   (toolbar "Σ icon").
-* **Show values as** — every measure takes a `displayMode`: `percentOfGrandTotal`,
+- **Show values as** — every measure takes a `displayMode`: `percentOfGrandTotal`,
   `percentOfRowTotal`, `percentOfColumnTotal`, `percentOfParentRowTotal`,
   `percentOfParentColumnTotal`, `index`, `differenceOfRow` / `differenceOfColumn`,
   `percentDifferenceOfRow` / `percentDifferenceOfColumn`, `runningTotalOfRow` /
   `runningTotalOfColumn`. Pick it from the measure menu in the field list.
 
-* **Calculated values** — safe formula parser (no `eval`), e.g. `[revenue] - [cost]`.
-  Choose the scope in the field list: *per record* (row scope) or *per cell, totals aware*
+- **Calculated values** — safe formula parser (no `eval`), e.g. `[revenue] - [cost]`.
+  Choose the scope in the field list: _per record_ (row scope) or _per cell, totals aware_
   (aggregate scope), which unlocks `grandTotal([revenue])`, `rowTotal(…)`, `columnTotal(…)`,
   `parentRowTotal(…)` and `parentColumnTotal(…)` — e.g.
   `[revenue] / grandTotal([revenue]) * 100` for a share-of-total measure.
@@ -131,14 +131,15 @@ other than Tailwind tokens (`--color-border`, `--color-card`, …) and `@/lib/ut
     }}
   />
   ```
-* **Renaming fields and measures** — double-click a chip in the field bar (or use the pencil
-  icon, or right-click a value cell → *Rename measure…*) to give a field or a single measure
+
+- **Renaming fields and measures** — double-click a chip in the field bar (or use the pencil
+  icon, or right-click a value cell → _Rename measure…_) to give a field or a single measure
   its own label. Row/column renames live in `config.fieldCaptions` (`{ "region": "Sales area" }`)
   and measure renames in `values[i].caption`, so the same field can appear twice with different
   aggregations and different names. Both travel in the shared report link and are applied to the
   grid, charts, exports and print output. Backends can also ship defaults via `fields[].caption`.
 
-* **KPIs from the data source** — a field can declare its goal and the grid shows a status
+- **KPIs from the data source** — a field can declare its goal and the grid shows a status
   arrow (on target / at risk / below target) next to every value and row total, while the
   field list groups KPI fields together:
 
@@ -153,37 +154,39 @@ other than Tailwind tokens (`--color-border`, `--color-card`, …) and `@/lib/ut
     },
   ];
   ```
-* **Charts** — Recharts columns / stacked columns / columns + line / line / area / pie with
+
+- **Charts** — Recharts columns / stacked columns / columns + line / line / area / pie with
   click-to-drill, a drillable axis and legend, chart-level filtering and a split view:
 
   ```ts
   config.chart = {
     visible: true,
-    type: "stackedBar",     // "bar" | "stackedBar" | "columnLine" | "line" | "area" | "pie"
-    position: "right",      // "bottom" (default) or "right" = split view, grid + chart together
-    drillRows: ["West"],    // axis drilled into the 2nd row field, filtered to West
-    drillCols: [],          // legend drill path along config.cols
+    type: "stackedBar", // "bar" | "stackedBar" | "columnLine" | "line" | "area" | "pie"
+    position: "right", // "bottom" (default) or "right" = split view, grid + chart together
+    drillRows: ["West"], // axis drilled into the 2nd row field, filtered to West
+    drillCols: [], // legend drill path along config.cols
     hiddenSeries: ["2025"], // series hidden from the legend (chart-only filtering)
     lineSeries: ["Target"], // series drawn as lines in the "columnLine" chart
   };
   ```
 
-  * **Drillable axis / legend** — the axis walks `config.rows` and the legend walks
+  - **Drillable axis / legend** — the axis walks `config.rows` and the legend walks
     `config.cols`. Clicking an axis label pushes that member onto `chart.drillRows` and shows
     the next level; clicking a legend entry does the same for `chart.drillCols`. The
     breadcrumb bar above the chart (`ChartDrillBar`) walks back up.
-  * **Interactive filtering** — at the deepest legend level a legend click toggles the series
+  - **Interactive filtering** — at the deepest legend level a legend click toggles the series
     in `chart.hiddenSeries` (chart only, report untouched); at the deepest axis level an axis
     click writes a `values` filter for that field into `config.filters`, so the grid, exports
     and the backend query follow. The member filter buttons above the chart
     (`config.showChartFilters`) do the same explicitly.
-  * **Split view** — `chart.position: "right"` renders grid and chart side by side (stacked on
+  - **Split view** — `chart.position: "right"` renders grid and chart side by side (stacked on
     small screens); the toolbar exposes it as "Split view (side by side)".
-  * `buildChartData(rows, config)` returns `{ data, series, allSeries, categoryField,
-    seriesField, canDrillCategory, canDrillSeries, categoryPath, seriesPath }`, so a backend
+  - `buildChartData(rows, config)` returns `{ data, series, allSeries, categoryField,
+seriesField, canDrillCategory, canDrillSeries, categoryPath, seriesPath }`, so a backend
     can build the same payload: send `chart.drillRows` / `drillCols` as extra equality filters
     and `rows[drillRows.length]` / `cols[drillCols.length]` as the group-by fields.
-* **Drill-through** — click any number, or any bar / point / slice in the chart, to inspect the
+
+- **Drill-through** — click any number, or any bar / point / slice in the chart, to inspect the
   source records. Chart drill-through keeps the axis and legend drill path, so a click on the
   second level drills through `[region, country] × [year, quarter]`. The dialog has a built-in
   field list ("Columns", with search) to pick the slice, plus **Select all** / **Deselect all**
@@ -192,8 +195,8 @@ other than Tailwind tokens (`--color-border`, `--color-card`, …) and `@/lib/ut
   ```ts
   config.drillThrough = {
     fields: ["orderId", "customer", "revenue"], // undefined = every source field, [] = no fields
-    maxRows: 1000,                              // hard cap, toolbar preset
-    sort: { field: "revenue", dir: "desc" },    // initial column sort
+    maxRows: 1000, // hard cap, toolbar preset
+    sort: { field: "revenue", dir: "desc" }, // initial column sort
   };
   ```
 
@@ -204,7 +207,7 @@ other than Tailwind tokens (`--color-border`, `--color-card`, …) and `@/lib/ut
   empty record objects (matching the Deselect-all state).
   `applyDrillSlice(rows, { fields, sort, maxRows })` is exported so a backend adapter can
   reproduce the projection, sorting and cap exactly; `chartDrillKeys(chartData, category,
-  series)` turns a chart click into `{ rowKey, colKey, label }`.
+series)` turns a chart click into `{ rowKey, colKey, label }`.
 
   The dialog has its own
   **Export…**, **Print** and **Copy** controls (respecting `permissions.allowExport`), so the
@@ -215,45 +218,55 @@ other than Tailwind tokens (`--color-border`, `--color-card`, …) and `@/lib/ut
 
   exportMatrix(matrixFromRows(rows, "Records behind North", { header: "Acme Ltd" }), "csv");
   ```
-* **Export & print** — Excel (.xls), CSV, TSV, HTML, JSON, clipboard, print/PDF.
+
+- **Export & print** — Excel (.xls), CSV, TSV, HTML, JSON, clipboard, print/PDF.
   **Custom headers and footers**: set `config.exportHeader` / `config.exportFooter` (or type
-  them in Format → *Export header & footer*) and every export and the print view prints them
+  them in Format → _Export header & footer_) and every export and the print view prints them
   above and below the table. Programmatically, pass a decoration object:
 
   ```ts
   import { matrixFromResult, printMatrix } from "@/components/pivot";
 
-  printMatrix(matrixFromResult(result, "en", "Q4 revenue", {
-    header: "Acme Ltd\nQ4 board pack",
-    footer: "Confidential — do not distribute",
-  }));
+  printMatrix(
+    matrixFromResult(result, "en", "Q4 revenue", {
+      header: "Acme Ltd\nQ4 board pack",
+      footer: "Confidential — do not distribute",
+    }),
+  );
   ```
-* **Formatting UI** — the toolbar **Format** button (also on the cell right-click menu) opens a
-  dialog with three tabs: *Number formatting* (decimals, thousands separator, ISO currency
-  code, prefix, suffix — written to `ValueDef.format`), *Conditional formatting* (rules of
+
+- **Formatting UI** — the toolbar **Format** button (also on the cell right-click menu) opens a
+  dialog with three tabs: _Number formatting_ (decimals, thousands separator, ISO currency
+  code, prefix, suffix — written to `ValueDef.format`), _Conditional formatting_ (rules of
   `{ field, operator, value, color, background }` written to `config.conditionalFormats`) and
-  *Export header & footer*.
-* **Share a report by link** — the toolbar **Share link** button serialises the whole report
+  _Export header & footer_.
+- **Share a report by link** — the toolbar **Share link** button serialises the whole report
   (fields, filters, formatting, layout, locale) into a `?report=` query parameter, copies the
   URL to the clipboard and updates the address bar. On mount, an uncontrolled `PivotStudio`
   restores a report found in the URL, so links work with no backend storage:
 
   ```ts
-  import { buildReportUrl, readReportFromUrl, encodeReport, decodeReport } from "@/components/pivot";
+  import {
+    buildReportUrl,
+    readReportFromUrl,
+    encodeReport,
+    decodeReport,
+  } from "@/components/pivot";
 
   const url = buildReportUrl(window.location.href, config); // share this
-  const restored = readReportFromUrl(url);                  // PivotConfig | null
+  const restored = readReportFromUrl(url); // PivotConfig | null
   ```
+
   For very large reports, store `encodeReport(config)` server-side and share a short id instead.
-* **Fullscreen mode** — the toolbar **Full screen** button uses the browser Fullscreen API when
+
+- **Fullscreen mode** — the toolbar **Full screen** button uses the browser Fullscreen API when
   available and always applies a fixed overlay; `Esc` leaves it.
-* **Context menu** — right-click any value cell for drill-through, copy this value, copy the
+- **Context menu** — right-click any value cell for drill-through, copy this value, copy the
   whole table, export to CSV, number/conditional formatting and drill up/down all levels.
   Reuse it standalone with the exported `GridContextMenu` plus `PivotGrid`'s
   `onCellContextMenu({ x, y, rowKey, colKey, label, value })` callback.
-* **Localisation** — bundled `en`, `fr`, `de`, `es`; locale-aware number formats.
-* **Security** — `rowFilter` row-level security, field masking, denied fields, read-only mode.
-
+- **Localisation** — bundled `en`, `fr`, `de`, `es`; locale-aware number formats.
+- **Security** — `rowFilter` row-level security, field masking, denied fields, read-only mode.
 
 ---
 
@@ -272,8 +285,14 @@ const engine = createBackendEngine({
 // Or: local for small datasets, backend above the threshold.
 const hybrid = createHybridEngine({ baseUrl: "...", threshold: 50_000 });
 
-<PivotStudio data={rows} fields={fields} engine={engine} datasetId={datasetId} allowFileUpload
-  onUploadToBackend={uploadCsv} />
+<PivotStudio
+  data={rows}
+  fields={fields}
+  engine={engine}
+  datasetId={datasetId}
+  allowFileUpload
+  onUploadToBackend={uploadCsv}
+/>;
 ```
 
 ### REST contract
@@ -292,7 +311,7 @@ All endpoints are JSON over POST.
     { "field": "revenue", "aggregator": "sum", "displayMode": "percentOfParentRowTotal" },
     { "field": "customerName", "aggregator": "distinctCount", "type": "string" },
     { "field": "orderDate", "aggregator": "min", "type": "date" },
-    { "field": "orderTime", "aggregator": "max", "type": "time" }
+    { "field": "orderTime", "aggregator": "max", "type": "time" },
   ],
 
   "filters": [
@@ -304,7 +323,7 @@ All endpoints are JSON over POST.
       "operator": "between",
       "value": "2024-02-01",
       "value2": "2024-02-28",
-      "valueType": "date"
+      "valueType": "date",
     },
     {
       "kind": "condition",
@@ -312,7 +331,7 @@ All endpoints are JSON over POST.
       "operator": "between",
       "value": "09:00",
       "value2": "17:00",
-      "valueType": "time"
+      "valueType": "time",
     },
     {
       "kind": "subquery",
@@ -320,8 +339,8 @@ All endpoints are JSON over POST.
       "measure": "revenue",
       "aggregator": "sum",
       "operator": "gt",
-      "value": 500
-    }
+      "value": 500,
+    },
   ],
   "showSubTotals": true,
   "showGrandTotals": true,
@@ -330,7 +349,10 @@ All endpoints are JSON over POST.
   "collapsed": ["North"],
   "collapsedCols": ["Bikes"],
   "sort": { "by": 0, "direction": "desc" },
-  "sorts": [{ "by": 0, "direction": "desc" }, { "by": "rows", "direction": "asc" }],
+  "sorts": [
+    { "by": 0, "direction": "desc" },
+    { "by": "rows", "direction": "asc" },
+  ],
   "locale": "en",
   // Aggregate-scope formulas become measures by name (see "values" above);
   // row-scope entries are applied to the records before grouping.
@@ -340,17 +362,17 @@ All endpoints are JSON over POST.
       "caption": "Share of total",
       "scope": "aggregate",
       "aggregator": "sum",
-      "formula": "[revenue] / grandTotal([revenue]) * 100"
+      "formula": "[revenue] / grandTotal([revenue]) * 100",
     },
-    { "name": "profit", "scope": "row", "formula": "[revenue] - [cost]" }
+    { "name": "profit", "scope": "row", "formula": "[revenue] - [cost]" },
   ],
   // KPI metadata copied from the field list, keyed by field name.
   "kpis": {
-    "revenue": { "goal": "targetRevenue", "direction": "higher", "warningAt": 0.9 }
+    "revenue": { "goal": "targetRevenue", "direction": "higher", "warningAt": 0.9 },
   },
   "limit": 500,
   "offset": 0,
-  "datasetId": "sales-2026"
+  "datasetId": "sales-2026",
 }
 ```
 
@@ -363,68 +385,109 @@ Response (`PivotResult`):
   "measure": { "field": "revenue", "caption": "Revenue", "aggregator": "sum" },
   "measures": [
     { "field": "revenue", "caption": "Revenue", "aggregator": "sum", "type": "number" },
-    { "field": "revenue", "caption": "Avg revenue", "aggregator": "average", "type": "number" }
+    { "field": "revenue", "caption": "Avg revenue", "aggregator": "average", "type": "number" },
   ],
   // One leaf column per (column member x measure); this maps leaf -> measure index.
   "measureIndexByLeaf": [0, 1],
   "rowTotalsByMeasure": [[576158, 1200]],
   "grandTotals": [2583335, 1345],
   "rowHeaders": [
-    { "key": ["North"], "label": "North", "depth": 0, "kind": "member",
-      "expandable": true, "expanded": true, "span": 1 },
-    { "key": ["North", "Bikes"], "label": "Bikes", "depth": 1, "kind": "member",
-      "expandable": false, "expanded": true, "span": 1 },
-    { "key": ["North"], "label": "North total", "depth": 0, "kind": "subtotal",
-      "expandable": false, "expanded": true, "span": 1 }
+    {
+      "key": ["North"],
+      "label": "North",
+      "depth": 0,
+      "kind": "member",
+      "expandable": true,
+      "expanded": true,
+      "span": 1,
+    },
+    {
+      "key": ["North", "Bikes"],
+      "label": "Bikes",
+      "depth": 1,
+      "kind": "member",
+      "expandable": false,
+      "expanded": true,
+      "span": 1,
+    },
+    {
+      "key": ["North"],
+      "label": "North total",
+      "depth": 0,
+      "kind": "subtotal",
+      "expandable": false,
+      "expanded": true,
+      "span": 1,
+    },
   ],
-  "colHeaderRows": [[{ "key": ["Q1"], "label": "Q1", "depth": 0, "kind": "member",
-                       "expandable": false, "expanded": true, "span": 1 }]],
-  "colLeaves":     [{ "key": ["Q1"], "label": "Q1", "depth": 0, "kind": "member",
-                      "expandable": false, "expanded": true, "span": 1 }],
-  "cells":     [[147312], [43290], [147312]],
+  "colHeaderRows": [
+    [
+      {
+        "key": ["Q1"],
+        "label": "Q1",
+        "depth": 0,
+        "kind": "member",
+        "expandable": false,
+        "expanded": true,
+        "span": 1,
+      },
+    ],
+  ],
+  "colLeaves": [
+    {
+      "key": ["Q1"],
+      "label": "Q1",
+      "depth": 0,
+      "kind": "member",
+      "expandable": false,
+      "expanded": true,
+      "span": 1,
+    },
+  ],
+  "cells": [[147312], [43290], [147312]],
   "rowTotals": [576158, 222656, 576158],
   "colTotals": [608186],
   "grandTotal": 2583335,
   // Aligned with "cells" / "rowTotalsByMeasure"; null when the measure is not a KPI.
-  "kpiStatuses":  [[{ "state": "onTarget", "ratio": 1.12, "goal": 131500 }], [null], [null]],
+  "kpiStatuses": [[{ "state": "onTarget", "ratio": 1.12, "goal": 131500 }], [null], [null]],
   "kpiRowTotals": [[{ "state": "atRisk", "ratio": 0.94, "goal": 612000 }], [null], [null]],
   "sourceCount": 480,
-  "meta": { "source": "backend", "queryId": "b12f" }
+  "meta": { "source": "backend", "queryId": "b12f" },
 }
 ```
 
 Rules the server must respect:
 
-* `cells[i][j]` aligns with `rowHeaders[i]` and `colLeaves[j]`; use `null` for empty cells.
-* Emit subtotal rows only when `showSubTotals` is true, and skip children of any path in
+- `cells[i][j]` aligns with `rowHeaders[i]` and `colLeaves[j]`; use `null` for empty cells.
+- Emit subtotal rows only when `showSubTotals` is true, and skip children of any path in
   `collapsed`.
-* Multilevel drill: `collapsed` holds row member paths, `collapsedCols` holds column member
+- Multilevel drill: `collapsed` holds row member paths, `collapsedCols` holds column member
   paths (levels joined with `\u0000`). A collapsed column member becomes a single aggregated
   leaf: keep it in `colHeaderRows` with `expandable: true`, `expanded: false` and
   `rowSpan` covering the remaining column levels, and drop its descendants from `colLeaves`.
   Parent members that still have visible children carry `expandable: true, expanded: true`.
-* `layout: "flat"` means one row per source record combination, no subtotals. `sorts` is the
+- `layout: "flat"` means one row per source record combination, no subtotals. `sorts` is the
   multi-column sort chain used by the flat layout (shift-click in the UI) and takes precedence
   over `sort`; `by: "rows"` sorts row members, a number sorts by that leaf column.
-* `grandTotalsPosition` decides whether the `kind: "grand"` row is emitted first or last.
-* `limit` / `offset` page the source records before aggregation.
-* Each measure may carry a `displayMode` ("show values as"), applied **after** aggregation and
+- `grandTotalsPosition` decides whether the `kind: "grand"` row is emitted first or last.
+- `limit` / `offset` page the source records before aggregation.
+- Each measure may carry a `displayMode` ("show values as"), applied **after** aggregation and
   per measure. Return `null` when the reference total is missing or zero:
 
-  | `displayMode` | Cell value |
-  | --- | --- |
-  | `raw` (default) | the aggregate |
-  | `percentOfGrandTotal` | value / grand total × 100 |
-  | `percentOfRowTotal` / `percentOfColumnTotal` | value / row (column) total × 100 |
-  | `percentOfParentRowTotal` | value / the same column's value for the row's **parent member**; falls back to the row total at the top level |
-  | `percentOfParentColumnTotal` | value / the parent column group's value for that row; falls back to the column total |
-  | `index` | (value × grand total) / (row total × column total) |
-  | `differenceOfRow` / `differenceOfColumn` | value − previous column (previous row); `null` in the first column (row) |
-  | `percentDifferenceOfRow` / `percentDifferenceOfColumn` | that difference ÷ the previous value × 100 |
-  | `runningTotalOfRow` | cumulative sum across the row, left to right |
-  | `runningTotalOfColumn` (`runningTotal` is an alias of the row variant) | cumulative sum down the column, top to bottom |
+  | `displayMode`                                                          | Cell value                                                                                                    |
+  | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+  | `raw` (default)                                                        | the aggregate                                                                                                 |
+  | `percentOfGrandTotal`                                                  | value / grand total × 100                                                                                     |
+  | `percentOfRowTotal` / `percentOfColumnTotal`                           | value / row (column) total × 100                                                                              |
+  | `percentOfParentRowTotal`                                              | value / the same column's value for the row's **parent member**; falls back to the row total at the top level |
+  | `percentOfParentColumnTotal`                                           | value / the parent column group's value for that row; falls back to the column total                          |
+  | `index`                                                                | (value × grand total) / (row total × column total)                                                            |
+  | `differenceOfRow` / `differenceOfColumn`                               | value − previous column (previous row); `null` in the first column (row)                                      |
+  | `percentDifferenceOfRow` / `percentDifferenceOfColumn`                 | that difference ÷ the previous value × 100                                                                    |
+  | `runningTotalOfRow`                                                    | cumulative sum across the row, left to right                                                                  |
+  | `runningTotalOfColumn` (`runningTotal` is an alias of the row variant) | cumulative sum down the column, top to bottom                                                                 |
 
-* `calculated` holds the report's formulas. `scope: "row"` (the default) is evaluated per
+- `calculated` holds the report's formulas. `scope: "row"` (the default) is evaluated per
   record before grouping and simply adds a column. `scope: "aggregate"` is evaluated **per
   grid cell after aggregation** and is referenced as a measure by `name`, so
   `{ "field": "share", "aggregator": "sum" }` renders the formula rather than a column.
@@ -432,25 +495,26 @@ Rules the server must respect:
   formula's own `aggregator` (default `sum`), and the total functions resolve against the
   same cell:
 
-  | Function | SQL equivalent for the cell |
-  | --- | --- |
-  | `grandTotal([f])` | aggregate of `f` over the whole (filtered) dataset |
-  | `rowTotal([f])` | over the cell's row group, all columns |
-  | `columnTotal([f])` | over the cell's column group, all rows |
-  | `parentRowTotal([f])` | over the row member's parent group, same column; falls back to `grandTotal` at the top level |
-  | `parentColumnTotal([f])` | over the column member's parent group, same row |
+  | Function                 | SQL equivalent for the cell                                                                  |
+  | ------------------------ | -------------------------------------------------------------------------------------------- |
+  | `grandTotal([f])`        | aggregate of `f` over the whole (filtered) dataset                                           |
+  | `rowTotal([f])`          | over the cell's row group, all columns                                                       |
+  | `columnTotal([f])`       | over the cell's column group, all rows                                                       |
+  | `parentRowTotal([f])`    | over the row member's parent group, same column; falls back to `grandTotal` at the top level |
+  | `parentColumnTotal([f])` | over the column member's parent group, same row                                              |
 
   Operators are `+ - * / % ^`, plus `abs`, `round`, `min`, `max` and `sqrt`. Division by zero
   yields `0`; a formula that cannot be evaluated yields `null`. Never `eval` these strings —
   parse them (the client uses a shunting-yard parser).
-* `kpis` maps a field name to its KPI descriptor, taken from `field.kpi` in the field list:
+
+- `kpis` maps a field name to its KPI descriptor, taken from `field.kpi` in the field list:
   `{ goal: string | number, direction?: "higher" | "lower", warningAt?: number }`. For every
   KPI measure the server grades the cell against the goal aggregated the same way and returns
   `kpiStatuses` / `kpiRowTotals`: `state` is `onTarget` when `ratio >= 1`, `atRisk` when
   `ratio >= warningAt` (default `0.9`) and `below` otherwise, where
   `ratio = value / goal` (`goal / value` when `direction` is `"lower"`). Return `null` for
   non-KPI measures and when the goal is missing or zero.
-* Condition filters carry an optional `valueType`
+- Condition filters carry an optional `valueType`
   (`"auto" | "number" | "text" | "date" | "time"`).
   With `"date"` the server must compare on the date timeline at **day granularity** —
   parse ISO dates (`2024-02-01`) and timestamps (`2024-02-01T18:45:00Z`), truncate both
@@ -458,11 +522,11 @@ Rules the server must respect:
   `CAST(field AS DATE) >= DATE '2024-02-01'` (and `BETWEEN … AND …` for `between`).
   Date operators map to: `lt` is before, `lte` is on or before, `gt` is after,
   `gte` is on or after, `eq` is on, `neq` is not on, `between` is between (inclusive).
-* With `valueType: "time"` the server compares **clock time only** — take the time part of the
+- With `valueType: "time"` the server compares **clock time only** — take the time part of the
   value (`HH:mm[:ss]`, or the time of an ISO timestamp) as seconds since midnight and compare
   against the operand parsed the same way; unparseable values never match. In DuckDB:
   `CAST(field AS TIME) >= TIME '09:00:00'` (and `BETWEEN TIME '09:00:00' AND TIME '17:00:00'`).
-* `{ "kind": "subquery", "field", "measure", "aggregator", "operator", "value", "value2?" }`
+- `{ "kind": "subquery", "field", "measure", "aggregator", "operator", "value", "value2?" }`
   is server-side filtering by a nested aggregate. Keep only the rows whose `field` value is in
   the set of members passing the test:
 
@@ -480,7 +544,7 @@ Rules the server must respect:
 #### `POST /api/pivot/drillthrough`
 
 ```jsonc
-{ "rowKey": ["North", "Bikes"], "colKey": ["Q1"], "limit": 500, "query": { /* as above */ } }
+{ "rowKey": ["North", "Bikes"], "colKey": ["Q1"], "limit": 500, "query": {/* as above */} }
 ```
 
 Returns `{ "rows": [ { "region": "North", ... } ] }` — the raw records behind the cell.
@@ -502,10 +566,14 @@ Returns the same `fields` array so the field list can be built without downloadi
 
 ```jsonc
 {
-  "rowFields": ["region", "country"], "colFields": ["category"],
-  "rowKey": ["North", "USA"], "colKey": ["Bikes"],
-  "field": "revenue", "aggregator": "sum", "value": 500,
-  "datasetId": "sales-2026"
+  "rowFields": ["region", "country"],
+  "colFields": ["category"],
+  "rowKey": ["North", "USA"],
+  "colKey": ["Bikes"],
+  "field": "revenue",
+  "aggregator": "sum",
+  "value": 500,
+  "datasetId": "sales-2026",
 }
 ```
 
@@ -521,8 +589,11 @@ For files that are far too big to upload from the browser (1GB+ parquet/CSV in o
 storage, or a warehouse table), register them by reference instead:
 
 ```jsonc
-{ "uri": "s3://warehouse/sales-2024.parquet", "format": "parquet",
-  "csv": { "delimiter": ";", "decimalSeparator": ",", "thousandsSeparator": "." } }
+{
+  "uri": "s3://warehouse/sales-2024.parquet",
+  "format": "parquet",
+  "csv": { "delimiter": ";", "decimalSeparator": ",", "thousandsSeparator": "." },
+}
 ```
 
 Returns `{ "datasetId": "sales-2024", "rowCount": 812345678, "fields": [...] }`. The same
@@ -540,7 +611,7 @@ const { datasetId } = await registerRemoteDataset({
 
 ### Custom data source API (any backend)
 
-`createCustomEngine` adapts *any* transport — GraphQL, gRPC-web, an internal SDK, a Web
+`createCustomEngine` adapts _any_ transport — GraphQL, gRPC-web, an internal SDK, a Web
 Worker — to the engine contract. Implement whichever level your backend supports:
 
 ```ts
@@ -567,31 +638,31 @@ Results are tagged `meta.source: "backend"` and `meta.queryId: <id>`.
 ### Server-side aggregation of large datasets (1GB+)
 
 ```ts
-import {
-  createServerAggregationEngine,
-  shouldOffload,
-  streamCsvRows,
-} from "@/components/pivot";
+import { createServerAggregationEngine, shouldOffload, streamCsvRows } from "@/components/pivot";
 
 // Every query is answered by the service; records never reach the browser.
 const engine = createServerAggregationEngine({
   baseUrl: "/api/pivot",
   datasetId: "sales-2024",
-  pageSize: 5000,              // grid rows requested per query (limit/offset)
+  pageSize: 5000, // grid rows requested per query (limit/offset)
 });
 
 // Decide browser vs backend from a file or row estimate.
-shouldOffload({ rowCount: 2_000_000 });      // { offload: true, reason: "rows" }
-shouldOffload({ byteSize: 1024 ** 3 });      // { offload: true, reason: "bytes" }
+shouldOffload({ rowCount: 2_000_000 }); // { offload: true, reason: "rows" }
+shouldOffload({ byteSize: 1024 ** 3 }); // { offload: true, reason: "bytes" }
 
 // Read a multi-GB CSV in batches (nothing bigger than one batch in memory).
-await streamCsvRows(file, async (rows, summary) => {
-  await fetch("/api/pivot/datasets/sales-2024/rows", {
-    method: "POST",
-    body: JSON.stringify(rows),
-  });
-  console.log(summary.rowCount);
-}, { batchSize: 10_000, csv: { delimiter: ";", decimalSeparator: "," } });
+await streamCsvRows(
+  file,
+  async (rows, summary) => {
+    await fetch("/api/pivot/datasets/sales-2024/rows", {
+      method: "POST",
+      body: JSON.stringify(rows),
+    });
+    console.log(summary.rowCount);
+  },
+  { batchSize: 10_000, csv: { delimiter: ";", decimalSeparator: "," } },
+);
 ```
 
 `streamCsvRows` accepts a `File`/`Blob`, a `ReadableStream`, or an async iterable of text
@@ -648,13 +719,13 @@ Then walk the result set once: rows with `is_subtotal = 0` become `kind: "member
 
 Practical notes:
 
-* Whitelist field names against the dataset schema before interpolating them into SQL, and
+- Whitelist field names against the dataset schema before interpolating them into SQL, and
   bind every filter literal as a parameter.
-* Apply row-level security server-side too — the client `rowFilter` is a UX convenience, not
+- Apply row-level security server-side too — the client `rowFilter` is a UX convenience, not
   a security boundary.
-* Uploaded files land well in DuckDB via `read_csv_auto('…')` / `read_json_auto('…')`, saved
+- Uploaded files land well in DuckDB via `read_csv_auto('…')` / `read_json_auto('…')`, saved
   as a Parquet file keyed by `datasetId`.
-* Cache on `(datasetId, query hash)` and return the hash as `meta.queryId`.
+- Cache on `(datasetId, query hash)` and return the hash as `meta.queryId`.
 
 ---
 
@@ -741,7 +812,6 @@ injection), auth headers, custom endpoint paths, multipart uploads, `PivotBacken
 status/message propagation, and hybrid routing (browser-side under the row threshold,
 backend above it or whenever a `datasetId` is set). Use them as executable documentation
 when implementing the server side.
-
 
 ## 5. Contributing / customising
 
@@ -844,4 +914,3 @@ relative, so it works wherever you put it.
 
 Full instructions, including a Tailwind v3 colour map, Next.js SSR notes and the
 backend-engine wiring, are in [`standalone/README.md`](./standalone/README.md).
-

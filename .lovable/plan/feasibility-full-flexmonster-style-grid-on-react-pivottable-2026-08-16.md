@@ -5,6 +5,7 @@ Short answer: yes, all 26 grid features are still achievable, and moving aggrega
 ## Implications of the backend shift
 
 With DuckDB doing aggregation:
+
 - **Hard client-side work becomes easier.** Virtual scrolling, 1M+ grouped rows, and server-side filtering become practical because the backend returns a pre-aggregated cell matrix.
 - **The frontend owns the interaction layer.** The grid renderer, drag-and-drop field list, toolbars, charts, export, drill-through, and conditional formatting stay in the React component.
 - **The frontend no longer owns the math.** Subtotals, grand totals, distinct counts, calculated values, etc. are either produced by the backend or computed locally only for small fallback datasets.
@@ -57,6 +58,7 @@ Each adapter (local or backend) is responsible for turning its own data into tha
 ## Feasibility by feature with the hybrid backend
 
 Easy (backend returns the matrix; frontend is pure display)
+
 - Grid title, show/hide field captions, show/hide spreadsheet headers
 - Grand totals / subtotals toggles, per-axis totals, totals top or bottom
 - Compact / classic / flat forms
@@ -67,6 +69,7 @@ Easy (backend returns the matrix; frontend is pure display)
 - Auto-calculation bar for selection
 
 Moderate (needs backend API support, but straightforward)
+
 - Expand/collapse and drill up/down multilevel hierarchies
 - Sort by value on the pivot table
 - Sort multiple columns in flat form
@@ -75,6 +78,7 @@ Moderate (needs backend API support, but straightforward)
 - Server-side filtering (now in DuckDB SQL)
 
 Hard / out of scope
+
 - Inline editing of aggregated cells unless the backend maps aggregates back to source rows
 - OLAP-style slice/dice beyond what the REST API supports
 - 1M+ raw rows if the backend is not queried incrementally
@@ -127,7 +131,6 @@ Rewrite `README.md` around the single engine plus the Spring Boot + DuckDB backe
 - Spring Boot wiring notes: controller + DTOs mirroring the JSON contract, DuckDB JDBC connection, parameter binding to avoid SQL injection from field names (whitelist against the field catalogue), and response caching by query id.
 - The hybrid switch: how to configure the row-count threshold and `baseUrl` so small datasets stay client-side and large ones go to the backend.
 - A mock backend example for local development and tests.
-
 
 ## Trade-offs
 

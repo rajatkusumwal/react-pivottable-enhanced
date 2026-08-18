@@ -36,9 +36,6 @@ export interface FieldDef {
   kpi?: KpiDef;
 }
 
-
-
-
 export type AggregatorName =
   | "sum"
   | "count"
@@ -72,7 +69,6 @@ export type ValueDisplayMode =
   | "runningTotal"
   | "index";
 
-
 export interface NumberFormat {
   decimals?: number;
   thousandsSeparator?: boolean;
@@ -93,7 +89,6 @@ export interface ValueDef {
    */
   type?: FieldType;
 }
-
 
 export type ConditionOperator =
   | "gt"
@@ -194,7 +189,6 @@ export interface KpiStatus {
   ratio: number | null;
   goal: number | null;
 }
-
 
 export interface ConditionalFormatRule {
   field: string;
@@ -318,7 +312,6 @@ export interface PivotConfig {
   /** CSV dialect used when reading files and writing CSV exports. */
   csv: CsvOptions;
 }
-
 
 export const defaultTheme: PivotTheme = {
   accent: "#2f6feb",

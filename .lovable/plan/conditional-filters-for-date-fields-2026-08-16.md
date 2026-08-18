@@ -16,6 +16,7 @@ This adds real date handling end to end: UI, engine, backend contract, tests, do
 ## Implementation
 
 **Types** (`src/components/pivot/types.ts`)
+
 - Add `valueType?: "auto" | "number" | "text" | "date"` to the `condition` filter variant
   (defaults to `auto` so existing configs keep working).
 - Mark date-capable operators explicitly; reuse the existing `ConditionOperator` union
@@ -23,6 +24,7 @@ This adds real date handling end to end: UI, engine, backend contract, tests, do
   so the backend contract stays stable.
 
 **Matching** (`src/components/pivot/filters.ts`)
+
 - Add a `parseDate` helper accepting ISO strings (`YYYY-MM-DD`, full ISO), epoch numbers and
   `Date` values; day-level comparison normalised to UTC midnight so `eq` on a timestamp
   matches the whole day.
@@ -32,14 +34,17 @@ This adds real date handling end to end: UI, engine, backend contract, tests, do
 - `applyFilters` passes `filter.valueType` through; `describeFilter` prints date-aware wording.
 
 **Editor** (`src/components/pivot/ui/FilterEditor.tsx`)
+
 - Track the selected field's type; when `date`, render `<input type="date">` for value and
   value2, show the date operator labels, and emit `valueType: "date"` on the created filter.
 - Top/bottom-N and member filters are unchanged.
 
 **Sample data** (`src/components/pivot/sample-data.ts`)
+
 - Change `orderDate` field definition to `type: "date"` (values already `YYYY-MM-DD`).
 
 **Backend / mock API**
+
 - No transport change needed: `valueType` rides along in the existing `filters` array of
   `POST /api/pivot/query` and `/drillthrough`. `createMockPivotApi` already delegates to
   `applyFilters`, so it gains date support automatically.

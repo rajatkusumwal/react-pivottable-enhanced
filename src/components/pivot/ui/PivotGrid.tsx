@@ -16,8 +16,6 @@ import type { ConditionalFormatRule, PivotTheme } from "../types";
 import { matchesCondition } from "../filters";
 import { OVERSCAN, ROW_HEIGHT, WINDOW_THRESHOLD } from "../constants";
 
-
-
 export interface SelectionStats {
   count: number;
   sum: number;
@@ -56,9 +54,14 @@ export interface PivotGridProps {
 
   onDrill?: (rowKey: string[], colKey: string[], label: string) => void;
   /** Right-click on a value cell; the host renders the context menu. */
-  onCellContextMenu?: (
-    payload: { x: number; y: number; rowKey: string[]; colKey: string[]; label: string; value: PivotCellValue },
-  ) => void;
+  onCellContextMenu?: (payload: {
+    x: number;
+    y: number;
+    rowKey: string[];
+    colKey: string[];
+    label: string;
+    value: PivotCellValue;
+  }) => void;
 
   onSelectionChange?: (stats: SelectionStats | null) => void;
   emptyLabel?: string;
@@ -195,7 +198,6 @@ export function PivotGrid({
     } satisfies SelectionStats;
   }, [anchor, focus, valueAt]);
 
-
   useEffect(() => {
     onSelectionChange?.(selection);
   }, [selection, onSelectionChange]);
@@ -221,7 +223,6 @@ export function PivotGrid({
       /* clipboard unavailable (e.g. tests) */
     }
   }, [anchor, focus, valueAt, measures, measureIndexAt, result.measure.format, locale]);
-
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "c") {
@@ -336,10 +337,13 @@ export function PivotGrid({
     return {};
   };
 
-
   // Row header columns: compact collapses everything into one column.
   const headerCols =
-    layout === "compact" ? 1 : layout === "flat" ? Math.max(result.rowFields.length, 1) : result.rowFields.length || 1;
+    layout === "compact"
+      ? 1
+      : layout === "flat"
+        ? Math.max(result.rowFields.length, 1)
+        : result.rowFields.length || 1;
 
   const rowLabelCells = (header: HeaderNode, index: number) => {
     if (layout === "compact") {
@@ -369,11 +373,7 @@ export function PivotGrid({
       );
     }
     const parts =
-      layout === "flat"
-        ? header.kind === "grand"
-          ? ["Grand total"]
-          : header.key
-        : header.key;
+      layout === "flat" ? (header.kind === "grand" ? ["Grand total"] : header.key) : header.key;
     const previous = index > 0 ? rowHeaders[index - 1] : undefined;
     return Array.from({ length: headerCols }).map((_, level) => {
       const raw = parts[level] ?? "";
@@ -426,7 +426,8 @@ export function PivotGrid({
       style={
         {
           "--pivot-accent": theme.accent,
-          "--pivot-cell-padding": theme.density === "compact" ? "0.15rem 0.35rem" : "0.3rem 0.55rem",
+          "--pivot-cell-padding":
+            theme.density === "compact" ? "0.15rem 0.35rem" : "0.3rem 0.55rem",
           fontSize: theme.fontSize,
         } as React.CSSProperties
       }
@@ -477,7 +478,7 @@ export function PivotGrid({
                         {sortIndexOf("rows") === -1 ? "" : ` ${sortGlyph("rows")}`}
                       </button>
                     ) : (
-                      (result.rowFields.join(" / ") || result.measure.caption)
+                      result.rowFields.join(" / ") || result.measure.caption
                     )}
                   </th>
                 )}
@@ -520,7 +521,11 @@ export function PivotGrid({
             ))
           ) : (
             <tr>
-              <th colSpan={headerCols} scope="col" className="pivot-corner sticky left-0 z-20 text-left">
+              <th
+                colSpan={headerCols}
+                scope="col"
+                className="pivot-corner sticky left-0 z-20 text-left"
+              >
                 {result.rowFields.join(" / ") || " "}
               </th>
               {showRowTotals &&
@@ -558,7 +563,9 @@ export function PivotGrid({
                     <button
                       type="button"
                       aria-label={
-                        multiSort ? `Sort by ${leaf.label} (shift-click to add)` : `Sort by ${leaf.label}`
+                        multiSort
+                          ? `Sort by ${leaf.label} (shift-click to add)`
+                          : `Sort by ${leaf.label}`
                       }
                       onClick={(e) => toggleSort(i, e.shiftKey)}
                       className="text-[10px] text-muted-foreground hover:text-foreground"
@@ -575,7 +582,6 @@ export function PivotGrid({
                 </th>
               ))}
               {showRowTotals && <th aria-hidden="true" colSpan={measureCount} />}
-
             </tr>
           )}
         </thead>
@@ -592,7 +598,11 @@ export function PivotGrid({
                 key={`${keyOf(header.key)}-${header.kind}-${rowIndex}`}
                 data-kind={header.kind}
                 className={
-                  hover?.row === rowIndex ? "pivot-row-hover" : theme.stripe && rowIndex % 2 ? "pivot-stripe" : ""
+                  hover?.row === rowIndex
+                    ? "pivot-row-hover"
+                    : theme.stripe && rowIndex % 2
+                      ? "pivot-stripe"
+                      : ""
                 }
               >
                 {rowLabelCells(header, rowIndex)}
@@ -719,7 +729,6 @@ export function PivotGrid({
                       {formatCell(totalAt(rowIndex, mi), mi)}
                     </td>
                   ))}
-
               </tr>
             );
           })}

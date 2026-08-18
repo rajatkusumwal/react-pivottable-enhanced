@@ -18,7 +18,6 @@ import type {
   ValueDef,
 } from "./types";
 
-
 export type { PivotCellValue };
 
 export type HeaderKind = "member" | "subtotal" | "grand";
@@ -54,7 +53,6 @@ export interface PivotMeasure {
   calculated?: boolean | undefined;
 }
 
-
 export interface PivotResult {
   rowFields: string[];
   colFields: string[];
@@ -88,8 +86,6 @@ export interface PivotResult {
   sourceCount: number;
   meta: { source: "local" | "backend"; queryId?: string };
 }
-
-
 
 export type PivotLayout = "compact" | "classic" | "flat";
 
@@ -131,7 +127,6 @@ export interface PivotQuery {
   /** Backend dataset handle returned by the upload endpoint. */
   datasetId?: string | undefined;
 }
-
 
 export interface DrillThroughQuery {
   rowKey: string[];
@@ -177,4 +172,3 @@ export function emptyResult(measure: PivotMeasure): PivotResult {
     meta: { source: "local" },
   };
 }
-

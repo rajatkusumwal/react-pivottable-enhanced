@@ -71,23 +71,81 @@ interface ProductNode {
 }
 
 const catalogue: ProductNode[] = [
-  { division: "Hardware", category: "Bikes", subcategory: "Mountain bikes", products: ["Trail 100", "Trail 300"] },
-  { division: "Hardware", category: "Bikes", subcategory: "Road bikes", products: ["Speedster", "Aero Pro"] },
-  { division: "Hardware", category: "Components", subcategory: "Wheels", products: ["Alloy wheel", "Carbon wheel"] },
-  { division: "Hardware", category: "Components", subcategory: "Brakes", products: ["Disc brake", "Rim brake"] },
-  { division: "Softgoods", category: "Clothing", subcategory: "Jerseys", products: ["Team jersey", "Classic jersey"] },
-  { division: "Softgoods", category: "Clothing", subcategory: "Gloves", products: ["Winter gloves", "Summer gloves"] },
-  { division: "Softgoods", category: "Accessories", subcategory: "Safety", products: ["Helmet", "Light set"] },
-  { division: "Softgoods", category: "Accessories", subcategory: "Hydration", products: ["Bottle", "Hydration pack"] },
+  {
+    division: "Hardware",
+    category: "Bikes",
+    subcategory: "Mountain bikes",
+    products: ["Trail 100", "Trail 300"],
+  },
+  {
+    division: "Hardware",
+    category: "Bikes",
+    subcategory: "Road bikes",
+    products: ["Speedster", "Aero Pro"],
+  },
+  {
+    division: "Hardware",
+    category: "Components",
+    subcategory: "Wheels",
+    products: ["Alloy wheel", "Carbon wheel"],
+  },
+  {
+    division: "Hardware",
+    category: "Components",
+    subcategory: "Brakes",
+    products: ["Disc brake", "Rim brake"],
+  },
+  {
+    division: "Softgoods",
+    category: "Clothing",
+    subcategory: "Jerseys",
+    products: ["Team jersey", "Classic jersey"],
+  },
+  {
+    division: "Softgoods",
+    category: "Clothing",
+    subcategory: "Gloves",
+    products: ["Winter gloves", "Summer gloves"],
+  },
+  {
+    division: "Softgoods",
+    category: "Accessories",
+    subcategory: "Safety",
+    products: ["Helmet", "Light set"],
+  },
+  {
+    division: "Softgoods",
+    category: "Accessories",
+    subcategory: "Hydration",
+    products: ["Bottle", "Hydration pack"],
+  },
 ];
 
 const months = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ] as const;
 const quarterOf = (monthIndex: number) => `Q${Math.floor(monthIndex / 3) + 1}`;
 const halfOf = (monthIndex: number) => (monthIndex < 6 ? "H1" : "H2");
-const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] as const;
+const weekdays = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+] as const;
 
 const channels = ["Online", "Retail", "Partner"] as const;
 const teamsByChannel: Record<string, string[]> = {
@@ -126,7 +184,7 @@ function mulberry32(seed: number) {
   };
 }
 
-const pick = <T,>(rand: () => number, list: readonly T[]): T =>
+const pick = <T>(rand: () => number, list: readonly T[]): T =>
   list[Math.floor(rand() * list.length)] as T;
 
 const round = (n: number, decimals = 2) => {
@@ -301,7 +359,12 @@ const baseFields: FieldDef[] = [
     folder: "Measures",
     // KPI straight from the data source: revenue is measured against the
     // target-revenue column, higher is better, "at risk" below 90% of goal.
-    kpi: { goal: "targetRevenue", direction: "higher", warningAt: 0.9, caption: "Revenue vs target" },
+    kpi: {
+      goal: "targetRevenue",
+      direction: "higher",
+      warningAt: 0.9,
+      caption: "Revenue vs target",
+    },
   },
   { name: "cost", caption: "Cost", type: "number", folder: "Measures" },
   { name: "profit", caption: "Profit", type: "number", folder: "Measures" },
@@ -326,7 +389,10 @@ export const sampleHierarchies: { caption: string; levels: string[] }[] = [
   { caption: "Geography", levels: ["region", "country", "state", "city", "store"] },
   { caption: "Product", levels: ["division", "category", "subcategory", "product", "sku"] },
   { caption: "Time", levels: ["year", "half", "quarter", "month", "week"] },
-  { caption: "Customer", levels: ["customerSegment", "customerType", "loyaltyTier", "customerName"] },
+  {
+    caption: "Customer",
+    levels: ["customerSegment", "customerType", "loyaltyTier", "customerName"],
+  },
   { caption: "Sales org", levels: ["channel", "salesTeam", "salesperson"] },
 ];
 
@@ -343,7 +409,6 @@ export const sampleFields: FieldDef[] = baseFields.map((field) => {
     level: hierarchy.levels.indexOf(field.name) + 1,
   };
 });
-
 
 export const sampleData = generateSalesData();
 

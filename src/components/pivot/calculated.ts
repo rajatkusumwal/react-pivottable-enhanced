@@ -49,7 +49,6 @@ export interface FormulaContext {
 
 const PRECEDENCE: Record<string, number> = { "+": 1, "-": 1, "*": 2, "/": 2, "%": 2, "^": 3 };
 
-
 export function tokenize(formula: string): Token[] {
   const tokens: Token[] = [];
   let i = 0;
@@ -228,7 +227,6 @@ export function validateFormula(formula: string): string | null {
   }
 }
 
-
 /** True for formulas evaluated per grid cell instead of per record. */
 export const isAggregateField = (field: CalculatedField) => field.scope === "aggregate";
 
@@ -236,16 +234,12 @@ export const isAggregateField = (field: CalculatedField) => field.scope === "agg
  * Adds one extra column per row-scope calculated field to every source row.
  * Aggregate-scope fields are skipped — the engine evaluates those per cell.
  */
-export function applyCalculatedFields(
-  rows: PivotRow[],
-  calculated: CalculatedField[],
-): PivotRow[] {
+export function applyCalculatedFields(rows: PivotRow[], calculated: CalculatedField[]): PivotRow[] {
   const rowScope = calculated.filter((f) => !isAggregateField(f));
   if (!rowScope.length) return rows;
   return rows.map((row) => {
     const next: PivotRow = { ...row };
     for (const field of rowScope) {
-
       try {
         next[field.name] = evaluateFormula(field.formula, next);
       } catch {

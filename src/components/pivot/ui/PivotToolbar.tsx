@@ -37,11 +37,9 @@ export interface PivotToolbarProps {
   isFullscreen?: boolean;
 }
 
-
 const btn =
   "inline-flex items-center gap-1.5 rounded border border-border bg-card px-2.5 py-1 text-xs text-foreground hover:bg-accent disabled:opacity-50";
-const select =
-  "rounded border border-border bg-card px-2 py-1 text-xs disabled:opacity-50";
+const select = "rounded border border-border bg-card px-2 py-1 text-xs disabled:opacity-50";
 
 export function PivotToolbar({
   strings,
@@ -130,7 +128,9 @@ export function PivotToolbar({
               aria-label="Chart type"
               value={config.chart.type}
               onChange={(e) =>
-                onChange({ chart: { ...config.chart, type: e.target.value as PivotConfig["chart"]["type"] } })
+                onChange({
+                  chart: { ...config.chart, type: e.target.value as PivotConfig["chart"]["type"] },
+                })
               }
               className={select}
             >
@@ -163,7 +163,6 @@ export function PivotToolbar({
           </label>
         </>
       )}
-
 
       <span className="mx-1 h-5 w-px bg-border" aria-hidden="true" />
 
@@ -210,7 +209,9 @@ export function PivotToolbar({
             aria-label="Grand totals position"
             value={config.grandTotalsPosition}
             onChange={(e) =>
-              onChange({ grandTotalsPosition: e.target.value as PivotConfig["grandTotalsPosition"] })
+              onChange({
+                grandTotalsPosition: e.target.value as PivotConfig["grandTotalsPosition"],
+              })
             }
             className={select}
           >
