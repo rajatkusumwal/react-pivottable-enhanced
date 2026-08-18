@@ -163,7 +163,7 @@
   }
 }
 
-/* Flexmonster-like grid skin shared by both engines. */
+/* Commercial-grade pivot grid skin shared by both engines. */
 @layer components {
   .pivot-fm table {
     border-collapse: collapse;

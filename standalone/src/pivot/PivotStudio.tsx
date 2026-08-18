@@ -65,7 +65,7 @@ export interface PivotStudioProps {
   /** Dataset handle for backend queries. */
   datasetId?: string;
   /**
-   * "dialog" (default) reproduces Flexmonster: a field bar above the grid plus a
+   * "dialog" (default) reproduces the commercial layout: a field bar above the grid plus a
    * popup field list. "sidebar" keeps the docked panel.
    */
   fieldsUi?: "dialog" | "sidebar";

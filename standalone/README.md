@@ -1,6 +1,6 @@
 # inhouse-grid-monster
 
-A Flexmonster-style pivot table for React: drag & drop fields, filters,
+A commercial-style pivot table for React: drag & drop fields, filters,
 calculated values, subtotals, charts, drill-through, export and inline editing.
 Aggregation runs in the browser by default and can be moved to a backend
 service by passing a different engine.
@@ -139,7 +139,7 @@ override any of them in your own CSS to re-skin the grid:
 | `engine`                      | `PivotEngineAdapter`     | local           | Swap in backend aggregation                      |
 | `datasetId`                   | `string`                 | —               | Dataset handle sent with backend queries         |
 | `onUploadToBackend`           | `(file) => Promise<…>`   | —               | Send uploads to your service instead of memory   |
-| `fieldsUi`                    | `"dialog" \| "sidebar"`  | `"dialog"`      | Flexmonster popup field list, or a docked panel  |
+| `fieldsUi`                    | `"dialog" \| "sidebar"`  | `"dialog"`      | Popup field list, or a docked panel              |
 | `showToolbar` / `showSidebar` | `boolean`                | `true`          | Hide chrome when the host supplies its own       |
 | `allowFileUpload`             | `boolean`                | `false`         | Show the CSV/JSON drop bar                       |
 | `permissions`                 | `Permissions`            | all on          | Turn off export, drill-through, editing, …       |

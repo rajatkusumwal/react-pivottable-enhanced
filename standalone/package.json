@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": false,
   "license": "MIT",
-  "description": "Flexmonster-like pivot table for React: drag & drop fields, filters, calculated values, charts, drill-through and export. Styled with Tailwind, no UI framework required.",
+  "description": "Commercial-grade pivot table for React: drag & drop fields, filters, calculated values, charts, drill-through and export. Styled with Tailwind, no UI framework required.",
   "keywords": [
     "react",
     "pivot-table",

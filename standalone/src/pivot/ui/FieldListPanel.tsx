@@ -38,7 +38,7 @@ export interface FieldListPanelProps {
   config: PivotConfig;
   readOnly: boolean;
   onChange: (patch: Partial<PivotConfig>) => void;
-  /** Dialog mode lays the panel out in two columns like Flexmonster. */
+  /** Dialog mode lays the panel out in two columns like a commercial pivot table's */
   layout?: "dialog" | "sidebar";
 }
 
@@ -47,7 +47,7 @@ const heading = "mb-2 text-xs font-semibold uppercase tracking-wide text-muted-f
 const control = "w-full rounded-md border border-border bg-background px-2 py-1.5 text-sm";
 const small = "rounded-md border border-border bg-background px-1.5 py-1 text-[11px]";
 
-/** Field list ordering, mirroring Flexmonster's "sort fields" menu. */
+/** Field list ordering, mirroring a commercial pivot table's "sort fields" menu. */
 export type SortMode = "source" | "asc" | "desc";
 
 interface FieldGroup {
@@ -94,7 +94,7 @@ function SourceField({
 }
 
 /**
- * The Flexmonster-style field list: searchable source fields on the left,
+ * The commercial-style field list: searchable source fields on the left,
  * Report filters / Columns / Rows / Measures drop zones on the right.
  * Every drag interaction also has a keyboard/select equivalent.
  */

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { PivotStudio, sampleData, sampleFields, createDefaultConfig } from "inhouse-grid-monster";
 
-const TITLE = "Free Pivot Table Demo: A Flexmonster-Style Grid on react-pivottable";
+const TITLE = "Free Pivot Table Demo: A Commercial-Grade Grid You Can Self-Host";
 const DESCRIPTION =
   "Try a free pivot table with drag-and-drop fields, filters, calculated values, subtotals, charts, drill-through, export and your own uploaded CSV or JSON file.";
 

@@ -13,9 +13,9 @@ import {
 } from "@/lib/pivot-comparison";
 import { cn } from "@/lib/utils";
 
-const TITLE = "Pivot Table Tools Compared: Flexmonster vs Free Options";
+const TITLE = "Pivot Table Tools Compared: Commercial vs Free Options";
 const DESCRIPTION =
-  "A plain-English comparison of the paid Flexmonster pivot table against the free react-pivottable engine and the inhouse-grid-monster shell built on top of it.";
+  "A plain-English comparison of paid commercial pivot tables against the free react-pivottable engine and the inhouse-grid-monster shell built on top of it.";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/")({
 });
 
 const plainNames: Record<ProductKey, { name: string; price: string }> = {
-  flexmonster: { name: "Flexmonster", price: "Paid" },
+  commercial: { name: "Commercial pivot table", price: "Paid" },
   reactPivottable: { name: "react-pivottable", price: "Free" },
   studio: { name: "inhouse-grid-monster", price: "Free" },
 };
@@ -93,7 +93,7 @@ function ComparisonPage() {
             return false;
           }
           if (diffOnly) {
-            const s = new Set([r.flexmonster.s, r.reactPivottable.s, r.studio.s]);
+            const s = new Set([r.commercial.s, r.reactPivottable.s, r.studio.s]);
             if (s.size === 1) return false;
           }
           return true;
@@ -114,11 +114,11 @@ function ComparisonPage() {
           <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">
             A pivot table lets people slice and summarise data on a screen, like in Excel. Below we
             take everything the paid tool{" "}
-            <strong className="font-medium text-foreground">Flexmonster</strong> can do —{" "}
-            {totalFeatures} things in total — and check whether the leading free tool,
+            <strong className="font-medium text-foreground">commercial pivot tables</strong> can do
+            — {totalFeatures} things in total — and check whether the leading free tool,
             react-pivottable, can do the same — plus the{" "}
             <strong className="font-medium text-foreground">inhouse-grid-monster</strong> shell on
-            this site, which builds a familiar Flexmonster-style experience on top of it.
+            this site, which builds a familiar commercial-style experience on top of it.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link
@@ -174,7 +174,7 @@ function ComparisonPage() {
                     >
                       Open the demo
                     </Link>
-                  ) : (
+                  ) : p.url ? (
                     <a
                       href={p.url}
                       target="_blank"
@@ -183,7 +183,7 @@ function ComparisonPage() {
                     >
                       Visit website
                     </a>
-                  )}
+                  ) : null}
                 </article>
               );
             })}
@@ -284,7 +284,7 @@ function ComparisonPage() {
           <div className="mt-6 hidden overflow-hidden rounded-xl border border-border md:block">
             <table className="w-full border-collapse text-sm">
               <caption className="sr-only">
-                Feature support comparison between Flexmonster, react-pivottable and
+                Feature support comparison between commercial pivot tables, react-pivottable and
                 inhouse-grid-monster
               </caption>
               <thead>
@@ -381,9 +381,9 @@ function ComparisonPage() {
 
         <footer className="mt-12 border-t border-border pt-6 text-sm leading-relaxed text-muted-foreground">
           <p>
-            Based on the official Flexmonster documentation and pricing pages, the react-pivottable
-            docs, and our own demo implementation. Last checked 16 August 2026 — always double-check
-            with the vendor before buying.
+            Based on published commercial pivot table documentation and pricing pages, the
+            react-pivottable docs, and our own demo implementation. Last checked 16 August 2026 —
+            always double-check with the vendor before buying.
           </p>
         </footer>
       </div>

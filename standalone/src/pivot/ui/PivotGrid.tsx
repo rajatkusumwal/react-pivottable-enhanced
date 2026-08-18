@@ -2,7 +2,7 @@
  * Pure display grid.
  *
  * It knows nothing about where the numbers came from: give it a `PivotResult`
- * and it renders a Flexmonster-style grid with compact / classic / flat
+ * and it renders a commercial-style grid with compact / classic / flat
  * layouts, subtotals, expand & collapse, sorting, column resizing, cell
  * selection with clipboard copy, keyboard navigation and row windowing.
  */

@@ -1,6 +1,6 @@
 # inhouse-grid-monster
 
-A free, Flexmonster-like pivot table for React 19, with its own aggregation engine
+A free, commercial-grade pivot table for React 19, with its own aggregation engine
 and grid renderer — no paid licence and no heavy UI framework. Drag-and-drop field
 list, subtotals, expand/collapse, compact / classic / flat layouts, filters,
 calculated values, charts, drill-through, exports, localisation and row-level
@@ -60,7 +60,7 @@ truth, and this demo site imports it through the `inhouse-grid-monster` path ali
 | `engine`                                              | `PivotEngineAdapter`                                 | Aggregation engine; defaults to the local one                                               |
 | `initialConfig` / `config` + `onConfigChange`         | `PivotConfig`                                        | Uncontrolled or controlled state                                                            |
 | `permissions`                                         | `Permissions`                                        | `readOnly`, `allowExport`, `allowDrillThrough`, `deniedFields`, `maskedFields`, `rowFilter` |
-| `fieldsUi`                                            | `"dialog" \| "sidebar"`                              | Flexmonster-style popup (default) or docked panel                                           |
+| `fieldsUi`                                            | `"dialog" \| "sidebar"`                              | commercial-style popup (default) or docked panel                                            |
 | `allowFileUpload`                                     | `boolean`                                            | Show the CSV/JSON upload bar                                                                |
 | `onUploadToBackend`                                   | `(file) => Promise<{ datasetId, rowCount, fields }>` | Send uploads to your service instead of memory                                              |
 | `datasetId`                                           | `string`                                             | Dataset handle passed to the backend engine                                                 |
@@ -742,7 +742,7 @@ values, charts, export, localisation, permissions, controlled config, the drag-a
 field list, member filters, file upload, and a custom engine adapter (proving the backend
 swap works without UI changes).
 
-`standalone/src/pivot/ui/PivotGrid.test.tsx` covers the Flexmonster-style grid itself:
+`standalone/src/pivot/ui/PivotGrid.test.tsx` covers the commercial-style grid itself:
 compact / classic / flat layouts, subtotals and grand totals, expand and collapse,
 spreadsheet headers, repeated member labels, cell selection with the auto-calculation
 stats, keyboard navigation, clipboard copy, multi-column sorting, column drill and row
