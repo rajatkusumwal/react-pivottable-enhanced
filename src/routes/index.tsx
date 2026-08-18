@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 
 const TITLE = "Pivot Table Tools Compared: Commercial vs Free Options";
 const DESCRIPTION =
-  "A plain-English comparison of paid commercial pivot tables against the free react-pivottable engine and the inhouse-grid-monster shell built on top of it.";
+  "A plain-English comparison of paid commercial pivot tables against the free react-pivottable engine and the react-pivottable-enhanced shell built on top of it.";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -34,7 +34,7 @@ export const Route = createFileRoute("/")({
 const plainNames: Record<ProductKey, { name: string; price: string }> = {
   commercial: { name: "Commercial pivot table", price: "Paid" },
   reactPivottable: { name: "react-pivottable", price: "Free" },
-  studio: { name: "inhouse-grid-monster", price: "Free" },
+  studio: { name: "react-pivottable-enhanced", price: "Free" },
 };
 
 const statusMeta = {
@@ -117,7 +117,7 @@ function ComparisonPage() {
             <strong className="font-medium text-foreground">commercial pivot tables</strong> can do
             — {totalFeatures} things in total — and check whether the leading free tool,
             react-pivottable, can do the same — plus the{" "}
-            <strong className="font-medium text-foreground">inhouse-grid-monster</strong> shell on
+            <strong className="font-medium text-foreground">react-pivottable-enhanced</strong> shell on
             this site, which builds a familiar commercial-style experience on top of it.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
@@ -125,7 +125,7 @@ function ComparisonPage() {
               to="/demos"
               className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground"
             >
-              Try inhouse-grid-monster
+              Try react-pivottable-enhanced
             </Link>
             <Link
               to="/docs"
@@ -285,7 +285,7 @@ function ComparisonPage() {
             <table className="w-full border-collapse text-sm">
               <caption className="sr-only">
                 Feature support comparison between commercial pivot tables, react-pivottable and
-                inhouse-grid-monster
+                react-pivottable-enhanced
               </caption>
               <thead>
                 <tr className="bg-surface-2">

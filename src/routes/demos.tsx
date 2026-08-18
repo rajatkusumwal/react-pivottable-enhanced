@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowLeft, ExternalLink } from "lucide-react";
-import { PivotStudio, sampleData, sampleFields, createDefaultConfig } from "inhouse-grid-monster";
+import { PivotStudio, sampleData, sampleFields, createDefaultConfig } from "react-pivottable-enhanced";
 
 const TITLE = "Free Pivot Table Demo: A Commercial-Grade Grid You Can Self-Host";
 const DESCRIPTION =

@@ -1,5 +1,5 @@
 /**
- * Ships the theme tokens inside dist/, so `inhouse-grid-monster/styles.css`
+ * Ships the theme tokens inside dist/, so `react-pivottable-enhanced/styles.css`
  * resolves from the published tarball without depending on src/.
  */
 import { copyFile, mkdir } from "node:fs/promises";

@@ -11,9 +11,9 @@
 
 <!-- LOVABLE:END -->
 
-# inhouse-grid-monster — working agreements
+# react-pivottable-enhanced — working agreements
 
-This repo is one product: a commercial-style pivot table (`standalone/src/pivot`, published as the `inhouse-grid-monster` npm package)
+This repo is one product: a commercial-style pivot table (`standalone/src/pivot`, published as the `react-pivottable-enhanced` npm package)
 plus a small marketing/demo site (`src/routes`). Junior developers read this code
 daily, so favour the obvious solution over the clever one.
 
@@ -29,7 +29,7 @@ standalone/src/pivot/
   ui/               presentational pieces (grid, toolbar, sidebar, dialogs, chart)
   *.ts                pure helpers: aggregators, filters, calculated, export, format, sort…
   *.test.ts(x)        tests sit next to the code they cover
-src/routes/                   demo site; imports the library as "inhouse-grid-monster"
+src/routes/                   demo site; imports the library as "react-pivottable-enhanced"
 src/lib/pivot-comparison.ts   feature matrix shown on the home page
 ```
 

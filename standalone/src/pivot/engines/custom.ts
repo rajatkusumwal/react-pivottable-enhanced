@@ -1,5 +1,5 @@
 /**
- * Custom data source API — plug any backend into inhouse-grid-monster.
+ * Custom data source API — plug any backend into react-pivottable-enhanced.
  *
  * Implement as much of `CustomDataSource` as your service supports:
  *

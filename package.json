@@ -1,8 +1,8 @@
 {
-  "name": "inhouse-grid-monster-site",
+  "name": "react-pivottable-enhanced-site",
   "version": "1.0.0",
   "private": true,
-  "description": "Demo site and documentation for inhouse-grid-monster; the pivot table library source lives in standalone/src/pivot.",
+  "description": "Demo site and documentation for react-pivottable-enhanced; the pivot table library source lives in standalone/src/pivot.",
   "license": "MIT",
   "sideEffects": false,
   "type": "module",

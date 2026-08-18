@@ -34,8 +34,8 @@
     "noUncheckedSideEffectImports": true,
     "paths": {
       "@/*": ["./src/*"],
-      "inhouse-grid-monster": ["./standalone/src/index.ts"],
-      "inhouse-grid-monster/*": ["./standalone/src/*"]
+      "react-pivottable-enhanced": ["./standalone/src/index.ts"],
+      "react-pivottable-enhanced/*": ["./standalone/src/*"]
     }
   }
 }
