@@ -1,0 +1,23 @@
+# Cloud Foundry manifest for the demo site.
+#
+# Build the Node server bundle first (the default build targets Cloudflare and
+# cannot run on CF):
+#
+#   npm run build:local        # emits dist/
+#   cf push                    # pushes dist/ with the Node.js buildpack
+#
+# Nitro's node-server entry listens on $PORT, which CF injects at runtime.
+applications:
+  - name: react-pivottable-enhanced
+    path: dist
+    buildpacks:
+      - nodejs_buildpack
+    command: node server/index.mjs
+    memory: 512M
+    disk_quota: 1G
+    instances: 1
+    health-check-type: port
+    env:
+      NODE_ENV: production
+      NPM_CONFIG_PRODUCTION: "true"
+      OPTIMIZE_MEMORY: "true"

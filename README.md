@@ -895,6 +895,38 @@ PORT=8080 node dist/server/index.mjs
 No `node_modules`, source files or project root are needed in the deployment
 folder — only Node.js 18+. The server is bundled with its runtime dependencies.
 
+### Deploying to Cloud Foundry (`cf push`)
+
+The repo ships a `manifest.yml` that pushes the `dist/` folder with the Node.js
+buildpack. Build the Node bundle first — the default Cloudflare build (`.output/`)
+will not run on CF:
+
+```bash
+npm run build:local        # emits dist/ (Node server bundle)
+cf login -a <your-api-endpoint>
+cf push                    # uses manifest.yml
+```
+
+What the manifest does:
+
+- `path: dist` — only the built bundle is uploaded, no sources or `node_modules`
+- `command: node server/index.mjs` — Nitro's Node entry
+- the app listens on `$PORT`, which Cloud Foundry injects; no code change needed
+- `nodejs_buildpack` supplies the Node runtime (the bundle has no npm deps to install)
+
+Useful variations:
+
+```bash
+cf push my-app-name                  # override the app name
+cf push -f manifest.yml --var ...    # if you templatise the manifest
+cf logs react-pivottable-enhanced --recent
+```
+
+If the app crashes on start, check `cf logs` for `Cannot find module` — that
+means the Cloudflare build was pushed by mistake; re-run `npm run build:local`.
+
+
+
 
 Conventions (also documented for AI coding agents in `AGENTS.md`, `CLAUDE.md`
 and `GEMINI.md`): tests live next to the code, cover a normal case, an edge case
