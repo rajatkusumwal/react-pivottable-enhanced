@@ -1,6 +1,9 @@
 {
-  "name": "tanstack_start_ts",
+  "name": "inhouse-grid-monster-site",
+  "version": "1.0.0",
   "private": true,
+  "description": "Demo site and documentation for inhouse-grid-monster, a Flexmonster-like React pivot table component.",
+  "license": "MIT",
   "sideEffects": false,
   "type": "module",
   "scripts": {
