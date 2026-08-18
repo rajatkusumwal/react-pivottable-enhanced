@@ -13,9 +13,9 @@ import {
 } from "@/lib/pivot-comparison";
 import { cn } from "@/lib/utils";
 
-const TITLE = "Pivot Table Tools Compared: commercial pivot tables vs Free Options";
+const TITLE = "Pivot Table Tools Compared: Commercial vs Free Options";
 const DESCRIPTION =
-  "A plain-English comparison of the paid commercial pivot tables pivot table against the free react-pivottable engine and the inhouse-grid-monster shell built on top of it.";
+  "A plain-English comparison of paid commercial pivot tables against the free react-pivottable engine and the inhouse-grid-monster shell built on top of it.";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/")({
 });
 
 const plainNames: Record<ProductKey, { name: string; price: string }> = {
-  commercial: { name: "commercial pivot tables", price: "Paid" },
+  commercial: { name: "Commercial pivot table", price: "Paid" },
   reactPivottable: { name: "react-pivottable", price: "Free" },
   studio: { name: "inhouse-grid-monster", price: "Free" },
 };
@@ -381,7 +381,7 @@ function ComparisonPage() {
 
         <footer className="mt-12 border-t border-border pt-6 text-sm leading-relaxed text-muted-foreground">
           <p>
-            Based on the official commercial pivot tables documentation and pricing pages, the react-pivottable
+            Based on published commercial pivot table documentation and pricing pages, the react-pivottable
             docs, and our own demo implementation. Last checked 16 August 2026 — always double-check
             with the vendor before buying.
           </p>

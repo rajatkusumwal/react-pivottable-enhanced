@@ -21,7 +21,7 @@ export interface FieldChipProps {
 }
 
 /**
- * A draggable field chip. Looks like a commercial pivot tables field token: grab handle,
+ * A draggable field chip. Looks like a commercial field token: grab handle,
  * caption, optional filter funnel and a remove cross.
  */
 export function FieldChip({

@@ -26,7 +26,7 @@ const n = (note?: string): Cell => ({ s: "no", ...(note ? { note } : {}) });
 export const products = [
   {
     key: "commercial" as const,
-    name: "commercial pivot tables",
+    name: "Commercial pivot table",
     subtitle: "Commercial • from $799/yr",
     url: "https://www.commercial.com/technical-specifications/",
   },
