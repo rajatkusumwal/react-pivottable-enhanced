@@ -8,6 +8,7 @@ import type {
   NumberFormat,
   PivotConfig,
 } from "../types";
+import { ModalPortal } from "./ModalPortal";
 
 export interface FormatDialogProps {
   open: boolean;
@@ -132,6 +133,7 @@ export function FormatDialog({
                 const format = value.format ?? {};
                 const caption = value.caption ?? value.field;
                 return (
+    <ModalPortal>
                   <fieldset
                     key={`${value.field}-${index}`}
                     className="rounded-md border border-border p-3"
@@ -343,5 +345,6 @@ export function FormatDialog({
         </footer>
       </div>
     </div>
+    </ModalPortal>
   );
 }
