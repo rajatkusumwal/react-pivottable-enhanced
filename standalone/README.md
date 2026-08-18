@@ -885,11 +885,11 @@ the grid, aggregation engine and exporters are written from scratch in this repo
 
 ---
 
-## Source, issues & contributing
+## Contributing
 
-- Repository: https://github.com/rajatkusumwal/react-pivottable-enhanced
-- Issues: https://github.com/rajatkusumwal/react-pivottable-enhanced/issues
-- Contributing guide: [CONTRIBUTING.md](https://github.com/rajatkusumwal/react-pivottable-enhanced/blob/main/CONTRIBUTING.md)
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for the workflow, code style and rules for agent-authored patches.
+
+The repository is currently private. Public links will be added when the project is opened up.
 
 ## Built with AI
 
