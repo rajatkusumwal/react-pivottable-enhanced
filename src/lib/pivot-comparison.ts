@@ -587,7 +587,7 @@ const rawCategories: RawCategory[] = [
       { feature: "Source code available", commercial: n(), reactPivottable: y() },
       {
         feature: "Internal-use commercial licence",
-        commercial: y("from ~$799/yr"),
+        commercial: y("Paid tier"),
         reactPivottable: y("MIT"),
       },
       {
