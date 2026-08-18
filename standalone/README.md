@@ -827,7 +827,52 @@ npm run build      # bundle + types + theme css -> dist/
 npm publish        # prepublishOnly re-runs the build
 ```
 
+### Distribute the `dist/` folder locally
+
+You can share the built package without publishing to npm. Two common ways:
+
+#### Option A: pack a tarball and install it
+
+From the `standalone/` directory:
+
+```bash
+npm run build
+npm pack           # creates react-pivottable-enhanced-1.0.0.tgz
+```
+
+Copy the `.tgz` file to the target machine or project, then install it:
+
+```bash
+npm install /path/to/react-pivottable-enhanced-1.0.0.tgz
+# or with yarn
+yarn add file:/path/to/react-pivottable-enhanced-1.0.0.tgz
+```
+
+In a consuming app the imports stay the same:
+
+```tsx
+import { PivotStudio, sampleData, sampleFields } from "react-pivottable-enhanced";
+import "react-pivottable-enhanced/styles.css";
+```
+
+#### Option B: install from a local directory
+
+If the `standalone/` folder is already on the target machine (e.g. cloned repo,
+shared network drive), install straight from that folder:
+
+```bash
+npm install /path/to/standalone
+# or
+npm install /path/to/standalone/react-pivottable-enhanced-1.0.0.tgz
+```
+
+This works because `standalone/package.json` declares the correct `main`, `module`,
+`types` and `exports` entries, and the `files` array ships only `dist/`, `README.md`
+and `LICENSE`. Peer dependencies (`react`, `react-dom`) and runtime dependencies
+(`@dnd-kit/*`, `lucide-react`, `recharts`) are installed by npm alongside the tarball.
+
 ### Pre-publish checklist
+
 
 Run from the repo root:
 
