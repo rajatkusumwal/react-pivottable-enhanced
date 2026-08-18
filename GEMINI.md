@@ -3,7 +3,6 @@ Read [CONTRIBUTING.md](./CONTRIBUTING.md) before making a change; it covers the 
 
 This project was developed entirely with AI coding agents and is provided as is under the MIT licence — review and test before production use.
 
-
 ## Angular wrapper (`angular/`)
 
 `angular/src` holds `react-pivottable-enhanced-angular`: a thin `<pivot-studio>`

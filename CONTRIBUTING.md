@@ -124,7 +124,6 @@ Please include:
 By contributing you agree that your contribution is licensed under the
 [MIT licence](./LICENSE).
 
-
 ## Angular wrapper (`angular/`)
 
 `angular/src` holds `react-pivottable-enhanced-angular`: a thin `<pivot-studio>`

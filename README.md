@@ -865,10 +865,10 @@ looks for a static `dist/server/server` entry and fails).
 
 Note the two different build targets:
 
-| Command           | Target                | Output folder | Runs with                |
-| ----------------- | --------------------- | ------------- | ------------------------ |
-| `npm run build`   | Cloudflare Workers    | `.output/`    | wrangler (not `node`)    |
-| `npm run build:local` | plain Node server | `dist/`       | `node dist/server/index.mjs` |
+| Command               | Target             | Output folder | Runs with                    |
+| --------------------- | ------------------ | ------------- | ---------------------------- |
+| `npm run build`       | Cloudflare Workers | `.output/`    | wrangler (not `node`)        |
+| `npm run build:local` | plain Node server  | `dist/`       | `node dist/server/index.mjs` |
 
 So for a local demo use the Node build, not the default one:
 
@@ -924,9 +924,6 @@ cf logs react-pivottable-enhanced --recent
 
 If the app crashes on start, check `cf logs` for `Cannot find module` — that
 means the Cloudflare build was pushed by mistake; re-run `npm run build:local`.
-
-
-
 
 Conventions (also documented for AI coding agents in `AGENTS.md`, `CLAUDE.md`
 and `GEMINI.md`): tests live next to the code, cover a normal case, an edge case
@@ -989,10 +986,10 @@ backend-engine wiring, are in [`standalone/README.md`](./standalone/README.md).
 
 ## Framework integrations
 
-| Framework | Package                                 | Status                                   |
-| --------- | --------------------------------------- | ---------------------------------------- |
-| React     | `react-pivottable-enhanced`             | Native — this is where the code lives    |
-| Angular   | `react-pivottable-enhanced-angular`     | Supported through a thin wrapper component |
+| Framework | Package                             | Status                                     |
+| --------- | ----------------------------------- | ------------------------------------------ |
+| React     | `react-pivottable-enhanced`         | Native — this is where the code lives      |
+| Angular   | `react-pivottable-enhanced-angular` | Supported through a thin wrapper component |
 
 ### Angular
 
@@ -1012,8 +1009,12 @@ import { PivotStudioComponent, sampleData, sampleFields } from "react-pivottable
 @Component({
   standalone: true,
   imports: [PivotStudioComponent],
-  template: `<pivot-studio [data]="data" [fields]="fields" title="Sales report"
-    (configChange)="onLayout($event)"></pivot-studio>`,
+  template: `<pivot-studio
+    [data]="data"
+    [fields]="fields"
+    title="Sales report"
+    (configChange)="onLayout($event)"
+  ></pivot-studio>`,
 })
 export class ReportsComponent {
   data = sampleData;

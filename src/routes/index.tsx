@@ -424,8 +424,6 @@ function ComparisonPage() {
           </p>
         </section>
 
-
-
         <footer className="mt-12 border-t border-border pt-6 text-sm leading-relaxed text-muted-foreground">
           <p>
             Based on publicly published documentation for commercial pivot tables, the

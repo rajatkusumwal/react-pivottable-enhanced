@@ -145,7 +145,6 @@ const toc = [
   ["publish", "Publish your own copy"],
 ];
 
-
 /** Report configs used by the live examples below; each one matches its code sample. */
 const exampleConfigs = {
   basic: createDefaultConfig({
@@ -624,7 +623,9 @@ const engine = createBackendEngine({ baseUrl: "https://api.example.com/pivot" })
               prop and re-emits the callbacks as Angular outputs — same features, same engine, same
               config object.
             </p>
-            <Code>npm i react-pivottable-enhanced-angular react-pivottable-enhanced react react-dom</Code>
+            <Code>
+              npm i react-pivottable-enhanced-angular react-pivottable-enhanced react react-dom
+            </Code>
             <Code label="reports.component.ts">{`import { Component } from "@angular/core";
 import { PivotStudioComponent, sampleData, sampleFields } from "react-pivottable-enhanced-angular";
 
@@ -667,7 +668,6 @@ export class ReportsComponent {
 
           <Section id="publish" title="9. Publish your own copy">
             <p>
-
               To ship a private build, the <code>standalone/</code> folder in this repo is the
               package: it syncs the component source, emits types and bundles ESM with React kept
               external.

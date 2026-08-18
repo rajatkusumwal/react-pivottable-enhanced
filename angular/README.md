@@ -80,29 +80,29 @@ export class ReportsModule {}
 
 ## Inputs
 
-| Input               | Type                                          | Default          | What it does                                          |
-| ------------------- | --------------------------------------------- | ---------------- | ----------------------------------------------------- |
-| `data`              | `PivotRow[]`                                  | `[]`             | Records to analyse (used by the local engine)          |
-| `fields`            | `FieldDef[]`                                  | `[]`             | Field metadata; use `inferFields(data)` if you have none |
-| `engine`            | `PivotEngineAdapter`                          | local engine     | Swap browser aggregation for a backend service         |
-| `initialConfig`     | `Partial<PivotConfig>`                        | —                | Starting layout (uncontrolled)                         |
-| `config`            | `PivotConfig`                                 | —                | Fully controlled layout; pair with `(configChange)`    |
-| `permissions`       | `Permissions`                                 | all allowed      | Turn off edit / export / drill-through                 |
-| `title`             | `string`                                      | `"Pivot table"`  | Accessible name of the pivot region                    |
-| `className`         | `string`                                      | `""`             | Extra classes on the wrapper                           |
-| `showSidebar`       | `boolean`                                     | `true`           | Show the docked field panel                            |
-| `showToolbar`       | `boolean`                                     | `true`           | Show the toolbar                                       |
-| `allowFileUpload`   | `boolean`                                     | `false`          | Show the "import your own file" bar                    |
-| `onUploadToBackend` | `UploadHandler`                               | —                | Send uploads to your service instead of memory         |
-| `datasetId`         | `string`                                      | —                | Dataset handle for backend queries                     |
-| `fieldsUi`          | `"dialog" \| "sidebar"`                       | `"dialog"`       | Field bar + popup, or docked panel                     |
+| Input               | Type                    | Default         | What it does                                             |
+| ------------------- | ----------------------- | --------------- | -------------------------------------------------------- |
+| `data`              | `PivotRow[]`            | `[]`            | Records to analyse (used by the local engine)            |
+| `fields`            | `FieldDef[]`            | `[]`            | Field metadata; use `inferFields(data)` if you have none |
+| `engine`            | `PivotEngineAdapter`    | local engine    | Swap browser aggregation for a backend service           |
+| `initialConfig`     | `Partial<PivotConfig>`  | —               | Starting layout (uncontrolled)                           |
+| `config`            | `PivotConfig`           | —               | Fully controlled layout; pair with `(configChange)`      |
+| `permissions`       | `Permissions`           | all allowed     | Turn off edit / export / drill-through                   |
+| `title`             | `string`                | `"Pivot table"` | Accessible name of the pivot region                      |
+| `className`         | `string`                | `""`            | Extra classes on the wrapper                             |
+| `showSidebar`       | `boolean`               | `true`          | Show the docked field panel                              |
+| `showToolbar`       | `boolean`               | `true`          | Show the toolbar                                         |
+| `allowFileUpload`   | `boolean`               | `false`         | Show the "import your own file" bar                      |
+| `onUploadToBackend` | `UploadHandler`         | —               | Send uploads to your service instead of memory           |
+| `datasetId`         | `string`                | —               | Dataset handle for backend queries                       |
+| `fieldsUi`          | `"dialog" \| "sidebar"` | `"dialog"`      | Field bar + popup, or docked panel                       |
 
 ## Outputs
 
-| Output         | Payload       | Fires when                                                     |
-| -------------- | ------------- | -------------------------------------------------------------- |
-| `configChange` | `PivotConfig` | The report layout changes (drag & drop, sorting, filters, …)     |
-| `dataChange`   | `PivotRow[]`  | Inline editing writes new values back into the records           |
+| Output         | Payload       | Fires when                                                   |
+| -------------- | ------------- | ------------------------------------------------------------ |
+| `configChange` | `PivotConfig` | The report layout changes (drag & drop, sorting, filters, …) |
+| `dataChange`   | `PivotRow[]`  | Inline editing writes new values back into the records       |
 
 Both are emitted inside the Angular zone, so change detection runs as usual.
 
@@ -112,11 +112,19 @@ Both are emitted inside the Angular zone, so change detection runs as usual.
 @Component({
   standalone: true,
   imports: [PivotStudioComponent],
-  template: `<pivot-studio [data]="data" [fields]="fields" [config]="config"
-    (configChange)="config = $event"></pivot-studio>`,
+  template: `<pivot-studio
+    [data]="data"
+    [fields]="fields"
+    [config]="config"
+    (configChange)="config = $event"
+  ></pivot-studio>`,
 })
 export class ControlledComponent {
-  config: PivotConfig = { ...createDefaultConfig(), rows: ["Region"], values: [{ field: "Revenue", aggregator: "sum" }] };
+  config: PivotConfig = {
+    ...createDefaultConfig(),
+    rows: ["Region"],
+    values: [{ field: "Revenue", aggregator: "sum" }],
+  };
 }
 ```
 
@@ -135,7 +143,12 @@ export class ReportsComponent {
 ```
 
 ```html
-<pivot-studio [engine]="engine" [datasetId]="datasetId" [data]="[]" [fields]="fields"></pivot-studio>
+<pivot-studio
+  [engine]="engine"
+  [datasetId]="datasetId"
+  [data]="[]"
+  [fields]="fields"
+></pivot-studio>
 ```
 
 ## Server-side rendering
@@ -144,7 +157,7 @@ The pivot renders in the browser only. Under Angular Universal, guard the compon
 
 ```html
 @if (isBrowser) {
-  <pivot-studio [data]="data" [fields]="fields"></pivot-studio>
+<pivot-studio [data]="data" [fields]="fields"></pivot-studio>
 }
 ```
 

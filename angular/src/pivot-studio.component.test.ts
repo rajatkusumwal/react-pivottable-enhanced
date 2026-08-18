@@ -103,8 +103,15 @@ describe("<pivot-studio>", () => {
     let emitted: PivotConfig | null = null;
     wrapper.configChange.subscribe((c: PivotConfig) => (emitted = c));
     // Trigger the React callback the same way the UI does, via the built props.
-    const props = (wrapper as unknown as { buildProps(): { onConfigChange?: (c: PivotConfig) => void } }).buildProps();
-    props.onConfigChange?.({ rows: [], columns: [], values: [], filters: [] } as unknown as PivotConfig);
+    const props = (
+      wrapper as unknown as { buildProps(): { onConfigChange?: (c: PivotConfig) => void } }
+    ).buildProps();
+    props.onConfigChange?.({
+      rows: [],
+      columns: [],
+      values: [],
+      filters: [],
+    } as unknown as PivotConfig);
     expect(emitted).not.toBeNull();
     expect(fixture.componentInstance.inZone.every(Boolean)).toBe(true);
   });
@@ -114,7 +121,9 @@ describe("<pivot-studio>", () => {
     fixture.detectChanges();
     await flush();
     const wrapper = fixture.debugElement.children[0]?.componentInstance as PivotStudioComponent;
-    const props = (wrapper as unknown as { buildProps(): { onDataChange?: (r: PivotRow[]) => void } }).buildProps();
+    const props = (
+      wrapper as unknown as { buildProps(): { onDataChange?: (r: PivotRow[]) => void } }
+    ).buildProps();
     props.onDataChange?.([{ a: 1 }]);
     expect(fixture.componentInstance.rows).toHaveLength(1);
   });
