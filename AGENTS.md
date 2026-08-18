@@ -57,7 +57,6 @@ src/lib/pivot-comparison.ts   feature matrix shown on the home page
 ## Contributing
 
 Full guide for humans and agents: [CONTRIBUTING.md](./CONTRIBUTING.md).
-Repository: https://github.com/rajatkusumwal/react-pivottable-enhanced
 
 - Only change what was asked; never edit `src/routeTree.gen.ts` or `dist/`.
 - Ship the test with the code, then run `bun run test` and `bunx tsgo --noEmit`

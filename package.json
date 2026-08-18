@@ -67,12 +67,7 @@
     "vite": "^8.2.0",
     "vitest": "^4.1.10"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/rajatkusumwal/react-pivottable-enhanced.git"
-  },
-  "homepage": "https://github.com/rajatkusumwal/react-pivottable-enhanced#readme",
-  "bugs": {
-    "url": "https://github.com/rajatkusumwal/react-pivottable-enhanced/issues"
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

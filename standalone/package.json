@@ -59,13 +59,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/rajatkusumwal/react-pivottable-enhanced.git",
-    "directory": "standalone"
-  },
-  "homepage": "https://github.com/rajatkusumwal/react-pivottable-enhanced#readme",
-  "bugs": {
-    "url": "https://github.com/rajatkusumwal/react-pivottable-enhanced/issues"
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

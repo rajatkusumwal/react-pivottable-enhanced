@@ -1,7 +1,5 @@
 # Contributing
 
-Repository: https://github.com/rajatkusumwal/react-pivottable-enhanced
-
 Welcome. This guide is written for two audiences: junior developers making their
 first change here, and AI coding agents doing the same. Both should be able to
 follow it top to bottom without asking anyone.
@@ -101,8 +99,8 @@ in both `standalone/package.json` and the README install notes.
 
 ## Reporting bugs and asking for features
 
-Open an issue at
-https://github.com/rajatkusumwal/react-pivottable-enhanced/issues with:
+The repository is currently private. Please share bug reports and feature requests
+with the maintainer directly, and include:
 
 - what you did, what you expected, what happened,
 - a minimal `data` + `initialConfig` snippet that reproduces it,
