@@ -8,6 +8,10 @@ service by passing a different engine.
 This is the reference manual for the package. The repo root `README.md` covers
 the demo site; everything a consuming app needs is here.
 
+- Source code: [github.com/rajatkusumwal/react-pivottable-enhanced](https://github.com/rajatkusumwal/react-pivottable-enhanced)
+- Issues: [github.com/rajatkusumwal/react-pivottable-enhanced/issues](https://github.com/rajatkusumwal/react-pivottable-enhanced/issues)
+- Contributing: [CONTRIBUTING.md](https://github.com/rajatkusumwal/react-pivottable-enhanced/blob/main/CONTRIBUTING.md)
+
 ## Contents
 
 1. [Feature list](#feature-list)

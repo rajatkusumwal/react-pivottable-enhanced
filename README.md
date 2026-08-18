@@ -6,6 +6,10 @@ list, subtotals, expand/collapse, compact / classic / flat layouts, filters,
 calculated values, charts, drill-through, exports, localisation and row-level
 security — in one component.
 
+- Source code: [github.com/rajatkusumwal/react-pivottable-enhanced](https://github.com/rajatkusumwal/react-pivottable-enhanced)
+- Issues: [github.com/rajatkusumwal/react-pivottable-enhanced/issues](https://github.com/rajatkusumwal/react-pivottable-enhanced/issues)
+- Contributing: [CONTRIBUTING.md](./CONTRIBUTING.md)
+
 Aggregation is **pluggable**: it runs in the browser by default and can be handed to a
 backend service (for example Spring Boot + DuckDB) without changing any UI code.
 

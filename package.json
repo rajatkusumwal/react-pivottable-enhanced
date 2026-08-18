@@ -4,6 +4,12 @@
   "private": true,
   "description": "Demo site and documentation for react-pivottable-enhanced; the pivot table library source lives in standalone/src/pivot.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rajatkusumwal/react-pivottable-enhanced"
+  },
+  "homepage": "https://github.com/rajatkusumwal/react-pivottable-enhanced#readme",
+  "bugs": "https://github.com/rajatkusumwal/react-pivottable-enhanced/issues",
   "sideEffects": false,
   "type": "module",
   "workspaces": [
