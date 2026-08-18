@@ -25,42 +25,104 @@ the demo site; everything a consuming app needs is here.
 13. [Troubleshooting](#troubleshooting)
 14. [Publishing this package](#publishing-this-package)
 
-## Screenshots
+## Feature list
 
-Every screenshot below is a real render of `PivotStudio` from the documentation
-page, with the exact code that produced it.
+Everything below ships in the package and is covered by the test suite. Each
+line names the capability and, where it exists, the prop or export that turns it
+on. "Not included" is listed honestly at the end so nobody plans around a gap.
 
-**A. Revenue by region and year** — two row levels, one column level, one
-currency measure, subtotals and grand totals.
+**Grid**
 
-![Pivot grid with region/country rows, year columns, subtotals and grand totals](./assets/basic-report.png)
+- Layouts: compact form, classic (tabular) form, flat table — `config.layout`
+- Virtualised rendering for thousands of rows
+- Subtotals and grand totals, toggled per rows/columns, positioned top or bottom
+- Expand/collapse members, drill up and down multilevel hierarchies
+- Sort members, sort by a value column, multi-column sort in flat table (shift-click)
+- Drag fields between rows, columns, measures and filters (`showDragDrop`)
+- Column/row resizing, cell selection, copy, keyboard navigation, row/column highlight
+- Selection summary bar (count, sum, average of selected cells)
+- Inline cell editing with proportional write-back (`allowEditing`, `onCellEdit`)
+- Grid title, custom captions for fields and measures, show/hide headers
 
-```tsx
-<PivotStudio
-  data={sampleData}
-  fields={sampleFields}
-  initialConfig={createDefaultConfig({
-    rows: ["region", "country"],
-    cols: ["year"],
-    values: [{ field: "revenue", aggregator: "sum", caption: "Revenue", format: { style: "currency", currency: "USD" } }],
-  })}
-/>
-```
+**Filters**
 
-**B. Several measures, formats and conditional highlighting** — sum, average and
-a "% of grand total" display mode, plus a colour rule on margin.
+- Member checkbox filters with a search box
+- Conditional filters for string, number, date and time fields
+- Top/bottom N value filters
+- Report (page) filter area, toggleable
+- Chart-level filters; filters can be pushed to the backend as subqueries
 
-![Pivot grid with multiple measures, percentage columns and conditional formatting](./assets/formatting.png)
+**Field list**
 
-**C. Charts and split view** — the same report drawn as a stacked column chart,
-with chart filters and drill-down back into the grid.
+- Dockable field list panel and dialog, searchable, with Expand All
+- Folders, hierarchies and sublevels, custom item ordering
+- Multiple fields in rows/columns, multiple measures, same field aggregated twice
+- String, date and time fields usable as measures
+- UI for adding calculated values; open/close the list from props
 
-![Stacked column chart rendered from the pivot report next to its grid](./assets/charts.png)
+**Aggregation**
 
-**D. Locked-down dashboard** — read-only mode: no toolbar, no field list, no
-drag & drop, for embedding inside an existing page.
+- `sum`, `count`, `distinctCount`, `average`, `median`, `product`, `min`, `max`,
+  population and sample standard deviation
+- Display modes: % of total, % of row, % of column, % of parent row/column,
+  index, difference and % difference, running totals
+- `registerAggregator` for custom functions; per-field allow-lists
 
-![Read-only pivot grid without toolbar or field list](./assets/locked-dashboard.png)
+**Calculated values**
+
+- Formula editor in the UI plus `config.calculated` in code
+- Formulas across several measures, grand-total-aware
+- KPI fields with status thresholds (`computeKpiStatus`)
+
+**Charts**
+
+- Column, bar, line, scatter, pie, stacked column, combined column + line, heatmap
+- Split view (grid + chart), tooltips, legend and title options
+- Click a bar or legend entry to filter or drill down
+
+**Drill-through**
+
+- Drill-through dialog from any grid cell or chart point
+- Configurable slice, column selection, sorting, row limit
+- Export the drill-through view itself
+
+**Toolbar and UI**
+
+- Built-in toolbar: layout switches, totals, export, print, language, clear
+- Save / open a report, share a report by link (`buildReportUrl`)
+- Conditional formatting UI and number formatting UI
+- Fullscreen mode, right-click context menu, fully customisable/hideable toolbar
+
+**Export and print**
+
+- Excel (`.xls` HTML workbook), CSV, TSV, HTML, JSON
+- Print / PDF through the browser print dialog
+- Custom headers and footers, drill-through export, copy to clipboard
+
+**Data sources**
+
+- In-browser JSON arrays and CSV (file, URL or paste)
+- CSV dialect options: separator, decimal mark, thousands separator
+- Any backend via `createBackendEngine` / `createCustomEngine`
+- Server-side aggregation for very large (1 GB+) datasets
+- Update data without resetting the current report
+
+**Options, styling and security**
+
+- Full report state save/restore as JSON (`config` + `onConfigChange`)
+- Localisation packs (`locale`, `locales`, `getLocale`), read-only mode
+- Theme tokens you can override, custom cell renderers, custom toolbar
+- Role-based access: `permissions`, `secureRows`, `visibleFields`, `can`
+- No data ever leaves your app unless you configure a backend engine
+
+**Not included** (so you can plan around it)
+
+- Direct database connectors (SQL, MongoDB, Elasticsearch) and OLAP/XMLA — connect
+  through your own API with a backend engine instead
+- Native PDF or PNG writers (printing covers PDF)
+- Angular, Vue, Svelte or Blazor wrappers — React only
+- Vendor support, SLA or a theme-builder tool
+
 
 ## For AI coding agents
 
