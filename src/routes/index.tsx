@@ -379,6 +379,53 @@ function ComparisonPage() {
           )}
         </section>
 
+        {/* Framework integrations */}
+        <section aria-labelledby="frameworks" className="mt-12">
+          <h2 id="frameworks" className="text-xl font-semibold text-foreground">
+            Works in React and Angular
+          </h2>
+          <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+            The pivot table is written in React. Angular apps use a small wrapper component that
+            mounts it, so both frameworks get exactly the same features — nothing is rebuilt twice.
+          </p>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <article className="rounded-xl border border-border bg-card p-5">
+              <h3 className="text-base font-semibold text-foreground">React</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Native. Install the package and render the component.
+              </p>
+              <pre className="mt-3 overflow-x-auto rounded-lg bg-surface px-3 py-2 text-xs text-foreground">
+                <code>npm i react-pivottable-enhanced</code>
+              </pre>
+              <pre className="mt-2 overflow-x-auto rounded-lg bg-surface px-3 py-2 text-xs text-foreground">
+                <code>{`<PivotStudio data={data} fields={fields} />`}</code>
+              </pre>
+            </article>
+            <article className="rounded-xl border border-border bg-card p-5">
+              <h3 className="text-base font-semibold text-foreground">Angular</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Same table through <code>&lt;pivot-studio&gt;</code>, with Angular inputs and
+                outputs.
+              </p>
+              <pre className="mt-3 overflow-x-auto rounded-lg bg-surface px-3 py-2 text-xs text-foreground">
+                <code>npm i react-pivottable-enhanced-angular</code>
+              </pre>
+              <pre className="mt-2 overflow-x-auto rounded-lg bg-surface px-3 py-2 text-xs text-foreground">
+                <code>{`<pivot-studio [data]="data" [fields]="fields"></pivot-studio>`}</code>
+              </pre>
+            </article>
+          </div>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Full setup for both is on the{" "}
+            <Link to="/docs" className="text-primary underline-offset-4 hover:underline">
+              docs page
+            </Link>
+            .
+          </p>
+        </section>
+
+
+
         <footer className="mt-12 border-t border-border pt-6 text-sm leading-relaxed text-muted-foreground">
           <p>
             Based on publicly published documentation for commercial pivot tables, the
