@@ -755,9 +755,22 @@ Useful commands:
 ```bash
 bun run dev      # start the demo app
 bun run test     # run the whole suite once (vitest)
+bun run test:package  # slow: build the npm package and test the artifact
 bun run lint     # eslint + prettier rules
 bun run format   # rewrite files with prettier
 ```
+
+### Testing the npm package
+
+`bun run test` includes `standalone/tests/package.test.ts`, which re-runs the
+sync script and checks that the package tree matches `src/components/pivot`
+(minus tests) and that every documented export resolves.
+
+`bun run test:package` is the slow suite: it runs the real library build
+(`sync -> vite build -> tsc -> copy-css`) and then asserts on `standalone/dist/`
+— that `index.js`, `index.d.ts` and `pivot-theme.css` exist, that React and the
+runtime deps stay external, and that a consumer can import the built bundle and
+render `PivotStudio`. Run it before every `npm publish`.
 
 ### Running a stable local demo (no HMR reloads)
 

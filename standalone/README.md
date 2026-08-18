@@ -124,5 +124,18 @@ npm run build      # sync + types + bundle + theme css -> dist/
 npm publish        # prepublishOnly re-runs the build
 ```
 
+### Pre-publish checklist
+
+Run from the repo root:
+
+```bash
+bun run test          # unit suite + package sync/export tests
+bun run test:package  # builds the package and tests dist/ as a consumer would
+```
+
+`test:package` fails if the bundle is missing, if the types or theme CSS are not
+emitted, if React (or another peer/runtime dependency) gets inlined, or if
+`PivotStudio` cannot render from the built artifact.
+
 `npm run sync` copies `src/components/pivot/` into `standalone/src/pivot/`
 (tests excluded); that folder is generated and gitignored.
