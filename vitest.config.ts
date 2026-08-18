@@ -1,11 +1,18 @@
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import tsconfigPaths from "vite-tsconfig-paths";
+import { resolve } from "node:path";
 
 export default defineConfig({
   plugins: [react(), tsconfigPaths()],
   resolve: {
     dedupe: ["react", "react-dom"],
+    alias: {
+      react: resolve("./node_modules/react"),
+      "react-dom": resolve("./node_modules/react-dom"),
+      "react/jsx-runtime": resolve("./node_modules/react/jsx-runtime"),
+      "react/jsx-dev-runtime": resolve("./node_modules/react/jsx-dev-runtime"),
+    },
   },
   test: {
     environment: "jsdom",
