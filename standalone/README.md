@@ -840,3 +840,35 @@ emitted, if React (or another peer/runtime dependency) gets inlined, or if
 
 Tests live next to the code in `standalone/src/pivot/` but never ship: the build
 excludes `*.test.*` and `files` publishes only `dist` and `README.md`.
+
+### What the suite covers
+
+341 tests across 21 files. The groups worth knowing about:
+
+| Area                | File(s)                                        | What is asserted                                                          |
+| ------------------- | ---------------------------------------------- | ------------------------------------------------------------------------- |
+| Core pivoting       | `pivot-core.test.ts`, `display-modes.test.ts`   | grouping, subtotals, grand totals, sorting, "% of" display modes            |
+| Edge cases          | `edge-cases.test.ts`                            | empty input, single row, blanks/nulls, wrong types, missing fields          |
+| Grid UI             | `ui/PivotGrid.test.tsx`                         | compact/classic/flat layouts, expand & collapse, selection, copy, windowing |
+| Full component      | `PivotStudio.test.tsx`                          | drag & drop, filters, calculated values, drill-down, import/clear           |
+| Charts & drill      | `charts.test.tsx`, `drillthrough.test.tsx`      | chart series, chart filtering, drill-through records and limits             |
+| Reporting           | `reporting-ui.test.tsx`, `report-link.test.ts`  | export matrices, headers/footers, share-by-link round-trip                  |
+| Backend contract    | `engines/backend.test.ts`, `engines/mock-api.test.ts` | request shape, headers, dataset ids, paging against a mocked REST API |
+| Backend failures    | `engines/backend-failures.test.ts`              | 500/401/413, dropped connection, abort/timeout, non-JSON body, hybrid fallback |
+| Accessibility       | `accessibility.test.tsx`                        | grid role & labels, Tab focus, arrow/shift navigation, Escape on popups     |
+| Performance         | `performance.test.ts`                           | 100k-row aggregate, filter and drill-through stay inside time budgets       |
+| Persistence         | `session-dataset.test.ts`                       | reload cache: round-trip, oversized payload, corrupt JSON, storage disabled |
+| Packaging           | `standalone/tests/*`                            | built `dist/` renders, types emit, peers stay external                      |
+
+Coverage is enforced from the repo root:
+
+```bash
+bun run test:coverage   # fails below 70% lines/functions/statements, 65% branches
+```
+
+Current numbers for `standalone/src/pivot`: 86% lines, 85% statements, 81%
+functions, 77% branches. The thresholds are floors, not targets — they exist so
+a new module cannot land completely untested.
+
+Performance budgets live at the top of `performance.test.ts`; raise them only
+with a measurement that justifies it.
