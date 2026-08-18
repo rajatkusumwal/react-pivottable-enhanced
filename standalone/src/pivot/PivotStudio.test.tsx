@@ -104,6 +104,22 @@ describe("PivotStudio grid", () => {
     expect(within(dialog).getByText(/1 records/)).toBeInTheDocument();
   });
 
+  it("renders overlays outside the studio so a transformed wrapper cannot clip them", async () => {
+    const user = userEvent.setup();
+    // A transform on any ancestor makes it the containing block for
+    // position: fixed, which used to anchor and clip the drill-through dialog.
+    render(
+      <div style={{ transform: "translateZ(0)", overflow: "hidden" }} data-testid="wrapper">
+        <PivotStudio data={data} fields={fields} initialConfig={baseConfig} title="Test pivot" />
+      </div>,
+    );
+    const grid = await screen.findByTestId("pivot-grid");
+    await user.click(within(grid).getByTestId("cell-0-0"));
+    const dialog = await screen.findByRole("dialog");
+    expect(screen.getByTestId("wrapper")).not.toContainElement(dialog);
+    expect(dialog.closest("body")).toBe(document.body);
+  });
+
   it("sorts by a column when the sort control is used", async () => {
     const user = userEvent.setup();
     setup();
