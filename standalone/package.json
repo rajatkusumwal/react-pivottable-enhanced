@@ -30,12 +30,10 @@
   },
   "files": [
     "dist",
-    "src",
     "README.md"
   ],
   "scripts": {
-    "sync": "node scripts/sync-from-app.mjs",
-    "build": "npm run sync && vite build && tsc -p tsconfig.build.json && node scripts/copy-css.mjs",
+    "build": "vite build && tsc -p tsconfig.build.json && node scripts/copy-css.mjs",
     "typecheck": "tsc -p tsconfig.build.json --noEmit",
     "prepublishOnly": "npm run build"
   },
