@@ -331,7 +331,9 @@ function LiveExample({
 }
 
 function DocsPage() {
+  const [framework, setFramework] = useState<Framework>("react");
   return (
+
     <main className="min-h-screen bg-background">
       <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
         <Link
