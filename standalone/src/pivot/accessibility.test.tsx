@@ -113,11 +113,24 @@ describe("grid keyboard navigation", () => {
   it("extends the selection with Shift+Arrow and reports the running total", async () => {
     const user = userEvent.setup();
     const onSelectionChange = vi.fn();
-    renderGrid({ onSelectionChange, allowDrillThrough: false });
-    await user.click(screen.getAllByTestId(/^cell-/)[0] as HTMLElement);
+    // One row field keeps every cell in the first column populated, so the
+    // extended range really does hold two numbers.
+    const flat = query({ rows: ["region"] });
+    render(
+      <PivotGrid
+        result={buildLocalResult(data, flat)}
+        layout="compact"
+        locale="en"
+        theme={defaultTheme}
+        allowDrillThrough={false}
+        onSelectionChange={onSelectionChange}
+      />,
+    );
+    await user.click(screen.getByTestId("cell-0-0"));
     await user.keyboard("{Shift>}{ArrowDown}{/Shift}");
     const last = onSelectionChange.mock.calls.at(-1)?.[0];
-    expect(last?.count).toBeGreaterThan(1);
+    expect(last?.count).toBe(2);
+    expect(last?.sum).toBe(400);
   });
 
   it("ignores arrow keys until a cell has been focused", async () => {
