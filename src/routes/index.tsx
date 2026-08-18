@@ -381,9 +381,14 @@ function ComparisonPage() {
 
         <footer className="mt-12 border-t border-border pt-6 text-sm leading-relaxed text-muted-foreground">
           <p>
-            Based on published commercial pivot table documentation and pricing pages, the
+            Based on publicly published documentation for commercial pivot tables, the
             react-pivottable docs, and our own demo implementation. Last checked 16 August 2026 —
             always double-check with the vendor before buying.
+          </p>
+          <p className="mt-3">
+            This project is independent and is not affiliated with, endorsed by or sponsored by any
+            pivot table vendor or the react-pivottable project. Product names and trademarks belong
+            to their respective owners and are used only for factual comparison.
           </p>
         </footer>
       </div>

@@ -32,7 +32,7 @@ export const products: {
   {
     key: "commercial",
     name: "Commercial pivot table",
-    subtitle: "Commercial • from $799/yr",
+    subtitle: "Commercial • paid licence",
   },
   {
     key: "reactPivottable",
@@ -52,7 +52,7 @@ export type ProductKey = (typeof products)[number]["key"];
 
 export const verdicts: Record<ProductKey, string> = {
   commercial:
-    "Does everything on this list. You get exports, charts, big-data handling and paid support — but you pay a yearly licence fee.",
+    "Does everything on this list. You get exports, charts, big-data handling and paid support — but you pay a licence fee.",
   reactPivottable:
     "Free and quick to drop into a React app. Good for simple internal dashboards, but there is no Excel/PDF export, no toolbar and no help desk if you get stuck.",
   studio:
@@ -587,7 +587,7 @@ const rawCategories: RawCategory[] = [
       { feature: "Source code available", commercial: n(), reactPivottable: y() },
       {
         feature: "Internal-use commercial licence",
-        commercial: y("from ~$799/yr"),
+        commercial: y("Paid tier"),
         reactPivottable: y("MIT"),
       },
       {
