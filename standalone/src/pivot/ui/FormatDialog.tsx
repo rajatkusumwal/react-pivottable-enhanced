@@ -96,7 +96,8 @@ export function FormatDialog({
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-foreground/40 p-4 sm:p-8">
+    <ModalPortal>
+      <div className="fixed inset-0 z-50 flex items-start justify-center bg-foreground/40 p-4 sm:p-8">
       <div
         role="dialog"
         aria-modal="true"
