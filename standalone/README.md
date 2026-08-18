@@ -925,7 +925,7 @@ excludes `*.test.*` and `files` publishes only `dist` and `README.md`.
 
 ### What the suite covers
 
-361 tests across 24 files (including the Angular wrapper suite). The groups worth knowing about:
+364 tests across 24 files (including the Angular wrapper suite). The groups worth knowing about:
 
 | Area             | File(s)                                               | What is asserted                                                               |
 | ---------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------ |
