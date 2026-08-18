@@ -1,67 +1,49 @@
-# inhouse-grid-monster — standalone package
+# inhouse-grid-monster
 
-This folder turns `src/components/pivot/` into a self-contained package you can
-drop into any React app (Vite, Next.js, CRA, Remix — anything that compiles
-TSX).
+A Flexmonster-style pivot table for React: drag & drop fields, filters,
+calculated values, subtotals, charts, drill-through, export and inline editing.
+Aggregation runs in the browser by default and can be moved to a backend
+service by passing a different engine.
 
-## 1. Get the source
-
-From the repo root:
-
-```bash
-node standalone/scripts/sync-from-app.mjs
-```
-
-That copies `src/components/pivot/` into `standalone/src/pivot/` and removes the
-`*.test.ts(x)` files. `standalone/src/pivot/` is generated, so it is gitignored —
-run the sync again after changing the component.
-
-## 2. Dependencies the target project needs
-
-Runtime packages (nothing else from this repo is required):
+## Install
 
 ```bash
-npm i react react-dom @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities lucide-react recharts
+npm i inhouse-grid-monster
 ```
 
-| Package                                             | Used for                             |
-| --------------------------------------------------- | ------------------------------------ |
-| `react`, `react-dom` (18.2+ or 19)                  | the component itself                 |
-| `@dnd-kit/core`, `/sortable`, `/utilities`          | drag & drop of fields between areas  |
-| `lucide-react`                                      | toolbar and grid icons               |
-| `recharts`                                          | the pivot charts tab                 |
+That pulls in the only runtime deps: `@dnd-kit/core`, `@dnd-kit/sortable`,
+`@dnd-kit/utilities`, `lucide-react` and `recharts`. `react` and `react-dom`
+(18.2+ or 19) stay peer dependencies, so the host app keeps one copy.
 
-Build-time requirements:
+Not needed: a router, shadcn/ui, Radix, `clsx`, `tailwind-merge`, or a backend.
 
-- **TypeScript 5+** with `"jsx": "react-jsx"` (or strip the types if your app is JS).
-- **Tailwind CSS** — the components are styled entirely with Tailwind utility
-  classes. Tailwind v4 is what the demo uses; v3 works if you define the same
-  semantic colour names.
-- **A CSS pipeline** that scans the pivot files, so the classes are not purged.
+## Use it
 
-Explicitly **not** needed: any router, `@tanstack/*`, shadcn/ui, Radix,
-`clsx`/`tailwind-merge`, or a backend. Aggregation runs in the browser unless
-you pass a different engine.
+```tsx
+import { PivotStudio, sampleData, sampleFields } from "inhouse-grid-monster";
+import "inhouse-grid-monster/styles.css";
 
-## 3. Theme tokens
+export function Reports() {
+  return <PivotStudio data={sampleData} fields={sampleFields} />;
+}
+```
 
-The classes reference semantic tokens (`bg-card`, `text-muted-foreground`,
-`border-border`, `bg-surface`, `text-primary`, …). Import the bundled token file
-once, after Tailwind:
+Tailwind CSS must be present in the host app (v4 recommended) and must scan the
+package so the utility classes survive purging:
 
 ```css
 /* app.css */
 @import "tailwindcss";
-@import "inhouse-grid-monster/styles.css"; /* or: @import "./pivot-theme.css"; */
+@source "../node_modules/inhouse-grid-monster/dist";
+@import "inhouse-grid-monster/styles.css"; /* semantic colour tokens */
 ```
 
-On Tailwind v3, copy the `:root` variables from `src/pivot-theme.css` into your
-global CSS and map them in `tailwind.config.js`:
+On Tailwind v3, add the package to `content` and map the tokens instead:
 
 ```js
 // tailwind.config.js
 export default {
-  content: ["./src/**/*.{ts,tsx}"], // must include the copied pivot folder
+  content: ["./src/**/*.{ts,tsx}", "./node_modules/inhouse-grid-monster/dist/**/*.js"],
   theme: {
     extend: {
       colors: {
@@ -90,63 +72,57 @@ export default {
 };
 ```
 
-## 4. Two ways to consume it
+The `:root` / `.dark` variables live in `inhouse-grid-monster/styles.css`;
+override any of them in your own CSS to re-skin the grid.
 
-### A. Copy the folder (simplest, recommended)
+## Props
 
-1. Run the sync script.
-2. Copy `standalone/src/pivot/` into your app, e.g. `src/pivot/`.
-3. Copy `standalone/src/pivot-theme.css` next to your global CSS and import it.
-4. Use it:
+| Prop                 | Type                                | Default    | What it does                                        |
+| -------------------- | ----------------------------------- | ---------- | --------------------------------------------------- |
+| `data`               | `PivotRow[]`                        | —          | Records to analyse (local engine)                    |
+| `fields`             | `FieldDef[]`                        | —          | Field metadata; `inferFields(rows)` can build it     |
+| `initialConfig`      | `Partial<PivotConfig>`              | —          | Starting report (uncontrolled)                       |
+| `config` / `onConfigChange` | `PivotConfig` / callback     | —          | Fully controlled report state                        |
+| `engine`             | `PivotEngineAdapter`                | local      | Swap in backend aggregation                          |
+| `fieldsUi`           | `"dialog" \| "sidebar"`             | `"dialog"` | Flexmonster popup field list, or a docked panel      |
+| `showToolbar` / `showSidebar` | `boolean`                  | `true`     | Hide chrome when the host supplies its own           |
+| `allowFileUpload`    | `boolean`                           | `true`     | Show the CSV/JSON drop bar                           |
+| `permissions`        | `Permissions`                       | all on     | Turn off export, drill-through, editing, …           |
+| `onDataChange`       | `(rows) => void`                    | —          | Inline cell edits written back                       |
+| `title`, `className` | `string`                            | —          | Header text and wrapper class                        |
+
+## Backend aggregation
 
 ```tsx
-import { PivotStudio, sampleData, sampleFields } from "./pivot";
+import { PivotStudio, createBackendEngine } from "inhouse-grid-monster";
 
-export function Reports() {
-  return <PivotStudio data={sampleData} fields={sampleFields} />;
-}
+const engine = createBackendEngine({ baseUrl: "https://api.example.com/pivot" });
+
+<PivotStudio fields={fields} data={[]} engine={engine} />;
 ```
 
-There is no path-alias magic — every import inside the folder is relative, so it
-works wherever you put it.
+Every engine returns the same `PivotResult`, so the browser engine and a service
+(e.g. Spring Boot + DuckDB) stay swappable. `createMockPivotApi()` implements the
+REST contract in-memory for tests. The request/response shapes are documented in
+the repo root `README.md`.
 
-### B. Build it as a package
+## Server-side rendering
+
+`PivotStudio` is a client component (it reads `window`/`sessionStorage` and uses
+drag & drop). In Next.js App Router add `"use client"` to the file that renders
+it, or load it with `next/dynamic` and `{ ssr: false }`.
+
+## Publishing this package
+
+From the repo root the component source lives in `src/components/pivot/`.
+`standalone/` builds it as a package:
 
 ```bash
 cd standalone
 npm install
-npm run sync
-npm run build      # -> dist/index.js + dist/index.d.ts
-npm pack           # or: npm publish --registry <your registry>
+npm run build      # sync + types + bundle + theme css -> dist/
+npm publish        # prepublishOnly re-runs the build
 ```
 
-Then in the host app:
-
-```tsx
-import { PivotStudio } from "inhouse-grid-monster";
-import "inhouse-grid-monster/styles.css";
-```
-
-React and the five runtime deps stay external, so the host app keeps one copy of
-each.
-
-## 5. Server-side rendering
-
-`PivotStudio` is a client component: it reads `window`/`sessionStorage` and uses
-drag & drop. In Next.js App Router add `"use client"` at the top of the file that
-renders it (or load it with `next/dynamic` and `{ ssr: false }`).
-
-## 6. Backend aggregation
-
-Nothing above changes if you move aggregation to a server: pass an engine.
-
-```tsx
-import { PivotStudio, createBackendEngine } from "./pivot";
-
-const engine = createBackendEngine({ baseUrl: "https://api.example.com/pivot" });
-
-<PivotStudio fields={fields} engine={engine} />;
-```
-
-The REST contract (request/response shapes, drill-through, paging) is documented
-in the root `README.md`.
+`npm run sync` copies `src/components/pivot/` into `standalone/src/pivot/`
+(tests excluded); that folder is generated and gitignored.

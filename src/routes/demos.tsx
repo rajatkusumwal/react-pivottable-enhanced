@@ -47,6 +47,13 @@ function DemosPage() {
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           Back to the comparison
         </Link>
+        <Link
+          to="/docs"
+          className="ml-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
+        >
+          Install it in your app
+        </Link>
+
 
         <h1 className="mt-6 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
           Try the free pivot table yourself

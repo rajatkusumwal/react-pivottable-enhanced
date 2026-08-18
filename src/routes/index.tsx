@@ -119,12 +119,21 @@ function ComparisonPage() {
             <strong className="font-medium text-foreground">inhouse-grid-monster</strong>{" "}
             shell on this site, which builds a familiar Flexmonster-style experience on top of it.
           </p>
-          <Link
-            to="/demos"
-            className="mt-5 inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground"
-          >
-            Try inhouse-grid-monster
-          </Link>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Link
+              to="/demos"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground"
+            >
+              Try inhouse-grid-monster
+            </Link>
+            <Link
+              to="/docs"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground"
+            >
+              Install it in your app
+            </Link>
+          </div>
+
         </header>
 
 
