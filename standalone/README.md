@@ -10,18 +10,135 @@ the demo site; everything a consuming app needs is here.
 
 ## Contents
 
-1. [Install](#install)
-2. [Hello pivot](#hello-pivot)
-3. [Tailwind setup](#tailwind-setup)
-4. [Props](#props)
-5. [The report config](#the-report-config)
-6. [Recipes](#recipes) — 14 copy-paste samples
-7. [Backend aggregation](#backend-aggregation)
-8. [Testing your integration](#testing-your-integration)
-9. [Server-side rendering](#server-side-rendering)
-10. [API reference](#api-reference)
-11. [Troubleshooting](#troubleshooting)
-12. [Publishing this package](#publishing-this-package)
+1. [Screenshots](#screenshots)
+2. [For AI coding agents](#for-ai-coding-agents)
+3. [Install](#install)
+4. [Hello pivot](#hello-pivot)
+5. [Tailwind setup](#tailwind-setup)
+6. [Props](#props)
+7. [The report config](#the-report-config)
+8. [Recipes](#recipes) — 14 copy-paste samples
+9. [Backend aggregation](#backend-aggregation)
+10. [Testing your integration](#testing-your-integration)
+11. [Server-side rendering](#server-side-rendering)
+12. [API reference](#api-reference)
+13. [Troubleshooting](#troubleshooting)
+14. [Publishing this package](#publishing-this-package)
+
+## Screenshots
+
+Every screenshot below is a real render of `PivotStudio` from the documentation
+page, with the exact code that produced it.
+
+**A. Revenue by region and year** — two row levels, one column level, one
+currency measure, subtotals and grand totals.
+
+![Pivot grid with region/country rows, year columns, subtotals and grand totals](./assets/basic-report.png)
+
+```tsx
+<PivotStudio
+  data={sampleData}
+  fields={sampleFields}
+  initialConfig={createDefaultConfig({
+    rows: ["region", "country"],
+    cols: ["year"],
+    values: [{ field: "revenue", aggregator: "sum", caption: "Revenue", format: { style: "currency", currency: "USD" } }],
+  })}
+/>
+```
+
+**B. Several measures, formats and conditional highlighting** — sum, average and
+a "% of grand total" display mode, plus a colour rule on margin.
+
+![Pivot grid with multiple measures, percentage columns and conditional formatting](./assets/formatting.png)
+
+**C. Charts and split view** — the same report drawn as a stacked column chart,
+with chart filters and drill-down back into the grid.
+
+![Stacked column chart rendered from the pivot report next to its grid](./assets/charts.png)
+
+**D. Locked-down dashboard** — read-only mode: no toolbar, no field list, no
+drag & drop, for embedding inside an existing page.
+
+![Read-only pivot grid without toolbar or field list](./assets/locked-dashboard.png)
+
+## For AI coding agents
+
+Read this section first; it is enough to integrate the package correctly
+without opening any other file.
+
+**Quick facts**
+
+| Key                | Value                                                                             |
+| ------------------ | --------------------------------------------------------------------------------- |
+| Package            | `react-pivottable-enhanced`                                                       |
+| Entry component    | `PivotStudio` (named export; there is **no** default export)                      |
+| Styles             | `import "react-pivottable-enhanced/styles.css"` — required                        |
+| Styling engine     | Tailwind CSS v4 (v3 works with a token map) in the **host** app                   |
+| Peers              | `react` and `react-dom` (18.2+ or 19)                                             |
+| Runtime deps       | `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`, `lucide-react`, `recharts` |
+| Rendering          | Client only — wrap in a client boundary / dynamic import under SSR                |
+| Data shape         | `Array<Record<string, string \| number \| null>>` (flat rows, one object per record) |
+
+**Minimum viable integration** (copy verbatim, then change the data):
+
+```tsx
+"use client";
+import { PivotStudio, inferFields, createDefaultConfig } from "react-pivottable-enhanced";
+import "react-pivottable-enhanced/styles.css";
+
+export function Reports({ rows }: { rows: Record<string, string | number | null>[] }) {
+  return (
+    <PivotStudio
+      data={rows}
+      fields={inferFields(rows)}
+      initialConfig={createDefaultConfig({
+        rows: ["region"],
+        cols: ["year"],
+        values: [{ field: "revenue", aggregator: "sum" }],
+      })}
+    />
+  );
+}
+```
+
+**Rules — violating these is the cause of almost every failed integration**
+
+1. Import named exports only: `import { PivotStudio } from "react-pivottable-enhanced"`.
+2. Always import the stylesheet once, and make Tailwind scan the package
+   (`@source "../node_modules/react-pivottable-enhanced/dist";`), or the grid
+   renders unstyled.
+3. A report needs at least one entry in `values`; otherwise the grid is empty.
+4. Field names in `rows`, `cols`, `values` and filters must match keys present
+   in the data records exactly (case-sensitive).
+5. Do not render on the server. Under Next.js App Router mark the wrapper
+   `"use client"`; under Pages Router use `dynamic(..., { ssr: false })`.
+6. Do not restyle internals with `!important` overrides — use the `theme` prop
+   and the CSS custom properties from `styles.css`.
+7. Keep `data` referentially stable (`useMemo`) — a new array identity on every
+   render re-aggregates the whole dataset.
+8. For datasets above ~100k rows use a backend engine
+   (`createBackendEngine`) instead of shipping rows to the browser.
+
+**Task → API map**
+
+| Task                              | Use                                                        |
+| --------------------------------- | ---------------------------------------------------------- |
+| Build field metadata from rows    | `inferFields(rows)`                                         |
+| Create a starting report          | `createDefaultConfig({ rows, cols, values })`               |
+| Save / restore a report           | `config` + `onConfigChange` props                           |
+| Share a report by URL             | `buildReportUrl`, `readReportFromUrl`                       |
+| Aggregate on a server             | `engine={createBackendEngine({ endpoint })}`                |
+| Fake a backend in tests           | `createMockPivotApi()`                                      |
+| Add a custom aggregation          | `registerAggregator(name, fn)`                              |
+| Add a derived measure             | `config.calculated` + `applyCalculatedFields`               |
+| Restrict what a user may see/do   | `permissions` prop, `secureRows`, `visibleFields`, `can`    |
+| Export / print                    | `exportMatrix`, `printMatrix`, `copyMatrix`                 |
+| Translate the UI                  | `locale` prop, `locales`, `getLocale`                       |
+
+Full prop table in [Props](#props); every scenario above has a worked example in
+[Recipes](#recipes).
+
 
 ## Install
 
