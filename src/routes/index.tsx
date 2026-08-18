@@ -117,8 +117,8 @@ function ComparisonPage() {
             <strong className="font-medium text-foreground">commercial pivot tables</strong> can do
             — {totalFeatures} things in total — and check whether the leading free tool,
             react-pivottable, can do the same — plus the{" "}
-            <strong className="font-medium text-foreground">react-pivottable-enhanced</strong> shell on
-            this site, which builds a familiar commercial-style experience on top of it.
+            <strong className="font-medium text-foreground">react-pivottable-enhanced</strong> shell
+            on this site, which builds a familiar commercial-style experience on top of it.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link

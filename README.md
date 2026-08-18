@@ -640,7 +640,11 @@ Results are tagged `meta.source: "backend"` and `meta.queryId: <id>`.
 ### Server-side aggregation of large datasets (1GB+)
 
 ```ts
-import { createServerAggregationEngine, shouldOffload, streamCsvRows } from "react-pivottable-enhanced";
+import {
+  createServerAggregationEngine,
+  shouldOffload,
+  streamCsvRows,
+} from "react-pivottable-enhanced";
 
 // Every query is answered by the service; records never reach the browser.
 const engine = createServerAggregationEngine({
@@ -834,7 +838,7 @@ bun run format   # rewrite files with prettier
 ```
 
 The suite covers core pivoting, edge cases, the grid UI, charts, drill-through,
-exports, the REST backend contract *and its failure paths*, accessibility and
+exports, the REST backend contract _and its failure paths_, accessibility and
 keyboard navigation, 100k-row performance budgets and reload persistence. See
 "What the suite covers" in [standalone/README.md](./standalone/README.md) for the
 file-by-file map.

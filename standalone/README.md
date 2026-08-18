@@ -123,7 +123,6 @@ on. "Not included" is listed honestly at the end so nobody plans around a gap.
 - Angular, Vue, Svelte or Blazor wrappers — React only
 - Vendor support, SLA or a theme-builder tool
 
-
 ## For AI coding agents
 
 Read this section first; it is enough to integrate the package correctly
@@ -131,16 +130,16 @@ without opening any other file.
 
 **Quick facts**
 
-| Key                | Value                                                                             |
-| ------------------ | --------------------------------------------------------------------------------- |
-| Package            | `react-pivottable-enhanced`                                                       |
-| Entry component    | `PivotStudio` (named export; there is **no** default export)                      |
-| Styles             | `import "react-pivottable-enhanced/styles.css"` — required                        |
-| Styling engine     | Tailwind CSS v4 (v3 works with a token map) in the **host** app                   |
-| Peers              | `react` and `react-dom` (18.2+ or 19)                                             |
-| Runtime deps       | `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`, `lucide-react`, `recharts` |
-| Rendering          | Client only — wrap in a client boundary / dynamic import under SSR                |
-| Data shape         | `Array<Record<string, string \| number \| null>>` (flat rows, one object per record) |
+| Key             | Value                                                                                  |
+| --------------- | -------------------------------------------------------------------------------------- |
+| Package         | `react-pivottable-enhanced`                                                            |
+| Entry component | `PivotStudio` (named export; there is **no** default export)                           |
+| Styles          | `import "react-pivottable-enhanced/styles.css"` — required                             |
+| Styling engine  | Tailwind CSS v4 (v3 works with a token map) in the **host** app                        |
+| Peers           | `react` and `react-dom` (18.2+ or 19)                                                  |
+| Runtime deps    | `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`, `lucide-react`, `recharts` |
+| Rendering       | Client only — wrap in a client boundary / dynamic import under SSR                     |
+| Data shape      | `Array<Record<string, string \| number \| null>>` (flat rows, one object per record)   |
 
 **Minimum viable integration** (copy verbatim, then change the data):
 
@@ -184,23 +183,22 @@ export function Reports({ rows }: { rows: Record<string, string | number | null>
 
 **Task → API map**
 
-| Task                              | Use                                                        |
-| --------------------------------- | ---------------------------------------------------------- |
-| Build field metadata from rows    | `inferFields(rows)`                                         |
-| Create a starting report          | `createDefaultConfig({ rows, cols, values })`               |
-| Save / restore a report           | `config` + `onConfigChange` props                           |
-| Share a report by URL             | `buildReportUrl`, `readReportFromUrl`                       |
-| Aggregate on a server             | `engine={createBackendEngine({ endpoint })}`                |
-| Fake a backend in tests           | `createMockPivotApi()`                                      |
-| Add a custom aggregation          | `registerAggregator(name, fn)`                              |
-| Add a derived measure             | `config.calculated` + `applyCalculatedFields`               |
-| Restrict what a user may see/do   | `permissions` prop, `secureRows`, `visibleFields`, `can`    |
-| Export / print                    | `exportMatrix`, `printMatrix`, `copyMatrix`                 |
-| Translate the UI                  | `locale` prop, `locales`, `getLocale`                       |
+| Task                            | Use                                                      |
+| ------------------------------- | -------------------------------------------------------- |
+| Build field metadata from rows  | `inferFields(rows)`                                      |
+| Create a starting report        | `createDefaultConfig({ rows, cols, values })`            |
+| Save / restore a report         | `config` + `onConfigChange` props                        |
+| Share a report by URL           | `buildReportUrl`, `readReportFromUrl`                    |
+| Aggregate on a server           | `engine={createBackendEngine({ endpoint })}`             |
+| Fake a backend in tests         | `createMockPivotApi()`                                   |
+| Add a custom aggregation        | `registerAggregator(name, fn)`                           |
+| Add a derived measure           | `config.calculated` + `applyCalculatedFields`            |
+| Restrict what a user may see/do | `permissions` prop, `secureRows`, `visibleFields`, `can` |
+| Export / print                  | `exportMatrix`, `printMatrix`, `copyMatrix`              |
+| Translate the UI                | `locale` prop, `locales`, `getLocale`                    |
 
 Full prop table in [Props](#props); every scenario above has a worked example in
 [Recipes](#recipes).
-
 
 ## Install
 
@@ -802,15 +800,15 @@ Grouped list of the public exports (all named, no default export):
 
 ## Troubleshooting
 
-| Symptom                                 | Cause and fix                                                                   |
-| --------------------------------------- | ------------------------------------------------------------------------------- |
-| Grid renders unstyled / black on white  | Tailwind is not scanning `dist`. Add the `@source` line (v4) or `content` entry |
-| Colours ignore your brand               | Import `react-pivottable-enhanced/styles.css` **before** your own token overrides    |
-| `window is not defined` at build time   | Rendered during SSR — see [Server-side rendering](#server-side-rendering)       |
-| Nothing in the grid                     | `values` is empty; a report needs at least one measure                          |
-| `sum` missing from a field's menu       | The field declares a narrower `aggregators` list, or is not `type: "number"`    |
-| Numbers read as text after a CSV import | Wrong CSV dialect — pass `csv` options or use `detectCsvOptions`                |
-| Uploaded file disappears on reload      | Uploads live in `sessionStorage` (8 MB cap) by design; use `onUploadToBackend`  |
+| Symptom                                 | Cause and fix                                                                     |
+| --------------------------------------- | --------------------------------------------------------------------------------- |
+| Grid renders unstyled / black on white  | Tailwind is not scanning `dist`. Add the `@source` line (v4) or `content` entry   |
+| Colours ignore your brand               | Import `react-pivottable-enhanced/styles.css` **before** your own token overrides |
+| `window is not defined` at build time   | Rendered during SSR — see [Server-side rendering](#server-side-rendering)         |
+| Nothing in the grid                     | `values` is empty; a report needs at least one measure                            |
+| `sum` missing from a field's menu       | The field declares a narrower `aggregators` list, or is not `type: "number"`      |
+| Numbers read as text after a CSV import | Wrong CSV dialect — pass `csv` options or use `detectCsvOptions`                  |
+| Uploaded file disappears on reload      | Uploads live in `sessionStorage` (8 MB cap) by design; use `onUploadToBackend`    |
 
 ## Publishing this package
 
@@ -845,20 +843,20 @@ excludes `*.test.*` and `files` publishes only `dist` and `README.md`.
 
 341 tests across 21 files. The groups worth knowing about:
 
-| Area                | File(s)                                        | What is asserted                                                          |
-| ------------------- | ---------------------------------------------- | ------------------------------------------------------------------------- |
-| Core pivoting       | `pivot-core.test.ts`, `display-modes.test.ts`   | grouping, subtotals, grand totals, sorting, "% of" display modes            |
-| Edge cases          | `edge-cases.test.ts`                            | empty input, single row, blanks/nulls, wrong types, missing fields          |
-| Grid UI             | `ui/PivotGrid.test.tsx`                         | compact/classic/flat layouts, expand & collapse, selection, copy, windowing |
-| Full component      | `PivotStudio.test.tsx`                          | drag & drop, filters, calculated values, drill-down, import/clear           |
-| Charts & drill      | `charts.test.tsx`, `drillthrough.test.tsx`      | chart series, chart filtering, drill-through records and limits             |
-| Reporting           | `reporting-ui.test.tsx`, `report-link.test.ts`  | export matrices, headers/footers, share-by-link round-trip                  |
-| Backend contract    | `engines/backend.test.ts`, `engines/mock-api.test.ts` | request shape, headers, dataset ids, paging against a mocked REST API |
-| Backend failures    | `engines/backend-failures.test.ts`              | 500/401/413, dropped connection, abort/timeout, non-JSON body, hybrid fallback |
-| Accessibility       | `accessibility.test.tsx`                        | grid role & labels, Tab focus, arrow/shift navigation, Escape on popups     |
-| Performance         | `performance.test.ts`                           | 100k-row aggregate, filter and drill-through stay inside time budgets       |
-| Persistence         | `session-dataset.test.ts`                       | reload cache: round-trip, oversized payload, corrupt JSON, storage disabled |
-| Packaging           | `standalone/tests/*`                            | built `dist/` renders, types emit, peers stay external                      |
+| Area             | File(s)                                               | What is asserted                                                               |
+| ---------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Core pivoting    | `pivot-core.test.ts`, `display-modes.test.ts`         | grouping, subtotals, grand totals, sorting, "% of" display modes               |
+| Edge cases       | `edge-cases.test.ts`                                  | empty input, single row, blanks/nulls, wrong types, missing fields             |
+| Grid UI          | `ui/PivotGrid.test.tsx`                               | compact/classic/flat layouts, expand & collapse, selection, copy, windowing    |
+| Full component   | `PivotStudio.test.tsx`                                | drag & drop, filters, calculated values, drill-down, import/clear              |
+| Charts & drill   | `charts.test.tsx`, `drillthrough.test.tsx`            | chart series, chart filtering, drill-through records and limits                |
+| Reporting        | `reporting-ui.test.tsx`, `report-link.test.ts`        | export matrices, headers/footers, share-by-link round-trip                     |
+| Backend contract | `engines/backend.test.ts`, `engines/mock-api.test.ts` | request shape, headers, dataset ids, paging against a mocked REST API          |
+| Backend failures | `engines/backend-failures.test.ts`                    | 500/401/413, dropped connection, abort/timeout, non-JSON body, hybrid fallback |
+| Accessibility    | `accessibility.test.tsx`                              | grid role & labels, Tab focus, arrow/shift navigation, Escape on popups        |
+| Performance      | `performance.test.ts`                                 | 100k-row aggregate, filter and drill-through stay inside time budgets          |
+| Persistence      | `session-dataset.test.ts`                             | reload cache: round-trip, oversized payload, corrupt JSON, storage disabled    |
+| Packaging        | `standalone/tests/*`                                  | built `dist/` renders, types emit, peers stay external                         |
 
 Coverage is enforced from the repo root:
 
