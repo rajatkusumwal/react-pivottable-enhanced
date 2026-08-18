@@ -59,29 +59,32 @@ describe("package entry point", () => {
   });
 
   it("computes a result from sample data through the local engine", async () => {
-    const engine = pkg.createLocalEngine(pkg.sampleData);
+    const engine = pkg.createLocalEngine();
     const config = pkg.createDefaultConfig(pkg.sampleFields);
-    const result = await engine.query({
-      rows: config.rows,
-      columns: config.columns,
-      measures: config.values.map((value) => ({ field: value.field, aggregator: value.aggregator })),
-      filters: [],
-      sorts: [],
-      layout: "compact",
-    });
+    const result = await engine.query(queryFrom(config), pkg.sampleData);
     expect(result.rowHeaders.length).toBeGreaterThan(0);
+    expect(result.meta.source).toBe("local");
   });
 
   it("survives an empty dataset without throwing", async () => {
-    const engine = pkg.createLocalEngine([]);
-    const result = await engine.query({
-      rows: [],
-      columns: [],
-      measures: [],
-      filters: [],
-      sorts: [],
-      layout: "compact",
-    });
+    const engine = pkg.createLocalEngine();
+    const config = pkg.createDefaultConfig(pkg.sampleFields);
+    const result = await engine.query(queryFrom(config), []);
     expect(result.cells).toBeDefined();
+    expect(result.sourceCount).toBe(0);
   });
 });
+
+function queryFrom(config: pkg.PivotConfig): pkg.PivotQuery {
+  return {
+    rows: config.rows,
+    cols: config.columns,
+    values: config.values,
+    filters: config.filters,
+    showSubTotals: true,
+    showGrandTotals: true,
+    layout: "compact",
+    collapsed: [],
+    locale: "en",
+  };
+}
