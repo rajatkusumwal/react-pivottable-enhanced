@@ -102,9 +102,7 @@ export function FilterEditor({
         <ul className="mb-2 space-y-1">
           {filters.map((f, i) => (
             <li key={i} className="flex items-center justify-between gap-2 text-xs">
-              <span className="truncate">
-                {describeFilter(f)}
-              </span>
+              <span className="truncate">{describeFilter(f)}</span>
               <button
                 type="button"
                 aria-label={`Remove filter ${i + 1}`}

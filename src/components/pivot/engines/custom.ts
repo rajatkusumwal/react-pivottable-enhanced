@@ -11,12 +11,7 @@
  * back to a sensible local behaviour.
  */
 import type { FieldDef, PivotRow } from "../types";
-import type {
-  DrillThroughQuery,
-  PivotEngineAdapter,
-  PivotQuery,
-  PivotResult,
-} from "../result";
+import type { DrillThroughQuery, PivotEngineAdapter, PivotQuery, PivotResult } from "../result";
 import { buildLocalResult, localDrillThrough } from "./local";
 
 export interface CustomDataSource {

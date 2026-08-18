@@ -36,7 +36,8 @@ export function shouldOffload(input: {
   const rowThreshold = input.rowThreshold ?? OFFLOAD_ROW_THRESHOLD;
   const byteThreshold = input.byteThreshold ?? OFFLOAD_BYTE_THRESHOLD;
   const estimatedBytes = input.byteSize ?? (input.rowCount ?? 0) * ESTIMATED_BYTES_PER_ROW;
-  if ((input.rowCount ?? 0) > rowThreshold) return { offload: true, reason: "rows", estimatedBytes };
+  if ((input.rowCount ?? 0) > rowThreshold)
+    return { offload: true, reason: "rows", estimatedBytes };
   if ((input.byteSize ?? 0) > byteThreshold)
     return { offload: true, reason: "bytes", estimatedBytes };
   return { offload: false, reason: "none", estimatedBytes };

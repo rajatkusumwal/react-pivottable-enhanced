@@ -24,8 +24,7 @@ export function ChartFilterBar({ strings, config, rows, readOnly, onChange }: Ch
 
   const filterFor = (field: string) =>
     config.filters.find((f) => f.kind === "values" && f.field === field) as
-      | Extract<FilterDef, { kind: "values" }>
-      | undefined;
+      Extract<FilterDef, { kind: "values" }> | undefined;
 
   const apply = (field: string, members: string[]) => {
     const existing = config.filters.findIndex((f) => f.kind === "values" && f.field === field);

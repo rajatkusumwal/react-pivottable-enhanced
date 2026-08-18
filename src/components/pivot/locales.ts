@@ -54,7 +54,10 @@ const en: PivotStrings = {
   noData: "No data to show",
 };
 
-export const locales: Record<string, { label: string; numberLocale: string; strings: PivotStrings }> = {
+export const locales: Record<
+  string,
+  { label: string; numberLocale: string; strings: PivotStrings }
+> = {
   en: { label: "English", numberLocale: "en-US", strings: en },
   fr: {
     label: "Français",

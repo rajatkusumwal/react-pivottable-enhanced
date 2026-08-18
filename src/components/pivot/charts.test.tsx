@@ -45,14 +45,20 @@ describe("chart data (drillable axis & legend)", () => {
   });
 
   it("drills the axis into the next row field", () => {
-    const chart = buildChartData(rows, cfg({ chart: { visible: true, type: "bar", drillRows: ["West"] } }));
+    const chart = buildChartData(
+      rows,
+      cfg({ chart: { visible: true, type: "bar", drillRows: ["West"] } }),
+    );
     expect(chart.categoryField).toBe("country");
     expect(chart.data.map((d) => d.name)).toEqual(["Canada", "USA"]);
     expect(chart.canDrillCategory).toBe(false);
   });
 
   it("drills the legend into the next column field", () => {
-    const chart = buildChartData(rows, cfg({ chart: { visible: true, type: "bar", drillCols: ["2024"] } }));
+    const chart = buildChartData(
+      rows,
+      cfg({ chart: { visible: true, type: "bar", drillCols: ["2024"] } }),
+    );
     expect(chart.seriesField).toBe("quarter");
     expect(chart.series).toEqual(["Q1", "Q2"]);
     expect(chart.canDrillSeries).toBe(false);

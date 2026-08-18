@@ -1,4 +1,5 @@
 <!-- LOVABLE:BEGIN -->
+
 > [!IMPORTANT]
 > This project is connected to [Lovable](https://lovable.dev). Avoid rewriting
 > published git history — force pushing, or rebasing/amending/squashing commits
@@ -7,6 +8,7 @@
 >
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
+
 <!-- LOVABLE:END -->
 
 # inhouse-grid-monster — working agreements
@@ -47,6 +49,6 @@ src/lib/pivot-comparison.ts   feature matrix shown on the home page
 - TypeScript strict; no `any`. Run `bunx tsgo --noEmit` before finishing.
 - Named exports only; no default exports in `src/components/pivot`.
 - New tunable numbers go in `constants.ts` with a one-line comment saying why.
-- Comments explain *why*, not *what*. Prefer a clear name over a comment.
+- Comments explain _why_, not _what_. Prefer a clear name over a comment.
 - Engines must keep returning the same `PivotResult`, so the browser engine and a
   backend service stay swappable.

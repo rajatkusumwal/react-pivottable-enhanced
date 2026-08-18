@@ -110,7 +110,11 @@ export function FormatDialog({
           </button>
         </header>
 
-        <div role="tablist" aria-label="Format sections" className="flex gap-1.5 border-b border-border px-4 py-2">
+        <div
+          role="tablist"
+          aria-label="Format sections"
+          className="flex gap-1.5 border-b border-border px-4 py-2"
+        >
           {tabButton("number", "Number formatting")}
           {tabButton("conditional", "Conditional formatting")}
           {tabButton("export", "Export header & footer")}
@@ -120,13 +124,18 @@ export function FormatDialog({
           {tab === "number" && (
             <div data-testid="number-format-tab" className="space-y-3">
               {config.values.length === 0 && (
-                <p className="text-xs text-muted-foreground">Add a value first, then format it here.</p>
+                <p className="text-xs text-muted-foreground">
+                  Add a value first, then format it here.
+                </p>
               )}
               {config.values.map((value, index) => {
                 const format = value.format ?? {};
                 const caption = value.caption ?? value.field;
                 return (
-                  <fieldset key={`${value.field}-${index}`} className="rounded-md border border-border p-3">
+                  <fieldset
+                    key={`${value.field}-${index}`}
+                    className="rounded-md border border-border p-3"
+                  >
                     <legend className="px-1 text-xs font-semibold">{caption}</legend>
                     <div className="flex flex-wrap items-center gap-3">
                       <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -148,7 +157,9 @@ export function FormatDialog({
                           disabled={readOnly}
                           aria-label={`Thousands separator for ${caption}`}
                           checked={format.thousandsSeparator ?? true}
-                          onChange={(e) => patchFormat(index, { thousandsSeparator: e.target.checked })}
+                          onChange={(e) =>
+                            patchFormat(index, { thousandsSeparator: e.target.checked })
+                          }
                         />
                         Thousands separator
                       </label>
@@ -164,7 +175,6 @@ export function FormatDialog({
                           onChange={(e) =>
                             patchFormat(index, { currency: e.target.value.toUpperCase() })
                           }
-
                         />
                       </label>
                       <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -199,7 +209,8 @@ export function FormatDialog({
           {tab === "conditional" && (
             <div data-testid="conditional-format-tab" className="space-y-2">
               <p className="text-xs text-muted-foreground">
-                Colour cells whose value matches a rule. Rules apply top to bottom; the first match wins.
+                Colour cells whose value matches a rule. Rules apply top to bottom; the first match
+                wins.
               </p>
               {config.conditionalFormats.map((rule, index) => (
                 <div
@@ -228,7 +239,9 @@ export function FormatDialog({
                     disabled={readOnly}
                     className={input}
                     value={rule.operator}
-                    onChange={(e) => patchRule(index, { operator: e.target.value as ConditionOperator })}
+                    onChange={(e) =>
+                      patchRule(index, { operator: e.target.value as ConditionOperator })
+                    }
                   >
                     {OPERATORS.map((o) => (
                       <option key={o.value} value={o.value}>
@@ -290,7 +303,8 @@ export function FormatDialog({
           {tab === "export" && (
             <div data-testid="export-decoration-tab" className="space-y-3">
               <p className="text-xs text-muted-foreground">
-                This text is printed above and below the table in every export and in the print view.
+                This text is printed above and below the table in every export and in the print
+                view.
               </p>
               <label className="block text-xs text-muted-foreground">
                 Header

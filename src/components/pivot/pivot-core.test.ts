@@ -51,11 +51,15 @@ describe("aggregations", () => {
   });
 
   it("supports custom aggregations", () => {
-    registerAggregator("margin", (r) => {
-      const rev = r.reduce((a, x) => a + Number(x["revenue"] ?? 0), 0);
-      const cost = r.reduce((a, x) => a + Number(x["cost"] ?? 0), 0);
-      return rev ? ((rev - cost) / rev) * 100 : null;
-    }, "Margin %");
+    registerAggregator(
+      "margin",
+      (r) => {
+        const rev = r.reduce((a, x) => a + Number(x["revenue"] ?? 0), 0);
+        const cost = r.reduce((a, x) => a + Number(x["cost"] ?? 0), 0);
+        return rev ? ((rev - cost) / rev) * 100 : null;
+      },
+      "Margin %",
+    );
     expect(aggregate("margin", rows, "revenue")).toBeCloseTo(46, 0);
   });
 
@@ -75,7 +79,9 @@ describe("aggregations", () => {
   });
 
   it("offers only type-appropriate aggregations in the measure menus", () => {
-    expect(aggregatorsForType("number")).toEqual(expect.arrayContaining(["sum", "average", "median"]));
+    expect(aggregatorsForType("number")).toEqual(
+      expect.arrayContaining(["sum", "average", "median"]),
+    );
     expect(aggregatorsForType("string")).toEqual([
       "count",
       "distinctCount",
@@ -104,14 +110,17 @@ describe("field list metadata", () => {
   });
 });
 
-
 describe("filters", () => {
   it("keeps or excludes chosen values", () => {
     expect(
-      applyFilters(rows, [{ kind: "values", field: "region", mode: "include", members: ["North"] }]),
+      applyFilters(rows, [
+        { kind: "values", field: "region", mode: "include", members: ["North"] },
+      ]),
     ).toHaveLength(2);
     expect(
-      applyFilters(rows, [{ kind: "values", field: "region", mode: "exclude", members: ["North"] }]),
+      applyFilters(rows, [
+        { kind: "values", field: "region", mode: "exclude", members: ["North"] },
+      ]),
     ).toHaveLength(2);
   });
 
@@ -300,7 +309,14 @@ describe("filters", () => {
 
   it("applies top-N filters", () => {
     const top = applyFilters(rows, [
-      { kind: "top", field: "region", measure: "revenue", aggregator: "sum", direction: "top", count: 1 },
+      {
+        kind: "top",
+        field: "region",
+        measure: "revenue",
+        aggregator: "sum",
+        direction: "top",
+        count: 1,
+      },
     ]);
     expect(new Set(top.map((r) => r["region"]))).toEqual(new Set(["South"]));
   });
@@ -313,7 +329,9 @@ describe("filters", () => {
 describe("calculated values", () => {
   it("evaluates formulas safely", () => {
     expect(evaluateFormula("[revenue] - [cost]", rows[0] as PivotRow)).toBe(40);
-    expect(evaluateFormula("([revenue] - [cost]) / [revenue] * 100", rows[0] as PivotRow)).toBeCloseTo(40);
+    expect(
+      evaluateFormula("([revenue] - [cost]) / [revenue] * 100", rows[0] as PivotRow),
+    ).toBeCloseTo(40);
     expect(validateFormula("[revenue] +")).not.toBeNull();
   });
 
@@ -386,7 +404,9 @@ describe("security", () => {
   });
 
   it("filters the field list and reports permissions", () => {
-    expect(visibleFields(sampleFields, { deniedFields: ["cost"] }).some((f) => f.name === "cost")).toBe(false);
+    expect(
+      visibleFields(sampleFields, { deniedFields: ["cost"] }).some((f) => f.name === "cost"),
+    ).toBe(false);
     expect(can({ allowExport: false }, "export")).toBe(false);
     expect(can({ readOnly: true }, "edit")).toBe(false);
     expect(can(undefined, "drillThrough")).toBe(true);

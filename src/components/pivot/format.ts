@@ -30,7 +30,6 @@ export function formatNumber(
     }).format(value);
   }
   return `${format?.prefix ?? ""}${text}${format?.suffix ?? ""}`;
-
 }
 
 export function formatPercent(value: number | null, locale: string, decimals = 1): string {

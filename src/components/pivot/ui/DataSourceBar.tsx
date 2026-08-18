@@ -26,7 +26,9 @@ export interface DataSourceBarProps {
   onLoad: (dataset: UploadedDataset) => void;
   onReset: () => void;
   /** Optional backend uploader (Spring Boot + DuckDB). */
-  onUploadToBackend?: (file: File) => Promise<{ datasetId: string; rowCount: number; fields: FieldDef[] }>;
+  onUploadToBackend?: (
+    file: File,
+  ) => Promise<{ datasetId: string; rowCount: number; fields: FieldDef[] }>;
   isCustom: boolean;
   /** CSV dialect used for reading files and writing CSV exports. */
   csv?: CsvOptions;
@@ -52,7 +54,9 @@ export function DataSourceBar({
     if (!file) return;
     setError("");
     if (file.size > MAX_BYTES) {
-      setError("That file is larger than 25 MB. Try a smaller extract, or point the app at the backend service.");
+      setError(
+        "That file is larger than 25 MB. Try a smaller extract, or point the app at the backend service.",
+      );
       return;
     }
     if (!/\.(csv|json)$/i.test(file.name)) {

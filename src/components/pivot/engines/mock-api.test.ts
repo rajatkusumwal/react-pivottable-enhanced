@@ -20,8 +20,16 @@ const rows: PivotRow[] = [
 ];
 
 const api = createMockPivotApi({ rows, datasetId: "sales" });
-const client = createBackendClient({ baseUrl: "https://api.test", fetchImpl: api.fetch, datasetId: "sales" });
-const engine = createBackendEngine({ baseUrl: "https://api.test", fetchImpl: api.fetch, datasetId: "sales" });
+const client = createBackendClient({
+  baseUrl: "https://api.test",
+  fetchImpl: api.fetch,
+  datasetId: "sales",
+});
+const engine = createBackendEngine({
+  baseUrl: "https://api.test",
+  fetchImpl: api.fetch,
+  datasetId: "sales",
+});
 
 const query = (partial: Partial<PivotQuery> = {}): PivotQuery => ({
   rows: ["region", "country"],
@@ -110,7 +118,11 @@ describe("drill up and down over the API", () => {
 
 describe("sorting and filtering over the API", () => {
   it("sorts row members", async () => {
-    const desc = await ask({ layout: "flat", rows: ["region"], sort: { by: "rows", direction: "desc" } });
+    const desc = await ask({
+      layout: "flat",
+      rows: ["region"],
+      sort: { by: "rows", direction: "desc" },
+    });
     expect(labels(desc)[0]).toBe("South");
   });
 

@@ -26,9 +26,7 @@ export function MemberFilterPopover({
 }: MemberFilterPopoverProps) {
   const all = useMemo(() => uniqueMembers(rows, field).slice(0, MEMBER_LIST_LIMIT), [rows, field]);
   const [query, setQuery] = useState("");
-  const [checked, setChecked] = useState<string[]>(
-    current?.members.length ? current.members : all,
-  );
+  const [checked, setChecked] = useState<string[]>(current?.members.length ? current.members : all);
 
   const shown = all.filter((m) => m.toLowerCase().includes(query.toLowerCase()));
   const allChecked = checked.length === all.length;
@@ -65,7 +63,9 @@ export function MemberFilterPopover({
                 checked={checked.includes(m)}
                 aria-label={m}
                 onChange={(e) =>
-                  setChecked((prev) => (e.target.checked ? [...prev, m] : prev.filter((x) => x !== m)))
+                  setChecked((prev) =>
+                    e.target.checked ? [...prev, m] : prev.filter((x) => x !== m),
+                  )
                 }
               />
               <span className="truncate">{m}</span>

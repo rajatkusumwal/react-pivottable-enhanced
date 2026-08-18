@@ -234,7 +234,10 @@ export function DrillThroughDialog({
               data-testid="drill-through-no-columns"
             >
               <div>
-                <Columns3 className="mx-auto mb-2 h-5 w-5 text-muted-foreground" aria-hidden="true" />
+                <Columns3
+                  className="mx-auto mb-2 h-5 w-5 text-muted-foreground"
+                  aria-hidden="true"
+                />
                 <p className="text-sm font-medium text-foreground">No columns selected</p>
                 <p className="mt-1 text-xs text-muted-foreground">
                   Keep this window open and use Columns above to select fields.
@@ -246,7 +249,10 @@ export function DrillThroughDialog({
               <thead className="sticky top-0 bg-secondary">
                 <tr>
                   {columns.map((c) => (
-                    <th key={c} className="border-b border-border px-0 py-0 text-left font-semibold">
+                    <th
+                      key={c}
+                      className="border-b border-border px-0 py-0 text-left font-semibold"
+                    >
                       <button
                         type="button"
                         className="flex w-full items-center gap-1 px-3 py-2 text-left hover:bg-accent"

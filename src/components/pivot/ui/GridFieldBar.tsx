@@ -145,7 +145,11 @@ export function GridFieldBar({
         group(
           strings.columns,
           config.cols.map((name) => (
-            <span key={name} className={chip} onDoubleClick={() => startRename(`field:${name}`, labelOf(name))}>
+            <span
+              key={name}
+              className={chip}
+              onDoubleClick={() => startRename(`field:${name}`, labelOf(name))}
+            >
               {renaming === `field:${name}` ? (
                 renameInput(name, (c) => onChange(renameFieldPatch(config, name, c)))
               ) : (
@@ -154,7 +158,12 @@ export function GridFieldBar({
                   {renameButton(`field:${name}`, name, labelOf(name))}
                 </>
               )}
-              <button type="button" aria-label={`Remove ${name}`} disabled={readOnly} onClick={() => remove(name)}>
+              <button
+                type="button"
+                aria-label={`Remove ${name}`}
+                disabled={readOnly}
+                onClick={() => remove(name)}
+              >
                 <X className="h-3 w-3" aria-hidden="true" />
               </button>
             </span>
@@ -165,7 +174,11 @@ export function GridFieldBar({
         group(
           strings.rows,
           config.rows.map((name) => (
-            <span key={name} className={chip} onDoubleClick={() => startRename(`field:${name}`, labelOf(name))}>
+            <span
+              key={name}
+              className={chip}
+              onDoubleClick={() => startRename(`field:${name}`, labelOf(name))}
+            >
               {renaming === `field:${name}` ? (
                 renameInput(name, (c) => onChange(renameFieldPatch(config, name, c)))
               ) : (
@@ -174,7 +187,12 @@ export function GridFieldBar({
                   {renameButton(`field:${name}`, name, labelOf(name))}
                 </>
               )}
-              <button type="button" aria-label={`Remove ${name}`} disabled={readOnly} onClick={() => remove(name)}>
+              <button
+                type="button"
+                aria-label={`Remove ${name}`}
+                disabled={readOnly}
+                onClick={() => remove(name)}
+              >
                 <X className="h-3 w-3" aria-hidden="true" />
               </button>
             </span>
@@ -191,7 +209,11 @@ export function GridFieldBar({
               onDoubleClick={() => startRename(`measure:${i}`, v.caption ?? labelOf(v.field))}
             >
               {config.showAggregationIcon && (
-                <Sigma data-testid="sigma-icon" className="h-3 w-3 shrink-0 text-primary" aria-hidden="true" />
+                <Sigma
+                  data-testid="sigma-icon"
+                  className="h-3 w-3 shrink-0 text-primary"
+                  aria-hidden="true"
+                />
               )}
               {renaming === `measure:${i}` ? (
                 renameInput(v.field, (c) => onChange(renameMeasurePatch(config, i, c)))

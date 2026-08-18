@@ -5,7 +5,7 @@ rows of that section on the comparison page.
 
 ## 1. Grand-total-aware formulas
 
-Today a calculated value is a *row-level* formula: it adds a column to each source
+Today a calculated value is a _row-level_ formula: it adds a column to each source
 record before aggregation (`[revenue] - [cost]`). That cannot express things like
 "share of the grand total" or "revenue per average order", because those need
 numbers that only exist after aggregation.

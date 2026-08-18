@@ -59,12 +59,18 @@ export function inferFields(rows: PivotRow[]): FieldDef[] {
   const sample = rows.slice(0, TYPE_INFERENCE_SAMPLE_SIZE);
   const names = [...new Set(sample.flatMap((r) => Object.keys(r)))];
   return names.map((name) => {
-    const values = sample.map((r) => r[name]).filter((v) => v !== null && v !== undefined && v !== "");
+    const values = sample
+      .map((r) => r[name])
+      .filter((v) => v !== null && v !== undefined && v !== "");
     const allNumbers = values.length > 0 && values.every((v) => Number.isFinite(Number(v)));
     const looksLikeDate =
-      !allNumbers && values.length > 0 && values.every((v) => /^\d{4}-\d{2}(-\d{2})?/.test(String(v)));
+      !allNumbers &&
+      values.length > 0 &&
+      values.every((v) => /^\d{4}-\d{2}(-\d{2})?/.test(String(v)));
     const looksLikeTime =
-      !allNumbers && values.length > 0 && values.every((v) => /^\d{1,2}:\d{2}(:\d{2})?$/.test(String(v)));
+      !allNumbers &&
+      values.length > 0 &&
+      values.every((v) => /^\d{1,2}:\d{2}(:\d{2})?$/.test(String(v)));
     return {
       name,
       caption: name.replace(/[_-]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),

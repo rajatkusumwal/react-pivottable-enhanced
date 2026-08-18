@@ -32,7 +32,15 @@ const baseConfig = createDefaultConfig({
 });
 
 const setup = (props: Partial<React.ComponentProps<typeof PivotStudio>> = {}) =>
-  render(<PivotStudio data={data} fields={fields} initialConfig={baseConfig} title="Test pivot" {...props} />);
+  render(
+    <PivotStudio
+      data={data}
+      fields={fields}
+      initialConfig={baseConfig}
+      title="Test pivot"
+      {...props}
+    />,
+  );
 
 beforeEach(() => {
   window.history.replaceState(null, "", "/");

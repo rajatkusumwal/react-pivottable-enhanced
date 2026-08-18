@@ -15,7 +15,7 @@ Goal: users coming from Flexmonster should recognise the layout, the wording and
    - Each Values chip has an aggregation dropdown (Sum, Count, Average, Distinct Count, Min, Max, …) exactly like Flexmonster's measure menu.
    - "Add calculated value" button opens the formula editor inside the same dialog.
    - Footer with Apply / Cancel, so changes are staged like Flexmonster.
-   The sidebar stays available as an optional docked mode via a prop for hosts that prefer it.
+     The sidebar stays available as an optional docked mode via a prop for hosts that prefer it.
 
 3. **Drag and drop on the grid itself**
    Field name headers above the rows/columns of the grid become draggable chips (Flexmonster's in-grid field bar), so a user can drag "Country" from rows to columns without opening the dialog. Includes filter funnel icons on those chips that open the member checklist popup.

@@ -112,12 +112,13 @@ function ComparisonPage() {
             Which pivot table tool should you use?
           </h1>
           <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-            A pivot table lets people slice and summarise data on a screen, like in Excel.
-            Below we take everything the paid tool <strong className="font-medium text-foreground">Flexmonster</strong>{" "}
-            can do — {totalFeatures} things in total — and check whether the leading free tool,
+            A pivot table lets people slice and summarise data on a screen, like in Excel. Below we
+            take everything the paid tool{" "}
+            <strong className="font-medium text-foreground">Flexmonster</strong> can do —{" "}
+            {totalFeatures} things in total — and check whether the leading free tool,
             react-pivottable, can do the same — plus the{" "}
-            <strong className="font-medium text-foreground">inhouse-grid-monster</strong>{" "}
-            shell on this site, which builds a familiar Flexmonster-style experience on top of it.
+            <strong className="font-medium text-foreground">inhouse-grid-monster</strong> shell on
+            this site, which builds a familiar Flexmonster-style experience on top of it.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link
@@ -133,9 +134,7 @@ function ComparisonPage() {
               Install it in your app
             </Link>
           </div>
-
         </header>
-
 
         {/* At a glance */}
         <section aria-labelledby="glance" className="mt-10">
@@ -199,19 +198,28 @@ function ComparisonPage() {
           <h2 className="text-sm font-semibold text-foreground">How to read the table</h2>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
             <li className="flex items-center gap-2">
-              <span className={cn("rounded-full px-2 py-0.5 text-xs font-medium", statusMeta.yes.chip)}>
+              <span
+                className={cn("rounded-full px-2 py-0.5 text-xs font-medium", statusMeta.yes.chip)}
+              >
                 Yes
               </span>
               Works out of the box.
             </li>
             <li className="flex items-center gap-2">
-              <span className={cn("rounded-full px-2 py-0.5 text-xs font-medium", statusMeta.partial.chip)}>
+              <span
+                className={cn(
+                  "rounded-full px-2 py-0.5 text-xs font-medium",
+                  statusMeta.partial.chip,
+                )}
+              >
                 Partly
               </span>
               Possible, but needs extra work, a plugin, or is limited.
             </li>
             <li className="flex items-center gap-2">
-              <span className={cn("rounded-full px-2 py-0.5 text-xs font-medium", statusMeta.no.chip)}>
+              <span
+                className={cn("rounded-full px-2 py-0.5 text-xs font-medium", statusMeta.no.chip)}
+              >
                 No
               </span>
               Not available at all.
@@ -276,7 +284,8 @@ function ComparisonPage() {
           <div className="mt-6 hidden overflow-hidden rounded-xl border border-border md:block">
             <table className="w-full border-collapse text-sm">
               <caption className="sr-only">
-                Feature support comparison between Flexmonster, react-pivottable and inhouse-grid-monster
+                Feature support comparison between Flexmonster, react-pivottable and
+                inhouse-grid-monster
               </caption>
               <thead>
                 <tr className="bg-surface-2">
@@ -313,10 +322,7 @@ function ComparisonPage() {
                   </tr>
                   {cat.rows.map((row) => (
                     <tr key={row.feature} className="border-b border-border/60 hover:bg-surface/70">
-                      <th
-                        scope="row"
-                        className="px-4 py-3 text-left font-normal text-foreground"
-                      >
+                      <th scope="row" className="px-4 py-3 text-left font-normal text-foreground">
                         {row.feature}
                       </th>
                       {products.map((p) => (
@@ -376,8 +382,8 @@ function ComparisonPage() {
         <footer className="mt-12 border-t border-border pt-6 text-sm leading-relaxed text-muted-foreground">
           <p>
             Based on the official Flexmonster documentation and pricing pages, the react-pivottable
-            docs, and our own demo implementation. Last checked 16 August 2026 — always
-            double-check with the vendor before buying.
+            docs, and our own demo implementation. Last checked 16 August 2026 — always double-check
+            with the vendor before buying.
           </p>
         </footer>
       </div>

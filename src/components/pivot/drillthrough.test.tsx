@@ -62,7 +62,9 @@ describe("drill-through slice", () => {
   });
 
   it("sorts numbers and strings in both directions", () => {
-    expect(applyDrillSlice(rows, { sort: { field: "revenue", dir: "desc" } })[0]!["revenue"]).toBe(100);
+    expect(applyDrillSlice(rows, { sort: { field: "revenue", dir: "desc" } })[0]!["revenue"]).toBe(
+      100,
+    );
     expect(applyDrillSlice(rows, { sort: { field: "rep", dir: "asc" } })[0]!["rep"]).toBe("Ann");
     expect(applyDrillSlice(rows, { sort: { field: "rep", dir: "desc" } })[0]!["rep"]).toBe("Eli");
   });
@@ -146,7 +148,12 @@ describe("drill-through from charts", () => {
 
   it("keeps the drill path from the axis and legend", () => {
     const keys = chartDrillKeys(
-      { categoryPath: ["West"], seriesPath: ["2024"], categoryField: "country", seriesField: "quarter" },
+      {
+        categoryPath: ["West"],
+        seriesPath: ["2024"],
+        categoryField: "country",
+        seriesField: "quarter",
+      },
       "USA",
       "Q1",
     );
@@ -284,7 +291,9 @@ describe("drill-through dialog", () => {
     fireEvent.click(within(list).getByRole("button", { name: "Deselect all" }));
     expect(screen.getByRole("dialog", { name: strings.drillThrough })).toBeTruthy();
     expect(screen.getByLabelText("Drill-through field list")).toBeTruthy();
-    expect(screen.getByTestId("drill-through-no-columns").textContent).toContain("No columns selected");
+    expect(screen.getByTestId("drill-through-no-columns").textContent).toContain(
+      "No columns selected",
+    );
     expect(screen.queryByTestId("drill-through-table")).toBeNull();
   });
   it("searches inside the drill-through field list", () => {

@@ -18,7 +18,14 @@ import { validateFormula } from "../calculated";
 import { areaOfField, moveField, reorderField } from "../dnd";
 import type { PivotArea } from "../dnd";
 import type { PivotStrings } from "../locales";
-import type { CalculatedField, FieldDef, FilterDef, PivotConfig, PivotRow, ValueDef } from "../types";
+import type {
+  CalculatedField,
+  FieldDef,
+  FilterDef,
+  PivotConfig,
+  PivotRow,
+  ValueDef,
+} from "../types";
 import { FieldChip } from "./FieldChip";
 import { DropArea } from "./DropArea";
 import { FilterEditor } from "./FilterEditor";
@@ -48,7 +55,6 @@ interface FieldGroup {
   hierarchies: { caption: string; levels: FieldDef[] }[];
   fields: FieldDef[];
 }
-
 
 function SourceField({
   field,
@@ -130,10 +136,7 @@ export function FieldListPanel({
     [fields, config.calculated, strings.calculatedValue],
   );
 
-  const fieldByName = useMemo(
-    () => new Map(allFields.map((f) => [f.name, f])),
-    [allFields],
-  );
+  const fieldByName = useMemo(() => new Map(allFields.map((f) => [f.name, f])), [allFields]);
   const labelOf = (name: string) =>
     config.fieldCaptions?.[name] ?? fieldByName.get(name)?.caption ?? name;
 
@@ -178,8 +181,7 @@ export function FieldListPanel({
         hierarchies: [...hierarchies.entries()].map(([caption, levels]) => ({
           caption,
           levels: [...levels].sort(
-            (a, b) =>
-              (a.level ?? order.get(a.name) ?? 0) - (b.level ?? order.get(b.name) ?? 0),
+            (a, b) => (a.level ?? order.get(a.name) ?? 0) - (b.level ?? order.get(b.name) ?? 0),
           ),
         })),
         fields: sortFields(loose),
@@ -198,7 +200,6 @@ export function FieldListPanel({
     setCollapsedGroups((current) =>
       current.includes(key) ? current.filter((k) => k !== key) : [...current, key],
     );
-
 
   const setArea = (field: FieldDef, area: PivotArea, index?: number) =>
     onChange(moveField(config, field.name, area, index, field.type));
@@ -255,7 +256,11 @@ export function FieldListPanel({
     if (!from || !to) return;
     const target = to.area;
     const targetList = listOf(target);
-    const index = to.name ? (to.slot >= 0 ? to.slot : targetList.indexOf(to.name)) : targetList.length;
+    const index = to.name
+      ? to.slot >= 0
+        ? to.slot
+        : targetList.indexOf(to.name)
+      : targetList.length;
 
     if (from.area === target && from.area !== "fields") {
       const current = from.slot >= 0 ? from.slot : targetList.indexOf(from.name);
@@ -276,51 +281,57 @@ export function FieldListPanel({
         const suffix = slot ? ` (${slot + 1})` : "";
         const def = fieldByName.get(v.field);
         return (
-        <FieldChip
-          key={`${v.field}-${i}`}
-          id={chipId("values", v.field, i)}
-          label={v.caption ?? labelOf(v.field)}
-          icon={
-            config.showAggregationIcon ? (
-              <Sigma data-testid="sigma-icon" className="h-3 w-3 shrink-0 text-primary" aria-hidden="true" />
-            ) : undefined
-          }
-          hint={aggregatorLabels[v.aggregator] ?? v.aggregator}
-          disabled={readOnly}
-          dragDisabled={dragDisabled}
-          active
-          onRemove={() => onChange({ values: config.values.filter((_, j) => j !== i) })}
-        >
-          <select
-            className={small}
-            aria-label={`Aggregation for ${v.field}${suffix}`}
-            disabled={readOnly}
-            value={v.aggregator}
-            onChange={(e) => updateValue(i, { aggregator: e.target.value })}
-          >
-            {aggregatorsForType(type, def?.aggregators).map((name) => (
-              <option key={String(name)} value={String(name)}>
-                {aggregatorLabels[String(name)] ?? String(name)}
-              </option>
-            ))}
-          </select>
-
-          <select
-            className={small}
-            aria-label={`Show ${v.field}${suffix} as`}
-            disabled={readOnly || type !== "number"}
-            value={v.displayMode ?? "raw"}
-            onChange={(e) =>
-              updateValue(i, { displayMode: e.target.value as NonNullable<ValueDef["displayMode"]> })
+          <FieldChip
+            key={`${v.field}-${i}`}
+            id={chipId("values", v.field, i)}
+            label={v.caption ?? labelOf(v.field)}
+            icon={
+              config.showAggregationIcon ? (
+                <Sigma
+                  data-testid="sigma-icon"
+                  className="h-3 w-3 shrink-0 text-primary"
+                  aria-hidden="true"
+                />
+              ) : undefined
             }
+            hint={aggregatorLabels[v.aggregator] ?? v.aggregator}
+            disabled={readOnly}
+            dragDisabled={dragDisabled}
+            active
+            onRemove={() => onChange({ values: config.values.filter((_, j) => j !== i) })}
           >
-            {Object.entries(displayModeLabels).map(([mode, label]) => (
-              <option key={mode} value={mode}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </FieldChip>
+            <select
+              className={small}
+              aria-label={`Aggregation for ${v.field}${suffix}`}
+              disabled={readOnly}
+              value={v.aggregator}
+              onChange={(e) => updateValue(i, { aggregator: e.target.value })}
+            >
+              {aggregatorsForType(type, def?.aggregators).map((name) => (
+                <option key={String(name)} value={String(name)}>
+                  {aggregatorLabels[String(name)] ?? String(name)}
+                </option>
+              ))}
+            </select>
+
+            <select
+              className={small}
+              aria-label={`Show ${v.field}${suffix} as`}
+              disabled={readOnly || type !== "number"}
+              value={v.displayMode ?? "raw"}
+              onChange={(e) =>
+                updateValue(i, {
+                  displayMode: e.target.value as NonNullable<ValueDef["displayMode"]>,
+                })
+              }
+            >
+              {Object.entries(displayModeLabels).map(([mode, label]) => (
+                <option key={mode} value={mode}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </FieldChip>
         );
       });
     }
@@ -381,7 +392,11 @@ export function FieldListPanel({
       <DropArea
         area="filters"
         title="Report filters"
-        hint={dragDisabled ? "Use the menus in the field list to add fields" : "Drop a field here to filter the whole report"}
+        hint={
+          dragDisabled
+            ? "Use the menus in the field list to add fields"
+            : "Drop a field here to filter the whole report"
+        }
         itemIds={config.filters.map((f) => chipId("filters", f.field))}
       >
         {chipsFor("filters")}
@@ -389,7 +404,11 @@ export function FieldListPanel({
       <DropArea
         area="cols"
         title={strings.columns}
-        hint={dragDisabled ? "Use the menus in the field list to add fields" : "Drop fields to build the columns"}
+        hint={
+          dragDisabled
+            ? "Use the menus in the field list to add fields"
+            : "Drop fields to build the columns"
+        }
         itemIds={config.cols.map((n) => chipId("cols", n))}
       >
         {chipsFor("cols")}
@@ -397,7 +416,11 @@ export function FieldListPanel({
       <DropArea
         area="rows"
         title={strings.rows}
-        hint={dragDisabled ? "Use the menus in the field list to add fields" : "Drop fields to build the rows"}
+        hint={
+          dragDisabled
+            ? "Use the menus in the field list to add fields"
+            : "Drop fields to build the rows"
+        }
         itemIds={config.rows.map((n) => chipId("rows", n))}
       >
         {chipsFor("rows")}
@@ -405,7 +428,11 @@ export function FieldListPanel({
       <DropArea
         area="values"
         title="Measures"
-        hint={dragDisabled ? "Use the menus in the field list to add fields" : "Drop a number field to summarise it"}
+        hint={
+          dragDisabled
+            ? "Use the menus in the field list to add fields"
+            : "Drop a number field to summarise it"
+        }
         itemIds={config.values.map((v, i) => chipId("values", v.field, i))}
       >
         {chipsFor("values")}
@@ -521,7 +548,10 @@ export function FieldListPanel({
                           onClick={() => toggleGroup(key)}
                         >
                           <span aria-hidden="true">{isCollapsed(key) ? "▸" : "▾"}</span>
-                          <Layers className="h-3.5 w-3.5 text-muted-foreground" aria-hidden="true" />
+                          <Layers
+                            className="h-3.5 w-3.5 text-muted-foreground"
+                            aria-hidden="true"
+                          />
                           <span className="truncate">{h.caption}</span>
                           <span className="text-[10px] text-muted-foreground">
                             ({h.levels.length} levels)
@@ -562,7 +592,6 @@ export function FieldListPanel({
       </div>
     </div>
   );
-
 
   const extrasBlock = (
     <div className="space-y-2">
@@ -616,9 +645,9 @@ export function FieldListPanel({
               </>
             ) : (
               <>
-                Totals are available: <code>grandTotal([revenue])</code>,{" "}
-                <code>rowTotal(…)</code>, <code>columnTotal(…)</code>,{" "}
-                <code>parentRowTotal(…)</code>, <code>parentColumnTotal(…)</code>
+                Totals are available: <code>grandTotal([revenue])</code>, <code>rowTotal(…)</code>,{" "}
+                <code>columnTotal(…)</code>, <code>parentRowTotal(…)</code>,{" "}
+                <code>parentColumnTotal(…)</code>
               </>
             )}
           </p>
