@@ -15,6 +15,7 @@
     "preview:local": "node dist/server/index.mjs",
     "lint": "eslint .",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "test:package": "vitest run --config vitest.package.config.ts",
     "lib:build": "cd standalone && vite build && tsc -p tsconfig.build.json && node scripts/copy-css.mjs",
     "lib:typecheck": "tsc -p standalone/tsconfig.build.json --noEmit",
