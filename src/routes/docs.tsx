@@ -53,7 +53,6 @@ function FrameworkTabs({
   );
 }
 
-
 const TITLE = "react-pivottable-enhanced Docs: Install the React Pivot Table in Minutes";
 const DESCRIPTION =
   "Install react-pivottable-enhanced from npm, add one Tailwind import and render a commercial-style pivot table in your React app. Props, theming and backend engine reference.";
@@ -179,7 +178,7 @@ function Section({
 }
 
 const toc = [
-  ["install", "Install"],
+  ["install", "Install (React & Angular)"],
   ["quick-start", "Quick start"],
   ["examples", "Live examples"],
   ["tailwind", "Tailwind setup"],
@@ -333,7 +332,6 @@ function LiveExample({
 function DocsPage() {
   const [framework, setFramework] = useState<Framework>("react");
   return (
-
     <main className="min-h-screen bg-background">
       <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
         <Link
@@ -503,7 +501,6 @@ export class ReportsComponent {
               </tbody>
             </table>
           </Section>
-
 
           <Section id="quick-start" title="2. Quick start">
             <p>Render the component with your rows. That is the whole integration.</p>
