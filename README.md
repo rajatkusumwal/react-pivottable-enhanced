@@ -826,11 +826,18 @@ Useful commands:
 
 ```bash
 bun run dev      # start the demo app
-bun run test     # run the whole suite once (vitest)
+bun run test     # run the whole suite once (vitest) — 341 tests
+bun run test:coverage # same, with coverage thresholds enforced
 bun run test:package  # slow: build the npm package and test the artifact
 bun run lint     # eslint + prettier rules
 bun run format   # rewrite files with prettier
 ```
+
+The suite covers core pivoting, edge cases, the grid UI, charts, drill-through,
+exports, the REST backend contract *and its failure paths*, accessibility and
+keyboard navigation, 100k-row performance budgets and reload persistence. See
+"What the suite covers" in [standalone/README.md](./standalone/README.md) for the
+file-by-file map.
 
 ### Testing the npm package
 
