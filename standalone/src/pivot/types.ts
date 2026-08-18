@@ -51,7 +51,7 @@ export type AggregatorName =
   | "last"
   | (string & {});
 
-/** Post-aggregation display transforms (commercial pivot tables "show values as"). */
+/** Post-aggregation display transforms (the commercial "show values as"). */
 export type ValueDisplayMode =
   | "raw"
   | "percentOfGrandTotal"
