@@ -861,12 +861,26 @@ render `PivotStudio`. Run it before every `npm publish`.
 ### Running a stable local demo (no HMR reloads)
 
 This is a server-rendered app, so `vite preview` cannot serve the build (it
-looks for a static `dist/server/server` entry and fails). Build a self-contained
-server bundle and run it with Node instead:
+looks for a static `dist/server/server` entry and fails).
+
+Note the two different build targets:
+
+| Command           | Target                | Output folder | Runs with                |
+| ----------------- | --------------------- | ------------- | ------------------------ |
+| `npm run build`   | Cloudflare Workers    | `.output/`    | wrangler (not `node`)    |
+| `npm run build:local` | plain Node server | `dist/`       | `node dist/server/index.mjs` |
+
+So for a local demo use the Node build, not the default one:
 
 ```bash
-bun run build
+npm run build:local     # == NITRO_PRESET=node-server vite build
+npm run preview:local   # == node dist/server/index.mjs
+# -> http://localhost:3000  (override with PORT=8080)
 ```
+
+If you ran `npm run build` and only got a `.output/` folder, that is the
+Cloudflare bundle — `node .output/server/index.mjs` will not start a server.
+Delete it and run `npm run build:local` instead.
 
 The resulting `dist/` folder is self-contained. To run it outside the project
 folder, copy `dist/` and start the server:
@@ -874,15 +888,13 @@ folder, copy `dist/` and start the server:
 ```bash
 cp -r dist /path/to/deploy
 cd /path/to/deploy
-node dist/server/index.mjs
+PORT=8080 node dist/server/index.mjs
 # -> http://localhost:8080
 ```
 
 No `node_modules`, source files or project root are needed in the deployment
 folder — only Node.js 18+. The server is bundled with its runtime dependencies.
 
-The default `bun run build` still targets Cloudflare for deployment, but the
-same `dist/server/index.mjs` entry also runs locally as a plain Node server.
 
 Conventions (also documented for AI coding agents in `AGENTS.md`, `CLAUDE.md`
 and `GEMINI.md`): tests live next to the code, cover a normal case, an edge case
