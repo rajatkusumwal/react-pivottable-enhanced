@@ -27,7 +27,7 @@ export default defineConfig({ define: { global: "globalThis" } });
 ## 2. Use it
 
 ```tsx
-import { PivotStudio, inferFields, createDefaultConfig } from "@/components/pivot";
+import { PivotStudio, inferFields, createDefaultConfig } from "inhouse-grid-monster";
 
 export function Report({ rows }) {
   return (
@@ -46,8 +46,9 @@ export function Report({ rows }) {
 }
 ```
 
-Copy `src/components/pivot/` into any React 19 app — it has no app-specific imports
-other than Tailwind tokens (`--color-border`, `--color-card`, …) and `@/lib/utils`.
+The component source is `standalone/src/pivot/` — the npm package **is** the source of
+truth, and this demo site imports it through the `inhouse-grid-monster` path alias in
+`tsconfig.json`. There is no copy of the pivot code anywhere else in the repo.
 
 ### Props
 
@@ -214,7 +215,7 @@ series)` turns a chart click into `{ rowKey, colKey, label }`.
   records behind a cell can leave the app as CSV/TSV/Excel/HTML/JSON:
 
   ```ts
-  import { matrixFromRows, exportMatrix } from "@/components/pivot";
+  import { matrixFromRows, exportMatrix } from "inhouse-grid-monster";
 
   exportMatrix(matrixFromRows(rows, "Records behind North", { header: "Acme Ltd" }), "csv");
   ```
@@ -225,7 +226,7 @@ series)` turns a chart click into `{ rowKey, colKey, label }`.
   above and below the table. Programmatically, pass a decoration object:
 
   ```ts
-  import { matrixFromResult, printMatrix } from "@/components/pivot";
+  import { matrixFromResult, printMatrix } from "inhouse-grid-monster";
 
   printMatrix(
     matrixFromResult(result, "en", "Q4 revenue", {
@@ -251,7 +252,7 @@ series)` turns a chart click into `{ rowKey, colKey, label }`.
     readReportFromUrl,
     encodeReport,
     decodeReport,
-  } from "@/components/pivot";
+  } from "inhouse-grid-monster";
 
   const url = buildReportUrl(window.location.href, config); // share this
   const restored = readReportFromUrl(url); // PivotConfig | null
@@ -275,7 +276,7 @@ series)` turns a chart click into `{ rowKey, colKey, label }`.
 Everything the grid renders is a `PivotResult`. Swap the engine and the UI is unchanged:
 
 ```tsx
-import { PivotStudio, createBackendEngine, createHybridEngine } from "@/components/pivot";
+import { PivotStudio, createBackendEngine, createHybridEngine } from "inhouse-grid-monster";
 
 const engine = createBackendEngine({
   baseUrl: "https://analytics.example.com",
@@ -600,7 +601,7 @@ Returns `{ "datasetId": "sales-2024", "rowCount": 812345678, "fields": [...] }`.
 endpoint still accepts a multipart upload for small files.
 
 ```ts
-import { registerRemoteDataset } from "@/components/pivot";
+import { registerRemoteDataset } from "inhouse-grid-monster";
 
 const { datasetId } = await registerRemoteDataset({
   baseUrl: "/api/pivot",
@@ -615,7 +616,7 @@ const { datasetId } = await registerRemoteDataset({
 Worker — to the engine contract. Implement whichever level your backend supports:
 
 ```ts
-import { createCustomEngine, PivotStudio } from "@/components/pivot";
+import { createCustomEngine, PivotStudio } from "inhouse-grid-monster";
 
 const engine = createCustomEngine({
   id: "graphql",
@@ -638,7 +639,7 @@ Results are tagged `meta.source: "backend"` and `meta.queryId: <id>`.
 ### Server-side aggregation of large datasets (1GB+)
 
 ```ts
-import { createServerAggregationEngine, shouldOffload, streamCsvRows } from "@/components/pivot";
+import { createServerAggregationEngine, shouldOffload, streamCsvRows } from "inhouse-grid-monster";
 
 // Every query is answered by the service; records never reach the browser.
 const engine = createServerAggregationEngine({
@@ -740,7 +741,7 @@ values, charts, export, localisation, permissions, controlled config, the drag-a
 field list, member filters, file upload, and a custom engine adapter (proving the backend
 swap works without UI changes).
 
-`src/components/pivot/ui/PivotGrid.test.tsx` covers the Flexmonster-style grid itself:
+`standalone/src/pivot/ui/PivotGrid.test.tsx` covers the Flexmonster-style grid itself:
 compact / classic / flat layouts, subtotals and grand totals, expand and collapse,
 spreadsheet headers, repeated member labels, cell selection with the auto-calculation
 stats, keyboard navigation, clipboard copy, multi-column sorting, column drill and row
@@ -774,7 +775,7 @@ total.
 
 ### Backend integration tests (no server required)
 
-`src/components/pivot/engines/backend.test.ts` verifies the REST contract against a mocked
+`standalone/src/pivot/engines/backend.test.ts` verifies the REST contract against a mocked
 `fetchImpl` — pass your own `fetch` mock through `createBackendClient({ fetchImpl })` or
 `createBackendEngine({ fetchImpl })` and you can test the whole Spring Boot + DuckDB
 integration without running the service:
@@ -792,7 +793,7 @@ the full grid can be driven over the REST contract with no server at all — use
 for a backend-shaped demo:
 
 ```ts
-import { createMockPivotApi, createBackendEngine, sampleData, sampleFields } from "@/components/pivot";
+import { createMockPivotApi, createBackendEngine, sampleData, sampleFields } from "inhouse-grid-monster";
 
 const api = createMockPivotApi({ rows: sampleData, fields: sampleFields, datasetId: "sales" });
 const engine = createBackendEngine({ baseUrl: "https://api.test", datasetId: "sales", fetchImpl: api.fetch });
@@ -801,7 +802,7 @@ const engine = createBackendEngine({ baseUrl: "https://api.test", datasetId: "sa
 // api.requests -> every request body sent; api.datasets -> server-side rows after edits
 ```
 
-`src/components/pivot/engines/mock-api.test.ts` runs every grid feature through it: compact /
+`standalone/src/pivot/engines/mock-api.test.ts` runs every grid feature through it: compact /
 classic / flat layouts, subtotals and grand totals (including position), row and column drill
 (`collapsed` / `collapsedCols`), single and multi-column sorting, server-side filters, paging,
 aggregator switching, drill-through, field metadata, member search, dataset upload and inline
@@ -815,7 +816,7 @@ when implementing the server side.
 
 ## 5. Contributing / customising
 
-Everything tunable is in one file, `src/components/pivot/constants.ts` — row
+Everything tunable is in one file, `standalone/src/pivot/constants.ts` — row
 height, virtualisation thresholds, member list limits, the default
 drill-through row cap and the type-inference sample size. Change a value there
 instead of hunting through components.
@@ -832,12 +833,11 @@ bun run format   # rewrite files with prettier
 
 ### Testing the npm package
 
-`bun run test` includes `standalone/tests/package.test.ts`, which re-runs the
-sync script and checks that the package tree matches `src/components/pivot`
-(minus tests) and that every documented export resolves.
+`bun run test` includes `standalone/tests/package.test.ts`, which checks that the
+package entry point exports every documented name and that those exports work.
 
 `bun run test:package` is the slow suite: it runs the real library build
-(`sync -> vite build -> tsc -> copy-css`) and then asserts on `standalone/dist/`
+(`vite build -> tsc -> copy-css`) and then asserts on `standalone/dist/`
 — that `index.js`, `index.d.ts` and `pivot-theme.css` exist, that React and the
 runtime deps stay external, and that a consumer can import the built bundle and
 render `PivotStudio`. Run it before every `npm publish`.
@@ -891,7 +891,7 @@ in-app docs page lives at `/docs`.
 
 ### Building and publishing that package
 
-`src/components/pivot/` is self-contained: it imports nothing from the demo app
+`standalone/src/pivot/` is self-contained: it imports nothing from the demo app
 (no router, no shadcn/ui, no `@/lib` helpers). The `standalone/` folder packages
 exactly that.
 

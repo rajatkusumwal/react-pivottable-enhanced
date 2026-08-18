@@ -114,13 +114,14 @@ it, or load it with `next/dynamic` and `{ ssr: false }`.
 
 ## Publishing this package
 
-From the repo root the component source lives in `src/components/pivot/`.
-`standalone/` builds it as a package:
+The component source lives here, in `standalone/src/pivot/` — this package is the
+single home of the pivot code, and the demo site in the repo root imports it via the
+`inhouse-grid-monster` path alias. Build the package with:
 
 ```bash
 cd standalone
 npm install
-npm run build      # sync + types + bundle + theme css -> dist/
+npm run build      # bundle + types + theme css -> dist/
 npm publish        # prepublishOnly re-runs the build
 ```
 
@@ -129,7 +130,7 @@ npm publish        # prepublishOnly re-runs the build
 Run from the repo root:
 
 ```bash
-bun run test          # unit suite + package sync/export tests
+bun run test          # unit suite (incl. standalone/src) + package export tests
 bun run test:package  # builds the package and tests dist/ as a consumer would
 ```
 
@@ -137,5 +138,5 @@ bun run test:package  # builds the package and tests dist/ as a consumer would
 emitted, if React (or another peer/runtime dependency) gets inlined, or if
 `PivotStudio` cannot render from the built artifact.
 
-`npm run sync` copies `src/components/pivot/` into `standalone/src/pivot/`
-(tests excluded); that folder is generated and gitignored.
+Tests live next to the code in `standalone/src/pivot/` but never ship: the build
+excludes `*.test.*` and `files` publishes only `dist` and `README.md`.
