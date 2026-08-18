@@ -987,6 +987,54 @@ relative, so it works wherever you put it.
 Full instructions, including a Tailwind v3 colour map, Next.js SSR notes and the
 backend-engine wiring, are in [`standalone/README.md`](./standalone/README.md).
 
+## Framework integrations
+
+| Framework | Package                                 | Status                                   |
+| --------- | --------------------------------------- | ---------------------------------------- |
+| React     | `react-pivottable-enhanced`             | Native — this is where the code lives    |
+| Angular   | `react-pivottable-enhanced-angular`     | Supported through a thin wrapper component |
+
+### Angular
+
+`angular/` holds a small `<pivot-studio>` Angular component that mounts the React
+pivot table, maps every input onto a React prop and re-emits the callbacks as Angular
+outputs. No pivot logic is duplicated, so Angular apps get the same features and the
+same tests.
+
+```bash
+npm i react-pivottable-enhanced-angular react-pivottable-enhanced react react-dom
+```
+
+```ts
+import { Component } from "@angular/core";
+import { PivotStudioComponent, sampleData, sampleFields } from "react-pivottable-enhanced-angular";
+
+@Component({
+  standalone: true,
+  imports: [PivotStudioComponent],
+  template: `<pivot-studio [data]="data" [fields]="fields" title="Sales report"
+    (configChange)="onLayout($event)"></pivot-studio>`,
+})
+export class ReportsComponent {
+  data = sampleData;
+  fields = sampleFields;
+  onLayout(config: unknown) {}
+}
+```
+
+Add the theme once in `angular.json` (`node_modules/react-pivottable-enhanced/dist/pivot-theme.css`).
+The trade-off is that React + ReactDOM (~50-150 KB gzipped) ship inside the Angular
+app; a framework-agnostic core remains an option if that ever matters.
+
+Build and typecheck it from the repo root:
+
+```bash
+bun run angular:build       # builds the React library first, then emits angular/dist
+bun run angular:typecheck
+```
+
+Full input/output reference: [`angular/README.md`](./angular/README.md).
+
 ---
 
 ## Licence & attribution

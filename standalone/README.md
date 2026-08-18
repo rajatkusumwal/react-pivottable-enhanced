@@ -27,7 +27,8 @@ the demo site; everything a consuming app needs is here.
 11. [Server-side rendering](#server-side-rendering)
 12. [API reference](#api-reference)
 13. [Troubleshooting](#troubleshooting)
-14. [Publishing this package](#publishing-this-package)
+14. [Using it from Angular](#using-it-from-angular)
+15. [Publishing this package](#publishing-this-package)
 
 ## Feature list
 
@@ -813,6 +814,41 @@ Grouped list of the public exports (all named, no default export):
 | `sum` missing from a field's menu       | The field declares a narrower `aggregators` list, or is not `type: "number"`      |
 | Numbers read as text after a CSV import | Wrong CSV dialect — pass `csv` options or use `detectCsvOptions`                  |
 | Uploaded file disappears on reload      | Uploads live in `sessionStorage` (8 MB cap) by design; use `onUploadToBackend`    |
+
+## Using it from Angular
+
+Angular apps use the companion wrapper package, which mounts this component inside an
+Angular component. Same features, same engine, same config object.
+
+```bash
+npm i react-pivottable-enhanced-angular react-pivottable-enhanced react react-dom
+```
+
+```ts
+import { Component } from "@angular/core";
+import { PivotStudioComponent, sampleData, sampleFields } from "react-pivottable-enhanced-angular";
+
+@Component({
+  standalone: true,
+  imports: [PivotStudioComponent],
+  template: `<pivot-studio
+    [data]="data"
+    [fields]="fields"
+    [initialConfig]="{ rows: ['Region'], values: [{ field: 'Revenue', aggregator: 'sum' }] }"
+    (configChange)="save($event)"
+  ></pivot-studio>`,
+})
+export class ReportsComponent {
+  data = sampleData;
+  fields = sampleFields;
+  save(config: unknown) {}
+}
+```
+
+Inputs mirror the props above one-for-one; `onConfigChange` / `onDataChange` become the
+`(configChange)` / `(dataChange)` outputs, emitted inside the Angular zone. The theme
+stylesheet is added once in `angular.json`. Full reference:
+[`angular/README.md`](https://github.com/rajatkusumwal/react-pivottable-enhanced/blob/main/angular/README.md).
 
 ## Publishing this package
 
