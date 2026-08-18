@@ -8,8 +8,11 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     setupFiles: ["./src/test/setup.ts"],
-    globalSetup: ["./standalone/tests/global-setup.ts"],
-    include: ["src/**/*.test.{ts,tsx}", "standalone/tests/package.test.ts"],
+    include: [
+      "src/**/*.test.{ts,tsx}",
+      "standalone/src/**/*.test.{ts,tsx}",
+      "standalone/tests/package.test.ts",
+    ],
     css: false,
   },
 });

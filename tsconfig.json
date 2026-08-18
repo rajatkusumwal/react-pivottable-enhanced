@@ -1,5 +1,14 @@
 {
-  "include": ["src/**/*.ts", "src/**/*.tsx", "vite.config.ts", "eslint.config.js"],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "standalone/src/**/*.ts",
+    "standalone/src/**/*.tsx",
+    "standalone/tests/**/*.ts",
+    "standalone/tests/**/*.tsx",
+    "vite.config.ts",
+    "eslint.config.js"
+  ],
   "compilerOptions": {
     "target": "ES2022",
     "jsx": "react-jsx",
@@ -24,7 +33,9 @@
     "exactOptionalPropertyTypes": true,
     "noUncheckedSideEffectImports": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "inhouse-grid-monster": ["./standalone/src/index.ts"],
+      "inhouse-grid-monster/*": ["./standalone/src/*"]
     }
   }
 }

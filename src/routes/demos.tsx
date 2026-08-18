@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowLeft, ExternalLink } from "lucide-react";
-import { PivotStudio, sampleData, sampleFields, createDefaultConfig } from "@/components/pivot";
+import { PivotStudio, sampleData, sampleFields, createDefaultConfig } from "inhouse-grid-monster";
 
 const TITLE = "Free Pivot Table Demo: A Flexmonster-Style Grid on react-pivottable";
 const DESCRIPTION =
