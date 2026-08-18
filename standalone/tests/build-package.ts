@@ -24,7 +24,6 @@ function run(command: string, args: string[]) {
 /** bundle -> emit declarations -> copy CSS (mirrors `npm run build`). */
 export function buildPackage(): Promise<void> {
   running ??= (async () => {
-
     // vite build empties dist/, so it must run before the declarations land.
     run("bunx", ["vite", "build", "--mode", "production"]);
     run("bunx", ["tsc", "-p", "tsconfig.build.json"]);
