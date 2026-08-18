@@ -169,7 +169,7 @@ describe("<pivot-studio>", () => {
     fixture.detectChanges();
     const el = fixture.nativeElement as HTMLElement;
     await waitFor(el, "[role='grid']");
-    expect(el.textContent).toContain("region");
+    expect(el.textContent).toContain("Sum of Revenue");
     expect(el.querySelector("button[title='Export']")).toBeNull();
   });
 
