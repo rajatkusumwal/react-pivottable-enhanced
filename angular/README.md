@@ -134,18 +134,18 @@ export class ReportsComponent {
 
 **Task → API map**
 
-| Task                            | Use                                                        |
-| ------------------------------- | ---------------------------------------------------------- |
-| Build field metadata from rows  | `inferFields(rows)`                                        |
-| Set a starting report           | `[initialConfig]`                                          |
-| Control the report from Angular | `[config]` + `(configChange)`                              |
-| Persist a report                | `(configChange)` → your store / `localStorage`             |
+| Task                            | Use                                                         |
+| ------------------------------- | ----------------------------------------------------------- |
+| Build field metadata from rows  | `inferFields(rows)`                                         |
+| Set a starting report           | `[initialConfig]`                                           |
+| Control the report from Angular | `[config]` + `(configChange)`                               |
+| Persist a report                | `(configChange)` → your store / `localStorage`              |
 | Aggregate on a server           | `[engine]="createBackendEngine({ baseUrl })"` + `datasetId` |
-| Fake a backend in tests         | `createMockPivotApi()` (React package)                     |
-| React to inline edits           | `(dataChange)`                                             |
-| Restrict what a user may do     | `[permissions]`                                            |
-| Docked field panel vs dialog    | `[fieldsUi]="'sidebar'"` / `'dialog'`                      |
-| Mount outside Angular DI        | `createPivotMount(hostElement)`                            |
+| Fake a backend in tests         | `createMockPivotApi()` (React package)                      |
+| React to inline edits           | `(dataChange)`                                              |
+| Restrict what a user may do     | `[permissions]`                                             |
+| Docked field panel vs dialog    | `[fieldsUi]="'sidebar'"` / `'dialog'`                       |
+| Mount outside Angular DI        | `createPivotMount(hostElement)`                             |
 
 ## Install
 
@@ -296,7 +296,7 @@ const config: PivotConfig = {
 };
 ```
 
-Field metadata tells the pivot what a column *is*:
+Field metadata tells the pivot what a column _is_:
 
 ```ts
 const fields: FieldDef[] = [
