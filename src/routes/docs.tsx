@@ -7,6 +7,52 @@ import {
   sampleData,
   sampleFields,
 } from "react-pivottable-enhanced";
+import pivotScreenshot from "@/assets/pivot-screenshot.jpg";
+
+type Framework = "react" | "angular";
+
+function FrameworkTabs({
+  value,
+  onChange,
+  labelledBy,
+}: {
+  value: Framework;
+  onChange: (next: Framework) => void;
+  labelledBy: string;
+}) {
+  const tabs: [Framework, string][] = [
+    ["react", "React"],
+    ["angular", "Angular"],
+  ];
+  return (
+    <div
+      id={labelledBy}
+      role="tablist"
+      aria-label="Choose your framework"
+      className="mt-4 inline-flex rounded-lg border border-border bg-surface p-1"
+    >
+      {tabs.map(([id, label]) => (
+        <button
+          key={id}
+          type="button"
+          role="tab"
+          id={`tab-${id}`}
+          aria-selected={value === id}
+          aria-controls={`panel-${id}`}
+          onClick={() => onChange(id)}
+          className={
+            value === id
+              ? "rounded-md bg-card px-4 py-1.5 text-sm font-medium text-foreground shadow-sm"
+              : "rounded-md px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground"
+          }
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 
 const TITLE = "react-pivottable-enhanced Docs: Install the React Pivot Table in Minutes";
 const DESCRIPTION =
