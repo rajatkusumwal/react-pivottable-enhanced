@@ -53,3 +53,20 @@ src/lib/pivot-comparison.ts   feature matrix shown on the home page
 - Comments explain _why_, not _what_. Prefer a clear name over a comment.
 - Engines must keep returning the same `PivotResult`, so the browser engine and a
   backend service stay swappable.
+
+## Contributing
+
+Full guide for humans and agents: [CONTRIBUTING.md](./CONTRIBUTING.md).
+Repository: https://github.com/rajatkusumwal/react-pivottable-enhanced
+
+- Only change what was asked; never edit `src/routeTree.gen.ts` or `dist/`.
+- Ship the test with the code, then run `bun run test` and `bunx tsgo --noEmit`
+  and report the real output.
+- Keep one copy of the pivot source: `standalone/src/pivot` — never duplicate it
+  into `src/`.
+
+## Provenance
+
+This project was developed end to end with AI coding agents and is published as
+is under the MIT licence, without warranty. Review and test it yourself before
+production use — use at your own discretion.
