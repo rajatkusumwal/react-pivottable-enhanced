@@ -1,11 +1,11 @@
 /**
- * Theme tokens used by inhouse-grid-monster.
+ * Theme tokens used by react-pivottable-enhanced.
  *
  * The pivot components style themselves with Tailwind utility classes that
  * point at semantic tokens (bg-card, text-muted-foreground, border-border …).
  * Import this file once in the host app, AFTER Tailwind, so those tokens exist.
  *
- * Using Tailwind v4:   @import "tailwindcss";  then  @import "inhouse-grid-monster/styles.css";
+ * Using Tailwind v4:   @import "tailwindcss";  then  @import "react-pivottable-enhanced/styles.css";
  * Using Tailwind v3:   map the same names in tailwind.config.js -> theme.extend.colors.
  */
 

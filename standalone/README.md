@@ -1,4 +1,4 @@
-# inhouse-grid-monster
+# react-pivottable-enhanced
 
 A commercial-style pivot table for React: drag & drop fields, filters,
 calculated values, subtotals, charts, drill-through, export and inline editing.
@@ -26,7 +26,7 @@ the demo site; everything a consuming app needs is here.
 ## Install
 
 ```bash
-npm i inhouse-grid-monster
+npm i react-pivottable-enhanced
 ```
 
 That pulls in the only runtime deps: `@dnd-kit/core`, `@dnd-kit/sortable`,
@@ -38,8 +38,8 @@ Not needed: a router, shadcn/ui, Radix, `clsx`, `tailwind-merge`, or a backend.
 ## Hello pivot
 
 ```tsx
-import { PivotStudio, sampleData, sampleFields } from "inhouse-grid-monster";
-import "inhouse-grid-monster/styles.css";
+import { PivotStudio, sampleData, sampleFields } from "react-pivottable-enhanced";
+import "react-pivottable-enhanced/styles.css";
 
 export function Reports() {
   return <PivotStudio data={sampleData} fields={sampleFields} />;
@@ -49,7 +49,7 @@ export function Reports() {
 With your own records, infer the field metadata and pick a starting report:
 
 ```tsx
-import { PivotStudio, inferFields, createDefaultConfig } from "inhouse-grid-monster";
+import { PivotStudio, inferFields, createDefaultConfig } from "react-pivottable-enhanced";
 
 const rows = [
   { region: "EMEA", country: "France", year: 2024, revenue: 1200, cost: 700 },
@@ -80,8 +80,8 @@ package so the utility classes survive purging:
 ```css
 /* app.css */
 @import "tailwindcss";
-@source "../node_modules/inhouse-grid-monster/dist";
-@import "inhouse-grid-monster/styles.css"; /* semantic colour tokens */
+@source "../node_modules/react-pivottable-enhanced/dist";
+@import "react-pivottable-enhanced/styles.css"; /* semantic colour tokens */
 ```
 
 On Tailwind v3, add the package to `content` and map the tokens instead:
@@ -89,7 +89,7 @@ On Tailwind v3, add the package to `content` and map the tokens instead:
 ```js
 // tailwind.config.js
 export default {
-  content: ["./src/**/*.{ts,tsx}", "./node_modules/inhouse-grid-monster/dist/**/*.js"],
+  content: ["./src/**/*.{ts,tsx}", "./node_modules/react-pivottable-enhanced/dist/**/*.js"],
   theme: {
     extend: {
       colors: {
@@ -118,7 +118,7 @@ export default {
 };
 ```
 
-The `:root` / `.dark` variables live in `inhouse-grid-monster/styles.css`;
+The `:root` / `.dark` variables live in `react-pivottable-enhanced/styles.css`;
 override any of them in your own CSS to re-skin the grid:
 
 ```css
@@ -182,7 +182,7 @@ const config = createDefaultConfig({
 ### Field metadata
 
 ```ts
-import type { FieldDef } from "inhouse-grid-monster";
+import type { FieldDef } from "react-pivottable-enhanced";
 
 const fields: FieldDef[] = [
   {
@@ -228,7 +228,7 @@ const fields: FieldDef[] = [
 
 ```tsx
 import { useState } from "react";
-import { PivotStudio, createDefaultConfig, type PivotConfig } from "inhouse-grid-monster";
+import { PivotStudio, createDefaultConfig, type PivotConfig } from "react-pivottable-enhanced";
 
 export function SavedReport({ saved }: { saved?: PivotConfig }) {
   const [config, setConfig] = useState<PivotConfig>(
@@ -257,7 +257,7 @@ export function SavedReport({ saved }: { saved?: PivotConfig }) {
 ### 2. Share a report by link
 
 ```tsx
-import { buildReportUrl, readReportFromUrl, REPORT_PARAM } from "inhouse-grid-monster";
+import { buildReportUrl, readReportFromUrl, REPORT_PARAM } from "react-pivottable-enhanced";
 
 const url = buildReportUrl(location.href, config); // …?report=<base64>
 const incoming = readReportFromUrl(location.href); // PivotConfig | null on load
@@ -296,7 +296,7 @@ totals and `index`.
 ### 4. A custom aggregator
 
 ```ts
-import { registerAggregator } from "inhouse-grid-monster";
+import { registerAggregator } from "react-pivottable-enhanced";
 
 registerAggregator("p95", (values) => {
   const nums = values.filter((v): v is number => typeof v === "number").sort((a, b) => a - b);
@@ -445,7 +445,7 @@ dashboards. Masked values render as `••••`.
 ### 12. Export and print with headers/footers
 
 ```ts
-import { exportMatrix, matrixFromResult } from "inhouse-grid-monster";
+import { exportMatrix, matrixFromResult } from "react-pivottable-enhanced";
 
 // From the report config: the toolbar uses these two lines
 exportHeader: "Acme Corp — confidential\nQ3 revenue by region",
@@ -465,7 +465,7 @@ exportMatrix(matrix, "csv"); // "csv" | "tsv" | "html" | "json" | "excel" | "pdf
 ### 13. CSV dialect (European files, tabs, semicolons)
 
 ```ts
-import { detectCsvOptions, parseCsv } from "inhouse-grid-monster";
+import { detectCsvOptions, parseCsv } from "react-pivottable-enhanced";
 
 csv: { delimiter: ";", decimalSeparator: ",", thousandsSeparator: "." }
 // or let the file decide:
@@ -476,7 +476,7 @@ const rows = parseCsv(text, opts);
 ### 14. Localisation
 
 ```ts
-import { locales, getLocale } from "inhouse-grid-monster";
+import { locales, getLocale } from "react-pivottable-enhanced";
 
 <PivotStudio data={rows} fields={fields} initialConfig={createDefaultConfig({ locale: "de" })} />;
 ```
@@ -487,7 +487,7 @@ result in `locales`.
 ## Backend aggregation
 
 ```tsx
-import { PivotStudio, createBackendEngine } from "inhouse-grid-monster";
+import { PivotStudio, createBackendEngine } from "react-pivottable-enhanced";
 
 const engine = createBackendEngine({
   baseUrl: "https://api.example.com", // endpoints appended: /api/pivot/query, …
@@ -512,7 +512,7 @@ import {
   createHybridEngine,
   createCustomEngine,
   createServerAggregationEngine,
-} from "inhouse-grid-monster";
+} from "react-pivottable-enhanced";
 
 // Local until the data gets big, then the service:
 const hybrid = createHybridEngine({ baseUrl: "https://api.example.com", threshold: 100_000 });
@@ -551,7 +551,7 @@ import {
   createBackendEngine,
   sampleData,
   sampleFields,
-} from "inhouse-grid-monster";
+} from "react-pivottable-enhanced";
 
 const api = createMockPivotApi({ rows: sampleData, fields: sampleFields, datasetId: "sales" });
 
@@ -584,7 +584,7 @@ it, or load it with `next/dynamic` and `{ ssr: false }`:
 "use client";
 import dynamic from "next/dynamic";
 
-const PivotStudio = dynamic(() => import("inhouse-grid-monster").then((m) => m.PivotStudio), {
+const PivotStudio = dynamic(() => import("react-pivottable-enhanced").then((m) => m.PivotStudio), {
   ssr: false,
   loading: () => <div className="h-96 animate-pulse rounded-xl bg-muted" />,
 });
@@ -626,7 +626,7 @@ Grouped list of the public exports (all named, no default export):
 | Symptom                                 | Cause and fix                                                                   |
 | --------------------------------------- | ------------------------------------------------------------------------------- |
 | Grid renders unstyled / black on white  | Tailwind is not scanning `dist`. Add the `@source` line (v4) or `content` entry |
-| Colours ignore your brand               | Import `inhouse-grid-monster/styles.css` **before** your own token overrides    |
+| Colours ignore your brand               | Import `react-pivottable-enhanced/styles.css` **before** your own token overrides    |
 | `window is not defined` at build time   | Rendered during SSR — see [Server-side rendering](#server-side-rendering)       |
 | Nothing in the grid                     | `values` is empty; a report needs at least one measure                          |
 | `sum` missing from a field's menu       | The field declares a narrower `aggregators` list, or is not `type: "number"`    |
@@ -637,7 +637,7 @@ Grouped list of the public exports (all named, no default export):
 
 The component source lives here, in `standalone/src/pivot/` — this package is the
 single home of the pivot code, and the demo site in the repo root imports it via the
-`inhouse-grid-monster` path alias. Build the package with:
+`react-pivottable-enhanced` path alias. Build the package with:
 
 ```bash
 cd standalone

@@ -1,5 +1,5 @@
 /**
- * Tunable numbers used across inhouse-grid-monster.
+ * Tunable numbers used across react-pivottable-enhanced.
  *
  * They live in one file so a junior developer can find and change a limit
  * without hunting through components. Anything that is a "magic number" in the
@@ -35,7 +35,7 @@ export const DEFAULT_DRILL_THROUGH_ROWS = 1000;
 export const ESTIMATED_BYTES_PER_ROW = 400;
 
 /** sessionStorage key holding the dataset the user uploaded in this tab. */
-export const SESSION_DATASET_KEY = "inhouse-grid-monster:dataset";
+export const SESSION_DATASET_KEY = "react-pivottable-enhanced:dataset";
 
 /** Largest serialised dataset we cache in sessionStorage (~8 MB of JSON). */
 export const SESSION_DATASET_MAX_CHARS = 8_000_000;

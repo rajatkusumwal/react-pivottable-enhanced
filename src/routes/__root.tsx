@@ -77,9 +77,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "inhouse-grid-monster" },
+      { title: "react-pivottable-enhanced" },
       { name: "description", content: "A commercial-style pivot table for React." },
-      { property: "og:title", content: "inhouse-grid-monster" },
+      { property: "og:title", content: "react-pivottable-enhanced" },
       { property: "og:description", content: "A commercial-style pivot table for React." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

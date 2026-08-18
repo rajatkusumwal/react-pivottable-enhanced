@@ -9,7 +9,7 @@ export type FeatureRow = {
   feature: string;
   commercial: Cell;
   reactPivottable: Cell;
-  /** inhouse-grid-monster (see /demos). */
+  /** react-pivottable-enhanced (see /demos). */
   studio: Cell;
 };
 
@@ -42,7 +42,7 @@ export const products: {
   },
   {
     key: "studio",
-    name: "inhouse-grid-monster",
+    name: "react-pivottable-enhanced",
     subtitle: "Free • in-house React grid",
     url: "/demos",
   },
@@ -56,7 +56,7 @@ export const verdicts: Record<ProductKey, string> = {
   reactPivottable:
     "Free and quick to drop into a React app. Good for simple internal dashboards, but there is no Excel/PDF export, no toolbar and no help desk if you get stuck.",
   studio:
-    "inhouse-grid-monster: a commercial-style React grid with no third-party pivot dependency — drag-and-drop field list, subtotals, expand/collapse, compact/classic/flat layouts, charts, exports, filters, calculated values and language packs. The maths can also be handed to your own backend service.",
+    "react-pivottable-enhanced: a commercial-style React grid with no third-party pivot dependency — drag-and-drop field list, subtotals, expand/collapse, compact/classic/flat layouts, charts, exports, filters, calculated values and language packs. The maths can also be handed to your own backend service.",
 };
 
 type RawRow = Omit<FeatureRow, "studio">;
@@ -616,7 +616,7 @@ const rawCategories: RawCategory[] = [
 ];
 
 /**
- * What inhouse-grid-monster (see /demos) actually ships, feature by feature.
+ * What react-pivottable-enhanced (see /demos) actually ships, feature by feature.
  * Anything not listed falls back to the best of react-pivottable.
  */
 const sharedStudioOverrides: Record<string, Cell> = {
@@ -739,7 +739,7 @@ const sharedStudioOverrides: Record<string, Cell> = {
   "SLA / guaranteed response time": n(),
 };
 
-/** Grid features the inhouse-grid-monster renderer adds on top of react-pivottable. */
+/** Grid features the react-pivottable-enhanced renderer adds on top of react-pivottable. */
 const gridStudioOverrides: Record<string, Cell> = {
   "Virtual grid rendering thousands of rows": y("Windowed rendering"),
   "Compact pivot table form": y("Indented hierarchy"),

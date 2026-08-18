@@ -27,15 +27,15 @@ Add one alias in `tsconfig.json` so app code imports the library by its package 
 ```json
 "paths": {
   "@/*": ["./src/*"],
-  "inhouse-grid-monster": ["./standalone/src/index.ts"],
-  "inhouse-grid-monster/*": ["./standalone/src/*"]
+  "react-pivottable-enhanced": ["./standalone/src/index.ts"],
+  "react-pivottable-enhanced/*": ["./standalone/src/*"]
 }
 ```
 
 `vite-tsconfig-paths` is already in both the app and the Vitest configs, so the alias
 resolves in dev, build and tests with no extra plugin. Then rewrite the site's imports
 (`src/routes/demos.tsx`, `src/routes/docs.tsx` and anything else touching
-`@/components/pivot`) to `from "inhouse-grid-monster"` — the same import a consumer of the
+`@/components/pivot`) to `from "react-pivottable-enhanced"` — the same import a consumer of the
 npm package writes, which means the demo site now dogfoods the published API.
 
 ## Tests

@@ -1,4 +1,4 @@
-# inhouse-grid-monster
+# react-pivottable-enhanced
 
 A free, commercial-grade pivot table for React 19, with its own aggregation engine
 and grid renderer — no paid licence and no heavy UI framework. Drag-and-drop field
@@ -18,7 +18,7 @@ backend service (for example Spring Boot + DuckDB) without changing any UI code.
 ## 1. Install
 
 ```bash
-npm i inhouse-grid-monster
+npm i react-pivottable-enhanced
 ```
 
 Runtime deps that come with it: `@dnd-kit/core`, `@dnd-kit/sortable`,
@@ -28,7 +28,7 @@ dependencies. No router, component library or backend required.
 ## 2. Use it
 
 ```tsx
-import { PivotStudio, inferFields, createDefaultConfig } from "inhouse-grid-monster";
+import { PivotStudio, inferFields, createDefaultConfig } from "react-pivottable-enhanced";
 
 export function Report({ rows }) {
   return (
@@ -48,7 +48,7 @@ export function Report({ rows }) {
 ```
 
 The component source is `standalone/src/pivot/` — the npm package **is** the source of
-truth, and this demo site imports it through the `inhouse-grid-monster` path alias in
+truth, and this demo site imports it through the `react-pivottable-enhanced` path alias in
 `tsconfig.json`. There is no copy of the pivot code anywhere else in the repo.
 
 ### Props
@@ -216,7 +216,7 @@ series)` turns a chart click into `{ rowKey, colKey, label }`.
   records behind a cell can leave the app as CSV/TSV/Excel/HTML/JSON:
 
   ```ts
-  import { matrixFromRows, exportMatrix } from "inhouse-grid-monster";
+  import { matrixFromRows, exportMatrix } from "react-pivottable-enhanced";
 
   exportMatrix(matrixFromRows(rows, "Records behind North", { header: "Acme Ltd" }), "csv");
   ```
@@ -227,7 +227,7 @@ series)` turns a chart click into `{ rowKey, colKey, label }`.
   above and below the table. Programmatically, pass a decoration object:
 
   ```ts
-  import { matrixFromResult, printMatrix } from "inhouse-grid-monster";
+  import { matrixFromResult, printMatrix } from "react-pivottable-enhanced";
 
   printMatrix(
     matrixFromResult(result, "en", "Q4 revenue", {
@@ -253,7 +253,7 @@ series)` turns a chart click into `{ rowKey, colKey, label }`.
     readReportFromUrl,
     encodeReport,
     decodeReport,
-  } from "inhouse-grid-monster";
+  } from "react-pivottable-enhanced";
 
   const url = buildReportUrl(window.location.href, config); // share this
   const restored = readReportFromUrl(url); // PivotConfig | null
@@ -277,7 +277,7 @@ series)` turns a chart click into `{ rowKey, colKey, label }`.
 Everything the grid renders is a `PivotResult`. Swap the engine and the UI is unchanged:
 
 ```tsx
-import { PivotStudio, createBackendEngine, createHybridEngine } from "inhouse-grid-monster";
+import { PivotStudio, createBackendEngine, createHybridEngine } from "react-pivottable-enhanced";
 
 const engine = createBackendEngine({
   baseUrl: "https://analytics.example.com",
@@ -602,7 +602,7 @@ Returns `{ "datasetId": "sales-2024", "rowCount": 812345678, "fields": [...] }`.
 endpoint still accepts a multipart upload for small files.
 
 ```ts
-import { registerRemoteDataset } from "inhouse-grid-monster";
+import { registerRemoteDataset } from "react-pivottable-enhanced";
 
 const { datasetId } = await registerRemoteDataset({
   baseUrl: "/api/pivot",
@@ -617,7 +617,7 @@ const { datasetId } = await registerRemoteDataset({
 Worker — to the engine contract. Implement whichever level your backend supports:
 
 ```ts
-import { createCustomEngine, PivotStudio } from "inhouse-grid-monster";
+import { createCustomEngine, PivotStudio } from "react-pivottable-enhanced";
 
 const engine = createCustomEngine({
   id: "graphql",
@@ -640,7 +640,7 @@ Results are tagged `meta.source: "backend"` and `meta.queryId: <id>`.
 ### Server-side aggregation of large datasets (1GB+)
 
 ```ts
-import { createServerAggregationEngine, shouldOffload, streamCsvRows } from "inhouse-grid-monster";
+import { createServerAggregationEngine, shouldOffload, streamCsvRows } from "react-pivottable-enhanced";
 
 // Every query is answered by the service; records never reach the browser.
 const engine = createServerAggregationEngine({
@@ -794,7 +794,7 @@ the full grid can be driven over the REST contract with no server at all — use
 for a backend-shaped demo:
 
 ```ts
-import { createMockPivotApi, createBackendEngine, sampleData, sampleFields } from "inhouse-grid-monster";
+import { createMockPivotApi, createBackendEngine, sampleData, sampleFields } from "react-pivottable-enhanced";
 
 const api = createMockPivotApi({ rows: sampleData, fields: sampleFields, datasetId: "sales" });
 const engine = createBackendEngine({ baseUrl: "https://api.test", datasetId: "sales", fetchImpl: api.fetch });
@@ -867,12 +867,12 @@ same `PivotResult` so the browser engine and a REST backend stay swappable.
 ### As an npm package
 
 ```bash
-npm i inhouse-grid-monster
+npm i react-pivottable-enhanced
 ```
 
 ```tsx
-import { PivotStudio, sampleData, sampleFields } from "inhouse-grid-monster";
-import "inhouse-grid-monster/styles.css";
+import { PivotStudio, sampleData, sampleFields } from "react-pivottable-enhanced";
+import "react-pivottable-enhanced/styles.css";
 
 <PivotStudio data={sampleData} fields={sampleFields} />;
 ```
@@ -881,8 +881,8 @@ Tailwind v4 hosts add one line so the classes survive purging:
 
 ```css
 @import "tailwindcss";
-@source "../node_modules/inhouse-grid-monster/dist";
-@import "inhouse-grid-monster/styles.css";
+@source "../node_modules/react-pivottable-enhanced/dist";
+@import "react-pivottable-enhanced/styles.css";
 ```
 
 The only runtime deps are `@dnd-kit/core`, `@dnd-kit/sortable`,

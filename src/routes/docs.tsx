@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowLeft } from "lucide-react";
-import { PivotStudio, createDefaultConfig, sampleData, sampleFields } from "inhouse-grid-monster";
+import { PivotStudio, createDefaultConfig, sampleData, sampleFields } from "react-pivottable-enhanced";
 
-const TITLE = "inhouse-grid-monster Docs: Install the React Pivot Table in Minutes";
+const TITLE = "react-pivottable-enhanced Docs: Install the React Pivot Table in Minutes";
 const DESCRIPTION =
-  "Install inhouse-grid-monster from npm, add one Tailwind import and render a commercial-style pivot table in your React app. Props, theming and backend engine reference.";
+  "Install react-pivottable-enhanced from npm, add one Tailwind import and render a commercial-style pivot table in your React app. Props, theming and backend engine reference.";
 
 export const Route = createFileRoute("/docs")({
   head: () => ({
@@ -295,7 +295,7 @@ function DocsPage() {
             Add the pivot table to your app
           </h1>
           <p className="mt-3 text-lg leading-relaxed text-muted-foreground">
-            <code className="rounded bg-surface px-1.5 py-0.5 text-base">inhouse-grid-monster</code>{" "}
+            <code className="rounded bg-surface px-1.5 py-0.5 text-base">react-pivottable-enhanced</code>{" "}
             is one npm package and one CSS import. It ships five small runtime dependencies, uses
             Tailwind classes for layout, and needs no router, component library or backend.
           </p>
@@ -327,7 +327,7 @@ function DocsPage() {
         <div className="mt-10 space-y-10">
           <Section id="install" title="1. Install">
             <p>One command. Everything the grid needs comes with it.</p>
-            <Code>npm i inhouse-grid-monster</Code>
+            <Code>npm i react-pivottable-enhanced</Code>
             <table className="mt-4 w-full border-collapse text-sm">
               <caption className="sr-only">Runtime dependencies and what they are used for</caption>
               <thead>
@@ -355,14 +355,14 @@ function DocsPage() {
 
           <Section id="quick-start" title="2. Quick start">
             <p>Render the component with your rows. That is the whole integration.</p>
-            <Code label="Reports.tsx">{`import { PivotStudio, sampleData, sampleFields } from "inhouse-grid-monster";
-import "inhouse-grid-monster/styles.css";
+            <Code label="Reports.tsx">{`import { PivotStudio, sampleData, sampleFields } from "react-pivottable-enhanced";
+import "react-pivottable-enhanced/styles.css";
 
 export function Reports() {
   return <PivotStudio data={sampleData} fields={sampleFields} />;
 }`}</Code>
             <p>With your own data, let the field types be inferred and pick a starting report:</p>
-            <Code>{`import { PivotStudio, inferFields, createDefaultConfig } from "inhouse-grid-monster";
+            <Code>{`import { PivotStudio, inferFields, createDefaultConfig } from "react-pivottable-enhanced";
 
 const fields = inferFields(rows);
 const config = createDefaultConfig({
@@ -386,8 +386,8 @@ const config = createDefaultConfig({
                 id="example-basic"
                 title="A. Revenue by region and year"
                 blurb="The smallest useful report: two row levels, one column level, one currency measure. Click a row to expand it."
-                code={`import { PivotStudio, createDefaultConfig, sampleData, sampleFields } from "inhouse-grid-monster";
-import "inhouse-grid-monster/styles.css";
+                code={`import { PivotStudio, createDefaultConfig, sampleData, sampleFields } from "react-pivottable-enhanced";
+import "react-pivottable-enhanced/styles.css";
 
 const config = createDefaultConfig({
   rows: ["region", "country"],
@@ -524,10 +524,10 @@ const config = createDefaultConfig({
               load the colour tokens. Tailwind v4:
             </p>
             <Code label="app.css">{`@import "tailwindcss";
-@source "../node_modules/inhouse-grid-monster/dist";
-@import "inhouse-grid-monster/styles.css";`}</Code>
+@source "../node_modules/react-pivottable-enhanced/dist";
+@import "react-pivottable-enhanced/styles.css";`}</Code>
             <p>
-              On Tailwind v3, add <code>./node_modules/inhouse-grid-monster/dist/**/*.js</code> to{" "}
+              On Tailwind v3, add <code>./node_modules/react-pivottable-enhanced/dist/**/*.js</code> to{" "}
               <code>content</code> and map the same token names in <code>theme.extend.colors</code>{" "}
               — the package README has the exact block to paste.
             </p>
@@ -588,7 +588,7 @@ const config = createDefaultConfig({
               engine and the same UI queries your service instead — every engine returns the same{" "}
               <code>PivotResult</code>, so they stay swappable.
             </p>
-            <Code>{`import { PivotStudio, createBackendEngine } from "inhouse-grid-monster";
+            <Code>{`import { PivotStudio, createBackendEngine } from "react-pivottable-enhanced";
 
 const engine = createBackendEngine({ baseUrl: "https://api.example.com/pivot" });
 
