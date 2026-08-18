@@ -617,8 +617,56 @@ const engine = createBackendEngine({ baseUrl: "https://api.example.com/pivot" })
             </p>
           </Section>
 
-          <Section id="publish" title="8. Publish your own copy">
+          <Section id="angular" title="8. Using it from Angular">
             <p>
+              The pivot table is a React component, and Angular apps use the companion wrapper
+              package. It renders <code>&lt;pivot-studio&gt;</code>, maps every input onto a React
+              prop and re-emits the callbacks as Angular outputs — same features, same engine, same
+              config object.
+            </p>
+            <Code>npm i react-pivottable-enhanced-angular react-pivottable-enhanced react react-dom</Code>
+            <Code label="reports.component.ts">{`import { Component } from "@angular/core";
+import { PivotStudioComponent, sampleData, sampleFields } from "react-pivottable-enhanced-angular";
+
+@Component({
+  standalone: true,
+  imports: [PivotStudioComponent],
+  selector: "app-reports",
+  template: \`
+    <pivot-studio
+      [data]="data"
+      [fields]="fields"
+      title="Sales report"
+      (configChange)="saveLayout($event)"
+    ></pivot-studio>
+  \`,
+})
+export class ReportsComponent {
+  data = sampleData;
+  fields = sampleFields;
+  saveLayout(config: unknown) {
+    localStorage.setItem("pivot-layout", JSON.stringify(config));
+  }
+}`}</Code>
+            <p>
+              Add the theme once in <code>angular.json</code> under <code>styles</code>:{" "}
+              <code>node_modules/react-pivottable-enhanced/dist/pivot-theme.css</code>. Inputs are{" "}
+              <code>data</code>, <code>fields</code>, <code>engine</code>, <code>config</code>,{" "}
+              <code>initialConfig</code>, <code>permissions</code>, <code>title</code>,{" "}
+              <code>showSidebar</code>, <code>showToolbar</code>, <code>allowFileUpload</code>,{" "}
+              <code>datasetId</code> and <code>fieldsUi</code>; outputs are{" "}
+              <code>(configChange)</code> and <code>(dataChange)</code>, emitted inside the Angular
+              zone.
+            </p>
+            <p>
+              Under Angular Universal, guard the element with <code>isPlatformBrowser</code> — the
+              grid renders in the browser only. The trade-off: React and ReactDOM ship inside the
+              Angular bundle (~50–150 KB gzipped).
+            </p>
+          </Section>
+
+          <Section id="publish" title="9. Publish your own copy">
+
               To ship a private build, the <code>standalone/</code> folder in this repo is the
               package: it syncs the component source, emits types and bundles ESM with React kept
               external.
