@@ -23,6 +23,7 @@ daily, so favour the obvious solution over the clever one.
 ## Layout
 
 ```
+angular/src/                  Angular wrapper (<pivot-studio>); no pivot logic lives here
 standalone/src/pivot/
   PivotStudio.tsx     the one component apps embed
   types.ts            PivotConfig and friends (the report state)
