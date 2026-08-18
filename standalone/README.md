@@ -870,3 +870,15 @@ a new module cannot land completely untested.
 
 Performance budgets live at the top of `performance.test.ts`; raise them only
 with a measurement that justifies it.
+
+---
+
+## Licence & attribution
+
+Released under the [MIT licence](./LICENSE).
+
+This is an independent project. It is not affiliated with, endorsed by or sponsored by
+any commercial pivot table vendor, nor by the `react-pivottable` open-source project.
+All product names and trademarks mentioned belong to their respective owners and are
+used only for factual, descriptive comparison. No third-party pivot code is bundled:
+the grid, aggregation engine and exporters are written from scratch in this repo.
