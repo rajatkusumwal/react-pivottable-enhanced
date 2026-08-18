@@ -1,12 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowLeft } from "lucide-react";
-import {
-  PivotStudio,
-  createDefaultConfig,
-  sampleData,
-  sampleFields,
-} from "inhouse-grid-monster";
+import { PivotStudio, createDefaultConfig, sampleData, sampleFields } from "inhouse-grid-monster";
 
 const TITLE = "inhouse-grid-monster Docs: Install the React Pivot Table in Minutes";
 const DESCRIPTION =
@@ -144,23 +139,37 @@ const toc = [
   ["publish", "Publish your own copy"],
 ];
 
-
 /** Report configs used by the live examples below; each one matches its code sample. */
 const exampleConfigs = {
   basic: createDefaultConfig({
     rows: ["region", "country"],
     cols: ["year"],
     values: [
-      { field: "revenue", aggregator: "sum", caption: "Revenue", format: { currency: "USD", decimals: 0 } },
+      {
+        field: "revenue",
+        aggregator: "sum",
+        caption: "Revenue",
+        format: { currency: "USD", decimals: 0 },
+      },
     ],
   }),
   measures: createDefaultConfig({
     rows: ["category", "subcategory"],
     cols: ["quarter"],
     values: [
-      { field: "revenue", aggregator: "sum", caption: "Revenue", format: { currency: "USD", decimals: 0 } },
+      {
+        field: "revenue",
+        aggregator: "sum",
+        caption: "Revenue",
+        format: { currency: "USD", decimals: 0 },
+      },
       { field: "orderId", aggregator: "distinctCount", caption: "Orders" },
-      { field: "margin", aggregator: "sum", caption: "Margin", format: { currency: "USD", decimals: 0 } },
+      {
+        field: "margin",
+        aggregator: "sum",
+        caption: "Margin",
+        format: { currency: "USD", decimals: 0 },
+      },
     ],
     calculated: [{ name: "margin", caption: "Margin", formula: "[revenue] - [cost]" }],
     conditionalFormats: [
@@ -171,7 +180,12 @@ const exampleConfigs = {
     rows: ["region"],
     cols: ["year"],
     values: [
-      { field: "revenue", aggregator: "sum", caption: "Revenue", format: { currency: "USD", decimals: 0 } },
+      {
+        field: "revenue",
+        aggregator: "sum",
+        caption: "Revenue",
+        format: { currency: "USD", decimals: 0 },
+      },
     ],
     chart: {
       visible: true,
@@ -185,8 +199,19 @@ const exampleConfigs = {
   locked: createDefaultConfig({
     rows: ["channel"],
     values: [
-      { field: "revenue", aggregator: "sum", caption: "Revenue", format: { currency: "USD", decimals: 0 } },
-      { field: "revenue", aggregator: "sum", caption: "Share", displayMode: "percentOfGrandTotal", format: { decimals: 1, suffix: "%" } },
+      {
+        field: "revenue",
+        aggregator: "sum",
+        caption: "Revenue",
+        format: { currency: "USD", decimals: 0 },
+      },
+      {
+        field: "revenue",
+        aggregator: "sum",
+        caption: "Share",
+        displayMode: "percentOfGrandTotal",
+        format: { decimals: 1, suffix: "%" },
+      },
     ],
     dragAndDrop: false,
   }),

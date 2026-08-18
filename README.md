@@ -1,28 +1,29 @@
 # inhouse-grid-monster
 
-A free, Flexmonster-like pivot table for React 19, built on the open-source
-[react-pivottable](https://react-pivottable.js.org/) aggregation utilities with a
-custom grid renderer on top. Drag-and-drop field list, subtotals, expand/collapse,
-compact / classic / flat layouts, filters, calculated values, charts, drill-through,
-exports, localisation and row-level security — in one component.
+A free, Flexmonster-like pivot table for React 19, with its own aggregation engine
+and grid renderer — no paid licence and no heavy UI framework. Drag-and-drop field
+list, subtotals, expand/collapse, compact / classic / flat layouts, filters,
+calculated values, charts, drill-through, exports, localisation and row-level
+security — in one component.
 
 Aggregation is **pluggable**: it runs in the browser by default and can be handed to a
 backend service (for example Spring Boot + DuckDB) without changing any UI code.
+
+> New here? Start with [`standalone/README.md`](./standalone/README.md) — it is the full
+> integration manual (install, Tailwind, props, 14 recipes). This file covers the demo
+> site and the backend contract.
 
 ---
 
 ## 1. Install
 
 ```bash
-npm i react-pivottable recharts @dnd-kit/core @dnd-kit/sortable lucide-react
+npm i inhouse-grid-monster
 ```
 
-Vite users — react-pivottable's UMD dependency references Node's `global`:
-
-```ts
-// vite.config.ts
-export default defineConfig({ define: { global: "globalThis" } });
-```
+Runtime deps that come with it: `@dnd-kit/core`, `@dnd-kit/sortable`,
+`@dnd-kit/utilities`, `lucide-react`, `recharts`. `react` / `react-dom` stay peer
+dependencies. No router, component library or backend required.
 
 ## 2. Use it
 

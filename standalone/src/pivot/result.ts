@@ -1,7 +1,7 @@
 /**
  * Engine-agnostic pivot result.
  *
- * Every engine (the local react-pivottable engine or a remote Spring Boot +
+ * Every engine (the local browser engine or a remote Spring Boot +
  * DuckDB service) produces this exact shape, and `PivotGrid` only knows how to
  * render it. That is what makes the aggregation side swappable.
  */
