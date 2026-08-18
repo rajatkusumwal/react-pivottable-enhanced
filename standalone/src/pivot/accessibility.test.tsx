@@ -78,7 +78,7 @@ describe("grid accessibility", () => {
   });
 
   it("labels expand and collapse controls with their action and member", () => {
-    renderGrid();
+    renderGrid({ onToggleCollapse: vi.fn() });
     expect(screen.getByRole("button", { name: "Collapse North" })).toBeInTheDocument();
   });
 
@@ -102,7 +102,7 @@ describe("grid keyboard navigation", () => {
   it("moves the selection with the arrow keys after clicking a cell", async () => {
     const user = userEvent.setup();
     const onSelectionChange = vi.fn();
-    renderGrid({ onSelectionChange });
+    renderGrid({ onSelectionChange, allowDrillThrough: false });
     const cells = screen.getAllByTestId(/^cell-/);
     await user.click(cells[0] as HTMLElement);
     onSelectionChange.mockClear();
@@ -113,7 +113,7 @@ describe("grid keyboard navigation", () => {
   it("extends the selection with Shift+Arrow and reports the running total", async () => {
     const user = userEvent.setup();
     const onSelectionChange = vi.fn();
-    renderGrid({ onSelectionChange });
+    renderGrid({ onSelectionChange, allowDrillThrough: false });
     await user.click(screen.getAllByTestId(/^cell-/)[0] as HTMLElement);
     await user.keyboard("{Shift>}{ArrowDown}{/Shift}");
     const last = onSelectionChange.mock.calls.at(-1)?.[0];
@@ -123,7 +123,7 @@ describe("grid keyboard navigation", () => {
   it("ignores arrow keys until a cell has been focused", async () => {
     const user = userEvent.setup();
     const onSelectionChange = vi.fn();
-    renderGrid({ onSelectionChange });
+    renderGrid({ onSelectionChange, allowDrillThrough: false });
     screen.getByTestId("pivot-grid").focus();
     onSelectionChange.mockClear();
     await user.keyboard("{ArrowDown}{ArrowRight}");
@@ -132,7 +132,7 @@ describe("grid keyboard navigation", () => {
 
   it("copies the selection with Ctrl+C without throwing when the clipboard is blocked", async () => {
     const user = userEvent.setup();
-    renderGrid();
+    renderGrid({ allowDrillThrough: false });
     await user.click(screen.getAllByTestId(/^cell-/)[0] as HTMLElement);
     await expect(user.keyboard("{Control>}c{/Control}")).resolves.not.toThrow();
   });
