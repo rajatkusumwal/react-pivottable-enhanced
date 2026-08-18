@@ -778,31 +778,57 @@ and `GEMINI.md`): tests live next to the code, cover a normal case, an edge case
 and a worst case; pure logic stays out of components; every engine returns the
 same `PivotResult` so the browser engine and a REST backend stay swappable.
 
-## Moving the pivot table into another React app
+## Using the pivot table in another React app
+
+### As an npm package
+
+```bash
+npm i inhouse-grid-monster
+```
+
+```tsx
+import { PivotStudio, sampleData, sampleFields } from "inhouse-grid-monster";
+import "inhouse-grid-monster/styles.css";
+
+<PivotStudio data={sampleData} fields={sampleFields} />;
+```
+
+Tailwind v4 hosts add one line so the classes survive purging:
+
+```css
+@import "tailwindcss";
+@source "../node_modules/inhouse-grid-monster/dist";
+@import "inhouse-grid-monster/styles.css";
+```
+
+The only runtime deps are `@dnd-kit/core`, `@dnd-kit/sortable`,
+`@dnd-kit/utilities`, `lucide-react` and `recharts`; `react`/`react-dom` are
+peer dependencies. No router, component library or backend required. The
+in-app docs page lives at `/docs`.
+
+### Building and publishing that package
 
 `src/components/pivot/` is self-contained: it imports nothing from the demo app
-(no router, no shadcn/ui, no `@/lib` helpers), so it can be lifted out as-is.
-The `standalone/` folder packages exactly that.
+(no router, no shadcn/ui, no `@/lib` helpers). The `standalone/` folder packages
+exactly that.
 
 ```bash
-node standalone/scripts/sync-from-app.mjs   # copies the folder, drops the tests
+cd standalone
+npm install
+npm run build     # sync + types + ESM bundle + theme css -> dist/
+npm publish       # prepublishOnly re-runs the build
 ```
 
-Dependencies the target project must install:
+`npm run sync` (or `node standalone/scripts/sync-from-app.mjs`) copies the
+component folder into `standalone/src/pivot/`, dropping the tests.
 
-```bash
-npm i react react-dom @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities lucide-react recharts
-```
+### Or just copy the folder
 
-Plus, at build time: TypeScript with `"jsx": "react-jsx"`, and Tailwind CSS
-(v4 or v3) configured to scan the copied folder. Import
-`standalone/src/pivot-theme.css` once so the semantic colour tokens the classes
-use (`bg-card`, `text-muted-foreground`, `border-border`, `bg-surface`, …)
-exist.
-
-Then either copy `standalone/src/pivot/` into your app and
-`import { PivotStudio } from "./pivot"`, or build a real package with
-`cd standalone && npm install && npm run sync && npm run build`.
+Run the sync, drop `standalone/src/pivot/` into your app, import
+`standalone/src/pivot-theme.css` next to your global CSS, and
+`import { PivotStudio } from "./pivot"`. Every import inside the folder is
+relative, so it works wherever you put it.
 
 Full instructions, including a Tailwind v3 colour map, Next.js SSR notes and the
 backend-engine wiring, are in [`standalone/README.md`](./standalone/README.md).
+
