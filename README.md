@@ -60,7 +60,7 @@ truth, and this demo site imports it through the `inhouse-grid-monster` path ali
 | `engine`                                              | `PivotEngineAdapter`                                 | Aggregation engine; defaults to the local one                                               |
 | `initialConfig` / `config` + `onConfigChange`         | `PivotConfig`                                        | Uncontrolled or controlled state                                                            |
 | `permissions`                                         | `Permissions`                                        | `readOnly`, `allowExport`, `allowDrillThrough`, `deniedFields`, `maskedFields`, `rowFilter` |
-| `fieldsUi`                                            | `"dialog" \| "sidebar"`                              | commercial-style popup (default) or docked panel                                           |
+| `fieldsUi`                                            | `"dialog" \| "sidebar"`                              | commercial-style popup (default) or docked panel                                            |
 | `allowFileUpload`                                     | `boolean`                                            | Show the CSV/JSON upload bar                                                                |
 | `onUploadToBackend`                                   | `(file) => Promise<{ datasetId, rowCount, fields }>` | Send uploads to your service instead of memory                                              |
 | `datasetId`                                           | `string`                                             | Dataset handle passed to the backend engine                                                 |

@@ -114,8 +114,8 @@ function ComparisonPage() {
           <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">
             A pivot table lets people slice and summarise data on a screen, like in Excel. Below we
             take everything the paid tool{" "}
-            <strong className="font-medium text-foreground">commercial pivot tables</strong> can do —{" "}
-            {totalFeatures} things in total — and check whether the leading free tool,
+            <strong className="font-medium text-foreground">commercial pivot tables</strong> can do
+            — {totalFeatures} things in total — and check whether the leading free tool,
             react-pivottable, can do the same — plus the{" "}
             <strong className="font-medium text-foreground">inhouse-grid-monster</strong> shell on
             this site, which builds a familiar commercial-style experience on top of it.
@@ -381,9 +381,9 @@ function ComparisonPage() {
 
         <footer className="mt-12 border-t border-border pt-6 text-sm leading-relaxed text-muted-foreground">
           <p>
-            Based on published commercial pivot table documentation and pricing pages, the react-pivottable
-            docs, and our own demo implementation. Last checked 16 August 2026 — always double-check
-            with the vendor before buying.
+            Based on published commercial pivot table documentation and pricing pages, the
+            react-pivottable docs, and our own demo implementation. Last checked 16 August 2026 —
+            always double-check with the vendor before buying.
           </p>
         </footer>
       </div>
