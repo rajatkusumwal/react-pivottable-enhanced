@@ -99,8 +99,11 @@ in both `standalone/package.json` and the README install notes.
 
 ## Reporting bugs and asking for features
 
-The repository is currently private. Please share bug reports and feature requests
-with the maintainer directly, and include:
+Open an issue on GitHub:
+
+- [github.com/rajatkusumwal/react-pivottable-enhanced/issues](https://github.com/rajatkusumwal/react-pivottable-enhanced/issues)
+
+Please include:
 
 - what you did, what you expected, what happened,
 - a minimal `data` + `initialConfig` snippet that reproduces it,
