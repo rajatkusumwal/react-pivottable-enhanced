@@ -25,7 +25,8 @@ describe("consuming the built package", () => {
     const { PivotStudio, sampleData, sampleFields } = pkg;
     render(<PivotStudio data={sampleData} fields={sampleFields} />);
     expect(await screen.findByRole("grid")).toBeInTheDocument();
-    expect(document.querySelectorAll("[role='row']").length).toBeGreaterThan(1);
+    // The grid paints real data, not just a shell.
+    expect((await screen.findByRole("grid")).querySelectorAll("td,th").length).toBeGreaterThan(1);
     cleanup();
   });
 

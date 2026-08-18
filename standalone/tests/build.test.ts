@@ -28,7 +28,9 @@ describe("library build output", () => {
 
   it("keeps peer and runtime dependencies external", () => {
     for (const dep of ["react", "react/jsx-runtime", "recharts", "@dnd-kit/core", "lucide-react"]) {
-      expect(bundle, `${dep} should stay external`).toContain(`from"${dep}"`);
+      expect(bundle, `${dep} should stay external`).toMatch(
+        new RegExp(`from\\s*["']${dep.replace("/", "\\/")}["']`),
+      );
     }
   });
 

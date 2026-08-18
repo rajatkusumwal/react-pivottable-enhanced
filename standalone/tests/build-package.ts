@@ -20,8 +20,9 @@ function run(command: string, args: string[]) {
 export function buildPackage(): Promise<void> {
   running ??= (async () => {
     run(process.execPath, [join(packageDir, "scripts", "sync-from-app.mjs")]);
-    run("bunx", ["tsc", "-p", "tsconfig.build.json"]);
+    // vite build empties dist/, so it must run before the declarations land.
     run("bunx", ["vite", "build"]);
+    run("bunx", ["tsc", "-p", "tsconfig.build.json"]);
     run(process.execPath, [join(packageDir, "scripts", "copy-css.mjs")]);
   })();
   return running;
