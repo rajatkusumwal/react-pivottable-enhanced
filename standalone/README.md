@@ -130,22 +130,22 @@ override any of them in your own CSS to re-skin the grid:
 
 ## Props
 
-| Prop                          | Type                     | Default          | What it does                                     |
-| ----------------------------- | ------------------------ | ---------------- | ------------------------------------------------ |
-| `data`                        | `PivotRow[]`             | —                | Records to analyse (local engine)                |
-| `fields`                      | `FieldDef[]`             | —                | Field metadata; `inferFields(rows)` can build it |
-| `initialConfig`               | `Partial<PivotConfig>`   | —                | Starting report (uncontrolled)                   |
-| `config` / `onConfigChange`   | `PivotConfig` / callback | —                | Fully controlled report state                    |
-| `engine`                      | `PivotEngineAdapter`     | local            | Swap in backend aggregation                      |
-| `datasetId`                   | `string`                 | —                | Dataset handle sent with backend queries         |
-| `onUploadToBackend`           | `(file) => Promise<…>`   | —                | Send uploads to your service instead of memory   |
-| `fieldsUi`                    | `"dialog" \| "sidebar"`  | `"dialog"`       | Flexmonster popup field list, or a docked panel  |
-| `showToolbar` / `showSidebar` | `boolean`                | `true`           | Hide chrome when the host supplies its own       |
-| `allowFileUpload`             | `boolean`                | `false`          | Show the CSV/JSON drop bar                       |
-| `permissions`                 | `Permissions`            | all on           | Turn off export, drill-through, editing, …       |
-| `onDataChange`                | `(rows) => void`         | —                | Inline cell edits written back                   |
-| `title`                       | `string`                 | `"Pivot table"`  | Header text                                      |
-| `className`                   | `string`                 | —                | Wrapper class                                    |
+| Prop                          | Type                     | Default         | What it does                                     |
+| ----------------------------- | ------------------------ | --------------- | ------------------------------------------------ |
+| `data`                        | `PivotRow[]`             | —               | Records to analyse (local engine)                |
+| `fields`                      | `FieldDef[]`             | —               | Field metadata; `inferFields(rows)` can build it |
+| `initialConfig`               | `Partial<PivotConfig>`   | —               | Starting report (uncontrolled)                   |
+| `config` / `onConfigChange`   | `PivotConfig` / callback | —               | Fully controlled report state                    |
+| `engine`                      | `PivotEngineAdapter`     | local           | Swap in backend aggregation                      |
+| `datasetId`                   | `string`                 | —               | Dataset handle sent with backend queries         |
+| `onUploadToBackend`           | `(file) => Promise<…>`   | —               | Send uploads to your service instead of memory   |
+| `fieldsUi`                    | `"dialog" \| "sidebar"`  | `"dialog"`      | Flexmonster popup field list, or a docked panel  |
+| `showToolbar` / `showSidebar` | `boolean`                | `true`          | Hide chrome when the host supplies its own       |
+| `allowFileUpload`             | `boolean`                | `false`         | Show the CSV/JSON drop bar                       |
+| `permissions`                 | `Permissions`            | all on          | Turn off export, drill-through, editing, …       |
+| `onDataChange`                | `(rows) => void`         | —               | Inline cell edits written back                   |
+| `title`                       | `string`                 | `"Pivot table"` | Header text                                      |
+| `className`                   | `string`                 | —               | Wrapper class                                    |
 
 ## The report config
 
@@ -185,10 +185,29 @@ const config = createDefaultConfig({
 import type { FieldDef } from "inhouse-grid-monster";
 
 const fields: FieldDef[] = [
-  { name: "region", caption: "Region", type: "string", folder: "Geography", hierarchy: "Geo", level: 1 },
-  { name: "country", caption: "Country", type: "string", folder: "Geography", hierarchy: "Geo", level: 2 },
+  {
+    name: "region",
+    caption: "Region",
+    type: "string",
+    folder: "Geography",
+    hierarchy: "Geo",
+    level: 1,
+  },
+  {
+    name: "country",
+    caption: "Country",
+    type: "string",
+    folder: "Geography",
+    hierarchy: "Geo",
+    level: 2,
+  },
   { name: "orderDate", caption: "Order date", type: "date", folder: "Time" },
-  { name: "unitPrice", caption: "Unit price", type: "number", aggregators: ["average", "min", "max"] },
+  {
+    name: "unitPrice",
+    caption: "Unit price",
+    type: "number",
+    aggregators: ["average", "min", "max"],
+  },
   {
     name: "revenue",
     caption: "Revenue",
@@ -212,14 +231,19 @@ import { useState } from "react";
 import { PivotStudio, createDefaultConfig, type PivotConfig } from "inhouse-grid-monster";
 
 export function SavedReport({ saved }: { saved?: PivotConfig }) {
-  const [config, setConfig] = useState<PivotConfig>(saved ?? createDefaultConfig({
-    rows: ["category"],
-    values: [{ field: "revenue", aggregator: "sum" }],
-  }));
+  const [config, setConfig] = useState<PivotConfig>(
+    saved ??
+      createDefaultConfig({
+        rows: ["category"],
+        values: [{ field: "revenue", aggregator: "sum" }],
+      }),
+  );
 
   return (
     <>
-      <button onClick={() => fetch("/api/reports", { method: "POST", body: JSON.stringify(config) })}>
+      <button
+        onClick={() => fetch("/api/reports", { method: "POST", body: JSON.stringify(config) })}
+      >
         Save this report
       </button>
       <PivotStudio data={rows} fields={fields} config={config} onConfigChange={setConfig} />
@@ -247,10 +271,20 @@ The toolbar's share button does the same thing and copies the URL.
 
 ```ts
 values: [
-  { field: "revenue", aggregator: "sum", caption: "Revenue", format: { currency: "USD", decimals: 0 } },
+  {
+    field: "revenue",
+    aggregator: "sum",
+    caption: "Revenue",
+    format: { currency: "USD", decimals: 0 },
+  },
   { field: "orderId", aggregator: "distinctCount", caption: "Orders" },
   { field: "marginPct", aggregator: "average", format: { decimals: 1, suffix: "%" } },
-  { field: "revenue", aggregator: "sum", caption: "% of total", displayMode: "percentOfGrandTotal" },
+  {
+    field: "revenue",
+    aggregator: "sum",
+    caption: "% of total",
+    displayMode: "percentOfGrandTotal",
+  },
 ];
 ```
 
@@ -266,7 +300,7 @@ import { registerAggregator } from "inhouse-grid-monster";
 
 registerAggregator("p95", (values) => {
   const nums = values.filter((v): v is number => typeof v === "number").sort((a, b) => a - b);
-  return nums.length ? nums[Math.floor(nums.length * 0.95)] ?? null : null;
+  return nums.length ? (nums[Math.floor(nums.length * 0.95)] ?? null) : null;
 });
 
 values: [{ field: "revenue", aggregator: "p95", caption: "P95 revenue" }];
@@ -300,9 +334,30 @@ formulas with `validateFormula(formula, fieldNames)` before saving them.
 filters: [
   { kind: "values", field: "region", mode: "include", members: ["EMEA", "APAC"] },
   { kind: "condition", field: "revenue", operator: "gte", value: 1000 },
-  { kind: "condition", field: "orderDate", operator: "between", value: "2024-01-01", value2: "2024-12-31", valueType: "date" },
-  { kind: "top", field: "country", measure: "revenue", aggregator: "sum", direction: "top", count: 10 },
-  { kind: "subquery", field: "customerName", measure: "revenue", aggregator: "sum", operator: "gt", value: 50000 },
+  {
+    kind: "condition",
+    field: "orderDate",
+    operator: "between",
+    value: "2024-01-01",
+    value2: "2024-12-31",
+    valueType: "date",
+  },
+  {
+    kind: "top",
+    field: "country",
+    measure: "revenue",
+    aggregator: "sum",
+    direction: "top",
+    count: 10,
+  },
+  {
+    kind: "subquery",
+    field: "customerName",
+    measure: "revenue",
+    aggregator: "sum",
+    operator: "gt",
+    value: 50000,
+  },
 ];
 ```
 
@@ -352,7 +407,11 @@ const [rows, setRows] = useState(initialRows);
 <PivotStudio
   data={rows}
   fields={fields}
-  initialConfig={createDefaultConfig({ editing: true, rows: ["region"], values: [{ field: "revenue", aggregator: "sum" }] })}
+  initialConfig={createDefaultConfig({
+    editing: true,
+    rows: ["region"],
+    values: [{ field: "revenue", aggregator: "sum" }],
+  })}
   onDataChange={(next) => {
     setRows(next);
     fetch("/api/rows", { method: "PUT", body: JSON.stringify(next) });
@@ -449,7 +508,11 @@ repo root `README.md`.
 Other engines:
 
 ```ts
-import { createHybridEngine, createCustomEngine, createServerAggregationEngine } from "inhouse-grid-monster";
+import {
+  createHybridEngine,
+  createCustomEngine,
+  createServerAggregationEngine,
+} from "inhouse-grid-monster";
 
 // Local until the data gets big, then the service:
 const hybrid = createHybridEngine({ baseUrl: "https://api.example.com", threshold: 100_000 });
@@ -483,7 +546,12 @@ const big = createServerAggregationEngine({
 tests need no server:
 
 ```ts
-import { createMockPivotApi, createBackendEngine, sampleData, sampleFields } from "inhouse-grid-monster";
+import {
+  createMockPivotApi,
+  createBackendEngine,
+  sampleData,
+  sampleFields,
+} from "inhouse-grid-monster";
 
 const api = createMockPivotApi({ rows: sampleData, fields: sampleFields, datasetId: "sales" });
 
@@ -516,10 +584,10 @@ it, or load it with `next/dynamic` and `{ ssr: false }`:
 "use client";
 import dynamic from "next/dynamic";
 
-const PivotStudio = dynamic(
-  () => import("inhouse-grid-monster").then((m) => m.PivotStudio),
-  { ssr: false, loading: () => <div className="h-96 animate-pulse rounded-xl bg-muted" /> },
-);
+const PivotStudio = dynamic(() => import("inhouse-grid-monster").then((m) => m.PivotStudio), {
+  ssr: false,
+  loading: () => <div className="h-96 animate-pulse rounded-xl bg-muted" />,
+});
 ```
 
 In Vite/TanStack apps, gate the render on a `mounted` flag set in `useEffect`.
@@ -555,15 +623,15 @@ Grouped list of the public exports (all named, no default export):
 
 ## Troubleshooting
 
-| Symptom                                   | Cause and fix                                                                  |
-| ----------------------------------------- | ------------------------------------------------------------------------------ |
-| Grid renders unstyled / black on white    | Tailwind is not scanning `dist`. Add the `@source` line (v4) or `content` entry |
-| Colours ignore your brand                 | Import `inhouse-grid-monster/styles.css` **before** your own token overrides    |
-| `window is not defined` at build time     | Rendered during SSR — see [Server-side rendering](#server-side-rendering)       |
-| Nothing in the grid                       | `values` is empty; a report needs at least one measure                          |
-| `sum` missing from a field's menu         | The field declares a narrower `aggregators` list, or is not `type: "number"`    |
-| Numbers read as text after a CSV import   | Wrong CSV dialect — pass `csv` options or use `detectCsvOptions`                |
-| Uploaded file disappears on reload        | Uploads live in `sessionStorage` (8 MB cap) by design; use `onUploadToBackend`  |
+| Symptom                                 | Cause and fix                                                                   |
+| --------------------------------------- | ------------------------------------------------------------------------------- |
+| Grid renders unstyled / black on white  | Tailwind is not scanning `dist`. Add the `@source` line (v4) or `content` entry |
+| Colours ignore your brand               | Import `inhouse-grid-monster/styles.css` **before** your own token overrides    |
+| `window is not defined` at build time   | Rendered during SSR — see [Server-side rendering](#server-side-rendering)       |
+| Nothing in the grid                     | `values` is empty; a report needs at least one measure                          |
+| `sum` missing from a field's menu       | The field declares a narrower `aggregators` list, or is not `type: "number"`    |
+| Numbers read as text after a CSV import | Wrong CSV dialect — pass `csv` options or use `detectCsvOptions`                |
+| Uploaded file disappears on reload      | Uploads live in `sessionStorage` (8 MB cap) by design; use `onUploadToBackend`  |
 
 ## Publishing this package
 

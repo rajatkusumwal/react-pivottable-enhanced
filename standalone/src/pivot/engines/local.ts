@@ -559,4 +559,3 @@ export function createLocalEngine(): PivotEngineAdapter {
     drillThrough: async (request, rows) => localDrillThrough(rows, request),
   };
 }
-

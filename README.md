@@ -25,7 +25,6 @@ Runtime deps that come with it: `@dnd-kit/core`, `@dnd-kit/sortable`,
 `@dnd-kit/utilities`, `lucide-react`, `recharts`. `react` / `react-dom` stay peer
 dependencies. No router, component library or backend required.
 
-
 ## 2. Use it
 
 ```tsx
