@@ -1,5 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { ArrowLeft } from "lucide-react";
+import {
+  PivotStudio,
+  createDefaultConfig,
+  sampleData,
+  sampleFields,
+} from "inhouse-grid-monster";
 
 const TITLE = "inhouse-grid-monster Docs: Install the React Pivot Table in Minutes";
 const DESCRIPTION =
@@ -128,6 +135,7 @@ function Section({
 const toc = [
   ["install", "Install"],
   ["quick-start", "Quick start"],
+  ["examples", "Live examples"],
   ["tailwind", "Tailwind setup"],
   ["theming", "Theming"],
   ["props", "Props"],
@@ -135,6 +143,112 @@ const toc = [
   ["ssr", "Next.js / SSR"],
   ["publish", "Publish your own copy"],
 ];
+
+
+/** Report configs used by the live examples below; each one matches its code sample. */
+const exampleConfigs = {
+  basic: createDefaultConfig({
+    rows: ["region", "country"],
+    cols: ["year"],
+    values: [
+      { field: "revenue", aggregator: "sum", caption: "Revenue", format: { currency: "USD", decimals: 0 } },
+    ],
+  }),
+  measures: createDefaultConfig({
+    rows: ["category", "subcategory"],
+    cols: ["quarter"],
+    values: [
+      { field: "revenue", aggregator: "sum", caption: "Revenue", format: { currency: "USD", decimals: 0 } },
+      { field: "orderId", aggregator: "distinctCount", caption: "Orders" },
+      { field: "margin", aggregator: "sum", caption: "Margin", format: { currency: "USD", decimals: 0 } },
+    ],
+    calculated: [{ name: "margin", caption: "Margin", formula: "[revenue] - [cost]" }],
+    conditionalFormats: [
+      { field: "margin", operator: "lt", value: 0, color: "#7f1d1d", background: "#fee2e2" },
+    ],
+  }),
+  chart: createDefaultConfig({
+    rows: ["region"],
+    cols: ["year"],
+    values: [
+      { field: "revenue", aggregator: "sum", caption: "Revenue", format: { currency: "USD", decimals: 0 } },
+    ],
+    chart: {
+      visible: true,
+      type: "stackedBar",
+      position: "right",
+      drillRows: [],
+      drillCols: [],
+      hiddenSeries: [],
+    },
+  }),
+  locked: createDefaultConfig({
+    rows: ["channel"],
+    values: [
+      { field: "revenue", aggregator: "sum", caption: "Revenue", format: { currency: "USD", decimals: 0 } },
+      { field: "revenue", aggregator: "sum", caption: "Share", displayMode: "percentOfGrandTotal", format: { decimals: 1, suffix: "%" } },
+    ],
+    dragAndDrop: false,
+  }),
+};
+
+function LiveExample({
+  id,
+  title,
+  blurb,
+  code,
+  children,
+}: {
+  id: string;
+  title: string;
+  blurb: string;
+  code: string;
+  children: React.ReactNode;
+}) {
+  const [tab, setTab] = useState<"preview" | "code">("preview");
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  return (
+    <article id={id} className="scroll-mt-24 rounded-xl border border-border bg-card p-4">
+      <h3 className="text-lg font-semibold text-foreground">{title}</h3>
+      <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{blurb}</p>
+
+      <div
+        role="tablist"
+        aria-label={`${title} preview and code`}
+        className="mt-3 inline-flex rounded-lg border border-border p-0.5"
+      >
+        {(["preview", "code"] as const).map((t) => (
+          <button
+            key={t}
+            role="tab"
+            type="button"
+            aria-selected={tab === t}
+            onClick={() => setTab(t)}
+            className={`rounded-md px-3 py-1.5 text-sm font-medium capitalize ${
+              tab === t ? "bg-primary text-primary-foreground" : "text-muted-foreground"
+            }`}
+          >
+            {t === "preview" ? "Live preview" : "Code"}
+          </button>
+        ))}
+      </div>
+
+      {tab === "preview" ? (
+        <div className="mt-3">
+          {mounted ? (
+            children
+          ) : (
+            <div className="h-80 animate-pulse rounded-lg border border-border bg-surface" />
+          )}
+        </div>
+      ) : (
+        <Code>{code}</Code>
+      )}
+    </article>
+  );
+}
 
 function DocsPage() {
   return (
@@ -230,6 +344,150 @@ const config = createDefaultConfig({
 });
 
 <PivotStudio data={rows} fields={fields} initialConfig={config} />;`}</Code>
+          </Section>
+
+          <Section id="examples" title="Live examples">
+            <p>
+              Each example below is the real component running on this page, next to the exact code
+              that produced it. Drag fields, expand rows, sort and export — then copy the snippet
+              into your app.
+            </p>
+
+            <div className="mt-4 space-y-6">
+              <LiveExample
+                id="example-basic"
+                title="A. Revenue by region and year"
+                blurb="The smallest useful report: two row levels, one column level, one currency measure. Click a row to expand it."
+                code={`import { PivotStudio, createDefaultConfig, sampleData, sampleFields } from "inhouse-grid-monster";
+import "inhouse-grid-monster/styles.css";
+
+const config = createDefaultConfig({
+  rows: ["region", "country"],
+  cols: ["year"],
+  values: [
+    { field: "revenue", aggregator: "sum", caption: "Revenue",
+      format: { currency: "USD", decimals: 0 } },
+  ],
+});
+
+<PivotStudio data={sampleData} fields={sampleFields}
+  initialConfig={config} title="Revenue by region" />;`}
+              >
+                <PivotStudio
+                  data={sampleData}
+                  fields={sampleFields}
+                  initialConfig={exampleConfigs.basic}
+                  title="Revenue by region"
+                  showSidebar={false}
+                />
+              </LiveExample>
+
+              <LiveExample
+                id="example-measures"
+                title="B. Several measures, a formula and colour rules"
+                blurb="Revenue, a distinct count of orders, and a calculated Margin field that turns red when it goes negative."
+                code={`const config = createDefaultConfig({
+  rows: ["category", "subcategory"],
+  cols: ["quarter"],
+  values: [
+    { field: "revenue", aggregator: "sum", caption: "Revenue",
+      format: { currency: "USD", decimals: 0 } },
+    { field: "orderId", aggregator: "distinctCount", caption: "Orders" },
+    { field: "margin", aggregator: "sum", caption: "Margin",
+      format: { currency: "USD", decimals: 0 } },
+  ],
+  calculated: [
+    { name: "margin", caption: "Margin", formula: "[revenue] - [cost]" },
+  ],
+  conditionalFormats: [
+    { field: "margin", operator: "lt", value: 0,
+      color: "#7f1d1d", background: "#fee2e2" },
+  ],
+});
+
+<PivotStudio data={rows} fields={fields} initialConfig={config} />;`}
+              >
+                <PivotStudio
+                  data={sampleData}
+                  fields={sampleFields}
+                  initialConfig={exampleConfigs.measures}
+                  title="Margin by category"
+                  showSidebar={false}
+                />
+              </LiveExample>
+
+              <LiveExample
+                id="example-chart"
+                title="C. Grid and chart side by side"
+                blurb="Turn the chart on and put it to the right for a split view. Click a legend entry to hide a series, or a column to drill in."
+                code={`const config = createDefaultConfig({
+  rows: ["region"],
+  cols: ["year"],
+  values: [{ field: "revenue", aggregator: "sum", caption: "Revenue" }],
+  chart: { visible: true, type: "stackedBar", position: "right" },
+});
+
+<PivotStudio data={rows} fields={fields} initialConfig={config} />;`}
+              >
+                <PivotStudio
+                  data={sampleData}
+                  fields={sampleFields}
+                  initialConfig={exampleConfigs.chart}
+                  title="Revenue trend"
+                  showSidebar={false}
+                />
+              </LiveExample>
+
+              <LiveExample
+                id="example-locked"
+                title="D. A locked-down dashboard tile"
+                blurb="No toolbar, no field list, no drag & drop, customer names masked and export switched off — a fixed report for viewers."
+                code={`<PivotStudio
+  data={rows}
+  fields={fields}
+  initialConfig={createDefaultConfig({
+    rows: ["channel"],
+    values: [
+      { field: "revenue", aggregator: "sum", caption: "Revenue" },
+      { field: "revenue", aggregator: "sum", caption: "Share",
+        displayMode: "percentOfGrandTotal", format: { decimals: 1, suffix: "%" } },
+    ],
+    dragAndDrop: false,
+  })}
+  showToolbar={false}
+  showSidebar={false}
+  permissions={{
+    readOnly: true,
+    allowExport: false,
+    allowDrillThrough: false,
+    maskedFields: ["customerName"],
+  }}
+/>;`}
+              >
+                <PivotStudio
+                  data={sampleData}
+                  fields={sampleFields}
+                  initialConfig={exampleConfigs.locked}
+                  title="Revenue by channel"
+                  showToolbar={false}
+                  showSidebar={false}
+                  permissions={{
+                    readOnly: true,
+                    allowExport: false,
+                    allowDrillThrough: false,
+                    maskedFields: ["customerName"],
+                  }}
+                />
+              </LiveExample>
+            </div>
+
+            <p className="mt-4">
+              Want the full screen with uploads, drill-through and every toolbar button?{" "}
+              <Link to="/demos" className="text-primary underline-offset-4 hover:underline">
+                Open the full demo
+              </Link>
+              .
+            </p>
           </Section>
 
           <Section id="tailwind" title="3. Tailwind setup">
