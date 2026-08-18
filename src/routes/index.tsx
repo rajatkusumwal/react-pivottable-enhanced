@@ -174,7 +174,7 @@ function ComparisonPage() {
                     >
                       Open the demo
                     </Link>
-                  ) : (
+                  ) : p.url ? (
                     <a
                       href={p.url}
                       target="_blank"
@@ -183,7 +183,7 @@ function ComparisonPage() {
                     >
                       Visit website
                     </a>
-                  )}
+                  ) : null}
                 </article>
               );
             })}
