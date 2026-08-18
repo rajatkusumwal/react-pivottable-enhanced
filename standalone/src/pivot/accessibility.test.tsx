@@ -57,7 +57,7 @@ const renderGrid = (props: Partial<React.ComponentProps<typeof PivotGrid>> = {})
   );
 };
 
-const strings = getLocale("en");
+const strings = getLocale("en").strings;
 
 describe("grid accessibility", () => {
   it("exposes the table as a labelled grid", () => {
@@ -83,7 +83,7 @@ describe("grid accessibility", () => {
   });
 
   it("announces the sort state on column headers", () => {
-    renderGrid({ onSort: vi.fn() });
+    renderGrid({ onSortChange: vi.fn(), showSortingControls: true });
     const grid = screen.getByTestId("pivot-grid");
     const sortButtons = within(grid)
       .getAllByRole("button")
@@ -178,7 +178,7 @@ describe("dialogs are announced as modals", () => {
         strings={strings}
         fields={fields}
         rows={data}
-        config={createDefaultConfig(fields)}
+        config={createDefaultConfig()}
         readOnly={false}
         onChange={vi.fn()}
         onClose={onClose}
@@ -195,7 +195,7 @@ describe("dialogs are announced as modals", () => {
       <FormatDialog
         open
         strings={strings}
-        config={createDefaultConfig(fields)}
+        config={createDefaultConfig()}
         fields={fields}
         readOnly={false}
         onChange={vi.fn()}
@@ -214,7 +214,7 @@ describe("dialogs are announced as modals", () => {
         strings={strings}
         fields={fields}
         rows={data}
-        config={createDefaultConfig(fields)}
+        config={createDefaultConfig()}
         readOnly={false}
         onChange={vi.fn()}
         onClose={vi.fn()}
