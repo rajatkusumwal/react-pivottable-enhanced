@@ -47,6 +47,16 @@ class HostComponent {
 /** Let React flush its work; Angular's fixture only drives the host. */
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
 
+/** Wait until React has painted something matching `selector`. */
+async function waitFor(el: HTMLElement, selector: string): Promise<Element> {
+  for (let i = 0; i < 50; i += 1) {
+    const found = el.querySelector(selector);
+    if (found) return found;
+    await flush();
+  }
+  throw new Error(`Timed out waiting for ${selector}`);
+}
+
 beforeAll(() => {
   TestBed.initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting());
 });
@@ -61,8 +71,9 @@ describe("<pivot-studio>", () => {
     fixture.detectChanges();
     await flush();
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.querySelector("[role='grid']")).not.toBeNull();
-    expect(el.textContent).toContain("Sales report");
+    await waitFor(el, "[role='grid']");
+    // The title is exposed as the accessible name of the pivot region.
+    expect(el.querySelector("[aria-label='Sales report']")).not.toBeNull();
   });
 
   it("re-renders when an input changes", async () => {
@@ -71,8 +82,9 @@ describe("<pivot-studio>", () => {
     await flush();
     fixture.componentInstance.title = "Renamed report";
     fixture.detectChanges();
-    await flush();
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain("Renamed report");
+    const el = fixture.nativeElement as HTMLElement;
+    await waitFor(el, "[aria-label='Renamed report']");
+    expect(el.querySelector("[aria-label='Sales report']")).toBeNull();
   });
 
   it("renders an empty dataset without crashing", async () => {
@@ -80,8 +92,7 @@ describe("<pivot-studio>", () => {
     fixture.componentInstance.data = [];
     fixture.componentInstance.fields = [];
     fixture.detectChanges();
-    await flush();
-    expect((fixture.nativeElement as HTMLElement).querySelector("[role='grid']")).not.toBeNull();
+    await waitFor(fixture.nativeElement as HTMLElement, "[role='grid']");
   });
 
   it("emits configChange inside the Angular zone when the report changes", async () => {
@@ -113,6 +124,7 @@ describe("<pivot-studio>", () => {
     fixture.detectChanges();
     await flush();
     const el = fixture.nativeElement as HTMLElement;
+    await waitFor(el, "[role='grid']");
     fixture.destroy();
     await flush();
     expect(el.querySelector("[role='grid']")).toBeNull();
@@ -130,7 +142,6 @@ describe("<pivot-studio>", () => {
     fixture.componentInstance.data = sampleData;
     fixture.componentInstance.fields = sampleFields;
     fixture.detectChanges();
-    await flush();
-    expect((fixture.nativeElement as HTMLElement).querySelector("[role='grid']")).not.toBeNull();
+    await waitFor(fixture.nativeElement as HTMLElement, "[role='grid']");
   });
 });
