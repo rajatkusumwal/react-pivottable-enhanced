@@ -882,3 +882,18 @@ any commercial pivot table vendor, nor by the `react-pivottable` open-source pro
 All product names and trademarks mentioned belong to their respective owners and are
 used only for factual, descriptive comparison. No third-party pivot code is bundled:
 the grid, aggregation engine and exporters are written from scratch in this repo.
+
+---
+
+## Source, issues & contributing
+
+- Repository: https://github.com/rajatkusumwal/react-pivottable-enhanced
+- Issues: https://github.com/rajatkusumwal/react-pivottable-enhanced/issues
+- Contributing guide: [CONTRIBUTING.md](../CONTRIBUTING.md)
+
+## Built with AI
+
+This project — library, demo site, tests and documentation — was developed end to
+end using AI coding agents. It is published as is under the MIT licence, with no
+warranty of any kind. Please review the source and test it in your own
+environment before depending on it; use at your own discretion.
