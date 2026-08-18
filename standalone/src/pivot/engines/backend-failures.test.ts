@@ -94,7 +94,7 @@ describe("backend transport failures", () => {
       baseUrl: "https://analytics.test",
       fetchImpl: fetchRejecting(abort as unknown as Error),
     });
-    await expect(client.drillThrough({ query: query(), rowPath: [], colPath: [] })).rejects.toThrow(
+    await expect(client.drillThrough({ query: query(), rowKey: [], colKey: [] })).rejects.toThrow(
       /aborted/i,
     );
   });
