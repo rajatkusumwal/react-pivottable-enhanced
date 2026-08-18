@@ -10,7 +10,7 @@ the demo site; everything a consuming app needs is here.
 
 ## Contents
 
-1. [Screenshots](#screenshots)
+1. [Feature list](#feature-list)
 2. [For AI coding agents](#for-ai-coding-agents)
 3. [Install](#install)
 4. [Hello pivot](#hello-pivot)
