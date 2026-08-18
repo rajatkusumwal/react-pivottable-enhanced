@@ -898,16 +898,16 @@ exactly that.
 ```bash
 cd standalone
 npm install
-npm run build     # sync + types + ESM bundle + theme css -> dist/
+npm run build     # types + ESM bundle + theme css -> dist/
 npm publish       # prepublishOnly re-runs the build
 ```
 
-`npm run sync` (or `node standalone/scripts/sync-from-app.mjs`) copies the
-component folder into `standalone/src/pivot/`, dropping the tests.
+From the repo root you can also run `bun run lib:build` and
+`bun run lib:typecheck` without changing directory.
 
 ### Or just copy the folder
 
-Run the sync, drop `standalone/src/pivot/` into your app, import
+Drop `standalone/src/pivot/` into your app, import
 `standalone/src/pivot-theme.css` next to your global CSS, and
 `import { PivotStudio } from "./pivot"`. Every import inside the folder is
 relative, so it works wherever you put it.
