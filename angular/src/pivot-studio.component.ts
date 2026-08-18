@@ -12,6 +12,7 @@ import {
   EventEmitter,
   Input,
   NgZone,
+  inject,
   Output,
   type OnChanges,
   type OnDestroy,
@@ -67,11 +68,10 @@ export class PivotStudioComponent implements OnInit, OnChanges, OnDestroy {
   @Output() readonly dataChange = new EventEmitter<PivotRow[]>();
 
   private mount: PivotMount | null = null;
-
-  constructor(
-    private readonly elementRef: ElementRef<HTMLElement>,
-    private readonly zone: NgZone,
-  ) {}
+  // inject() avoids constructor-parameter metadata, so the wrapper works with
+  // any bundler, including ones that do not emit decorator metadata.
+  private readonly elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly zone = inject(NgZone);
 
   ngOnInit(): void {
     this.zone.runOutsideAngular(() => {
