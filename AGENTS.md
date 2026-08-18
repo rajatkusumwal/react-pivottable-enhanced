@@ -23,6 +23,7 @@ daily, so favour the obvious solution over the clever one.
 ## Layout
 
 ```
+angular/src/                  Angular wrapper (<pivot-studio>); no pivot logic lives here
 standalone/src/pivot/
   PivotStudio.tsx     the one component apps embed
   types.ts            PivotConfig and friends (the report state)
@@ -72,3 +73,15 @@ Full guide for humans and agents: [CONTRIBUTING.md](./CONTRIBUTING.md).
 This project was developed end to end with AI coding agents and is published as
 is under the MIT licence, without warranty. Review and test it yourself before
 production use — use at your own discretion.
+
+## Angular wrapper (`angular/`)
+
+`angular/src` holds `react-pivottable-enhanced-angular`: a thin `<pivot-studio>`
+component that mounts the React `PivotStudio`. Rules:
+
+- Wrapper only — no pivot logic, no duplicated types. Types are re-exported from
+  `react-pivottable-enhanced`.
+- Every input maps 1:1 onto a React prop; outputs re-emit React callbacks inside the
+  Angular zone.
+- Tests sit next to the code (`angular/src/*.test.ts`) and run with `bun run test`.
+- Build/typecheck with `bun run angular:build` / `bun run angular:typecheck`.

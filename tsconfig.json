@@ -6,6 +6,7 @@
     "standalone/src/**/*.tsx",
     "standalone/tests/**/*.ts",
     "standalone/tests/**/*.tsx",
+    "angular/src/**/*.ts",
     "vite.config.ts",
     "eslint.config.js"
   ],
@@ -31,11 +32,14 @@
     "noPropertyAccessFromIndexSignature": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "noUncheckedSideEffectImports": true,
     "paths": {
       "@/*": ["./src/*"],
       "react-pivottable-enhanced": ["./standalone/src/index.ts"],
-      "react-pivottable-enhanced/*": ["./standalone/src/*"]
+      "react-pivottable-enhanced/*": ["./standalone/src/*"],
+      "react-pivottable-enhanced-angular": ["./angular/src/index.ts"]
     }
   }
 }

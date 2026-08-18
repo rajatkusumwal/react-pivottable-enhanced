@@ -13,7 +13,8 @@
   "sideEffects": false,
   "type": "module",
   "workspaces": [
-    "standalone"
+    "standalone",
+    "angular"
   ],
   "scripts": {
     "dev": "vite dev",
@@ -28,6 +29,8 @@
     "test:package": "vitest run --config vitest.package.config.ts",
     "lib:build": "cd standalone && vite build && tsc -p tsconfig.build.json && node scripts/copy-css.mjs",
     "lib:typecheck": "tsc -p standalone/tsconfig.build.json --noEmit",
+    "angular:build": "bun run lib:build && tsc -p angular/tsconfig.build.json",
+    "angular:typecheck": "bun run lib:build && tsc -p angular/tsconfig.build.json --noEmit",
     "test:watch": "vitest",
     "format": "prettier --write ."
   },
@@ -51,6 +54,11 @@
     "vite-tsconfig-paths": "^6.0.2"
   },
   "devDependencies": {
+    "@angular/common": "^20",
+    "@angular/compiler": "^20",
+    "@angular/core": "^20",
+    "@angular/platform-browser": "^20",
+    "@angular/platform-browser-dynamic": "^20",
     "@eslint/js": "^9.32.0",
     "@lovable.dev/vite-tanstack-config": "^2.15.0",
     "@testing-library/dom": "^10.4.1",
@@ -74,7 +82,8 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",
     "vite": "^8.2.0",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.10",
+    "zone.js": "^0.16.2"
   },
   "engines": {
     "node": ">=18.0.0"
