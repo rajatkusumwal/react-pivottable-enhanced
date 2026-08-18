@@ -884,7 +884,6 @@ folder — only Node.js 18+. The server is bundled with its runtime dependencies
 The default `bun run build` still targets Cloudflare for deployment, but the
 same `dist/server/index.mjs` entry also runs locally as a plain Node server.
 
-
 Conventions (also documented for AI coding agents in `AGENTS.md`, `CLAUDE.md`
 and `GEMINI.md`): tests live next to the code, cover a normal case, an edge case
 and a worst case; pure logic stays out of components; every engine returns the

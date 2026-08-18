@@ -873,7 +873,6 @@ and `LICENSE`. Peer dependencies (`react`, `react-dom`) and runtime dependencies
 
 ### Pre-publish checklist
 
-
 Run from the repo root:
 
 ```bash
