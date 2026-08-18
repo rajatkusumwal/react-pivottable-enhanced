@@ -5,7 +5,7 @@ import { PivotStudio, createDefaultConfig, sampleData, sampleFields } from "inho
 
 const TITLE = "inhouse-grid-monster Docs: Install the React Pivot Table in Minutes";
 const DESCRIPTION =
-  "Install inhouse-grid-monster from npm, add one Tailwind import and render a Flexmonster-style pivot table in your React app. Props, theming and backend engine reference.";
+  "Install inhouse-grid-monster from npm, add one Tailwind import and render a commercial-style pivot table in your React app. Props, theming and backend engine reference.";
 
 export const Route = createFileRoute("/docs")({
   head: () => ({
@@ -58,7 +58,7 @@ const props: PropRow[] = [
     name: "fieldsUi",
     type: '"dialog" | "sidebar"',
     fallback: '"dialog"',
-    what: "Popup field list (Flexmonster-style) or a docked panel.",
+    what: "Popup field list (commercial-style) or a docked panel.",
   },
   {
     name: "showToolbar / showSidebar",

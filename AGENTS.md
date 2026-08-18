@@ -13,7 +13,7 @@
 
 # inhouse-grid-monster — working agreements
 
-This repo is one product: a Flexmonster-style pivot table (`standalone/src/pivot`, published as the `inhouse-grid-monster` npm package)
+This repo is one product: a commercial-style pivot table (`standalone/src/pivot`, published as the `inhouse-grid-monster` npm package)
 plus a small marketing/demo site (`src/routes`). Junior developers read this code
 daily, so favour the obvious solution over the clever one.
 

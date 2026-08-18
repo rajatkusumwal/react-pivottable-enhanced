@@ -1,10 +1,10 @@
 /**
- * Pure helpers behind the Flexmonster-style drag & drop field list.
+ * Pure helpers behind the commercial-style drag & drop field list.
  * Keeping the move logic here means it can be unit tested without a DOM.
  */
 import type { FieldDef, FilterDef, PivotConfig } from "./types";
 
-/** The five buckets a field can live in, mirroring Flexmonster's field list. */
+/** The five buckets a field can live in, mirroring commercial pivot tables. field list. */
 export type PivotArea = "fields" | "filters" | "rows" | "cols" | "values";
 
 export const pivotAreas: PivotArea[] = ["filters", "cols", "rows", "values"];

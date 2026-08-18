@@ -1,5 +1,5 @@
 /**
- * Grid feature tests: these cover the Flexmonster-style grid capabilities the
+ * Grid feature tests: these cover the commercial-style grid capabilities the
  * comparison table on the home page claims (layouts, subtotals, expand and
  * collapse, spreadsheet headers, repeated labels, selection + auto-calc,
  * keyboard navigation, copy and row windowing).

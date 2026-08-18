@@ -27,7 +27,7 @@ export interface PivotToolbarProps {
   onPrint: () => void;
   onCopy: () => void;
   onReset: () => void;
-  /** Opens the Flexmonster-style field list dialog. */
+  /** Opens the commercial-style field list dialog. */
   onOpenFields?: (() => void) | undefined;
   /** Opens the number / conditional formatting dialog. */
   onOpenFormat?: (() => void) | undefined;

@@ -169,7 +169,7 @@ export function applyFilters(rows: PivotRow[], filters: FilterDef[]): PivotRow[]
   let out = rows;
   for (const filter of filters) {
     if (filter.kind === "values") {
-      // An empty include list means "all members" (Flexmonster behaviour).
+      // An empty include list means "all members" (commercial pivot tables behaviour).
       if (filter.mode === "include" && filter.members.length === 0) continue;
       const set = new Set(filter.members.map(String));
       out = out.filter((r) => {

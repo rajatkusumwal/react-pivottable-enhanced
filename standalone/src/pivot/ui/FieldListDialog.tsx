@@ -14,7 +14,7 @@ export interface FieldListDialogProps {
   onClose: () => void;
 }
 
-/** Flexmonster's popup field list, opened from the toolbar "Fields" button. */
+/** commercial pivot tables. popup field list, opened from the toolbar "Fields" button. */
 export function FieldListDialog({
   open,
   strings,

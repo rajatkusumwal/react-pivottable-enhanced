@@ -14,7 +14,7 @@ export interface MemberFilterPopoverProps {
   onClose: () => void;
 }
 
-/** Flexmonster's member checklist: search, select all, tick the values to keep. */
+/** commercial pivot tables. member checklist: search, select all, tick the values to keep. */
 export function MemberFilterPopover({
   field,
   label,

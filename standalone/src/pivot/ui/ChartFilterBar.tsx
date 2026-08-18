@@ -14,7 +14,7 @@ export interface ChartFilterBarProps {
 }
 
 /**
- * Flexmonster-style filter controls on the chart: one button per charted field
+ * commercial-style filter controls on the chart: one button per charted field
  * that opens the member checklist and writes a report filter back into the config.
  */
 export function ChartFilterBar({ strings, config, rows, readOnly, onChange }: ChartFilterBarProps) {

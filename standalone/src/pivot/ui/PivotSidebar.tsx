@@ -13,7 +13,7 @@ export interface PivotSidebarProps {
 
 /**
  * Docked version of the field list (kept for hosts that prefer a permanent
- * panel over Flexmonster's popup). Same drag & drop behaviour.
+ * panel over commercial pivot tables. popup). Same drag & drop behaviour.
  */
 export function PivotSidebar(props: PivotSidebarProps) {
   return (
