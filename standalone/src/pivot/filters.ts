@@ -83,7 +83,10 @@ export const timeOperatorLabels: Partial<Record<ConditionOperator, string>> = {
 };
 
 /** True when the condition should be evaluated on the clock (seconds of day). */
-function comparesAsTime(valueType: ConditionValueType | undefined, operator: ConditionOperator): boolean {
+function comparesAsTime(
+  valueType: ConditionValueType | undefined,
+  operator: ConditionOperator,
+): boolean {
   return valueType === "time" && dateOperators.includes(operator);
 }
 

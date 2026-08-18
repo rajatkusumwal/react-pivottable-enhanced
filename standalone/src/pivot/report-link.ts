@@ -16,9 +16,7 @@ const toBase64 = (text: string): string => {
   const bytes = new TextEncoder().encode(text);
   let binary = "";
   for (const b of bytes) binary += String.fromCharCode(b);
-  return typeof btoa === "function"
-    ? btoa(binary)
-    : Buffer.from(text, "utf-8").toString("base64");
+  return typeof btoa === "function" ? btoa(binary) : Buffer.from(text, "utf-8").toString("base64");
 };
 
 const fromBase64 = (base64: string): string => {
