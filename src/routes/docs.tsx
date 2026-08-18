@@ -451,8 +451,8 @@ export class ReportsComponent {
                 src={pivotScreenshot}
                 alt={
                   framework === "react"
-                    ? "The pivot table rendered in a React app: toolbar, field areas and a grid of revenue by region and quarter"
-                    : "The same pivot table rendered inside an Angular app through the pivot-studio component"
+                    ? "The pivot table rendered in a React app: revenue by region and quarter with expandable rows and subtotals"
+                    : "The same pivot grid rendered inside an Angular app through the pivot-studio component"
                 }
                 width={1240}
                 height={385}
@@ -462,7 +462,7 @@ export class ReportsComponent {
               <figcaption className="border-t border-border px-4 py-2 text-xs text-muted-foreground">
                 {framework === "react"
                   ? "What the snippet above renders in a React app."
-                  : "The same screen in Angular — identical toolbar, fields and grid, because it is the same component."}
+                  : "The same screen in Angular — identical grid, drilling and totals, because it is the same component."}
               </figcaption>
             </figure>
 
