@@ -16,6 +16,9 @@ import { sampleData, sampleFields } from "react-pivottable-enhanced";
 import type { PivotConfig, PivotRow } from "react-pivottable-enhanced";
 import { PivotStudioComponent } from "./pivot-studio.component";
 import { PivotStudioModule } from "./pivot-studio.module";
+import { readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
 @Component({
   standalone: true,
