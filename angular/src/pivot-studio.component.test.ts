@@ -16,6 +16,9 @@ import { sampleData, sampleFields } from "react-pivottable-enhanced";
 import type { PivotConfig, PivotRow } from "react-pivottable-enhanced";
 import { PivotStudioComponent } from "./pivot-studio.component";
 import { PivotStudioModule } from "./pivot-studio.module";
+import { readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
 @Component({
   standalone: true,
@@ -153,4 +156,60 @@ describe("<pivot-studio>", () => {
     fixture.detectChanges();
     await waitFor(fixture.nativeElement as HTMLElement, "[role='grid']");
   });
+
+  it("applies initialConfig and hides the toolbar when asked", async () => {
+    const fixture = TestBed.createComponent(PivotStudioComponent);
+    fixture.componentInstance.data = sampleData;
+    fixture.componentInstance.fields = sampleFields;
+    fixture.componentInstance.showToolbar = false;
+    fixture.componentInstance.initialConfig = {
+      rows: ["region"],
+      values: [{ field: "revenue", aggregator: "sum" }],
+    };
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    await waitFor(el, "[role='grid']");
+    expect(el.textContent).toContain("Sum of Revenue");
+    expect(el.querySelector("button[title='Export']")).toBeNull();
+  });
+
+  it("omits optional props that were never set, so React keeps its defaults", () => {
+    const fixture = TestBed.createComponent(PivotStudioComponent);
+    const wrapper = fixture.componentInstance as unknown as {
+      buildProps(): Record<string, unknown>;
+    };
+    const props = wrapper.buildProps();
+    for (const key of ["engine", "initialConfig", "config", "permissions", "datasetId"]) {
+      expect(key in props, key).toBe(false);
+    }
+  });
+
+  it("maps every React prop onto an input or an output", () => {
+    const reactProps = propNamesOf(
+      readFileSync(
+        resolve(
+          dirname(fileURLToPath(import.meta.url)),
+          "../../standalone/src/pivot/PivotStudio.tsx",
+        ),
+        "utf-8",
+      ),
+    );
+    // Callbacks are surfaced as Angular outputs with a shorter name.
+    const outputs: Record<string, string> = {
+      onConfigChange: "configChange",
+      onDataChange: "dataChange",
+    };
+    const instance = TestBed.createComponent(PivotStudioComponent)
+      .componentInstance as unknown as Record<string, unknown>;
+    for (const prop of reactProps) {
+      const name = outputs[prop] ?? prop;
+      expect(name in instance, `missing wrapper member for ${prop}`).toBe(true);
+    }
+  });
 });
+
+/** Property names declared in the PivotStudioProps interface of the React source. */
+function propNamesOf(source: string): string[] {
+  const body = source.split("export interface PivotStudioProps {")[1]?.split("\n}")[0] ?? "";
+  return [...body.matchAll(/^ {2}(\w+)\??:/gm)].map((m) => m[1] as string);
+}

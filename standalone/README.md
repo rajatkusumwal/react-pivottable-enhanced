@@ -925,7 +925,7 @@ excludes `*.test.*` and `files` publishes only `dist` and `README.md`.
 
 ### What the suite covers
 
-341 tests across 21 files. The groups worth knowing about:
+364 tests across 24 files (including the Angular wrapper suite). The groups worth knowing about:
 
 | Area             | File(s)                                               | What is asserted                                                               |
 | ---------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------ |
@@ -940,6 +940,7 @@ excludes `*.test.*` and `files` publishes only `dist` and `README.md`.
 | Accessibility    | `accessibility.test.tsx`                              | grid role & labels, Tab focus, arrow/shift navigation, Escape on popups        |
 | Performance      | `performance.test.ts`                                 | 100k-row aggregate, filter and drill-through stay inside time budgets          |
 | Persistence      | `session-dataset.test.ts`                             | reload cache: round-trip, oversized payload, corrupt JSON, storage disabled    |
+| Angular wrapper  | `angular/src/*.test.ts`                               | mount/teardown, input updates, zone-correct outputs, NgModule path             |
 | Packaging        | `standalone/tests/*`                                  | built `dist/` renders, types emit, peers stay external                         |
 
 Coverage is enforced from the repo root:

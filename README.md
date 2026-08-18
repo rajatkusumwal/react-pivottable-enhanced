@@ -834,7 +834,7 @@ Useful commands:
 
 ```bash
 bun run dev      # start the demo app
-bun run test     # run the whole suite once (vitest) — 341 tests
+bun run test     # run the whole suite once (vitest) — 364 tests
 bun run test:coverage # same, with coverage thresholds enforced
 bun run test:package  # slow: build the npm package and test the artifact
 bun run lint     # eslint + prettier rules
