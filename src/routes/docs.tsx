@@ -210,7 +210,10 @@ function LiveExample({
   useEffect(() => setMounted(true), []);
 
   return (
-    <article id={id} className="scroll-mt-24 rounded-xl border border-border bg-card p-4">
+    <article
+      id={id}
+      className="min-w-0 scroll-mt-24 overflow-hidden rounded-xl border border-border bg-card p-4"
+    >
       <h3 className="text-lg font-semibold text-foreground">{title}</h3>
       <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{blurb}</p>
 
@@ -236,7 +239,7 @@ function LiveExample({
       </div>
 
       {tab === "preview" ? (
-        <div className="mt-3">
+        <div className="mt-3 min-w-0 max-w-full overflow-x-auto">
           {mounted ? (
             children
           ) : (
