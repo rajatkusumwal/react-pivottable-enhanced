@@ -31,7 +31,7 @@ import { GridFieldBar } from "./ui/GridFieldBar";
 
 import { PivotGrid } from "./ui/PivotGrid";
 import type { SelectionStats } from "./ui/PivotGrid";
-import { DataSourceBar, suggestConfig } from "./ui/DataSourceBar";
+import { DataSourceBar } from "./ui/DataSourceBar";
 import type { UploadedDataset } from "./ui/DataSourceBar";
 import { loadSessionDataset, saveSessionDataset } from "./session-dataset";
 import { formatNumber } from "./format";
