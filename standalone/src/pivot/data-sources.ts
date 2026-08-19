@@ -129,3 +129,26 @@ function detectCsvOptionsSafe(text: string): CsvOptions {
     return csvOptions();
   }
 }
+
+/**
+ * Picks a sensible first report for a freshly uploaded file: the first text
+ * column on rows, the first numeric column summed.
+ */
+export function suggestConfig(fields: FieldDef[]) {
+  const text = fields.filter((f) => f.type === "string");
+  const numeric = fields.filter((f) => f.type === "number");
+  return {
+    rows: text[0] ? [text[0].name] : [],
+    cols: text[1] ? [text[1].name] : [],
+    values: numeric[0]
+      ? [
+          {
+            field: numeric[0].name,
+            aggregator: "sum" as const,
+            caption: numeric[0].caption ?? numeric[0].name,
+            format: { decimals: 0 },
+          },
+        ]
+      : [],
+  };
+}
