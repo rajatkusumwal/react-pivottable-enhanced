@@ -669,11 +669,30 @@ already a dependency of your app.
 - **Decorator metadata errors in an exotic bundler** — the component uses `inject()`
   rather than constructor injection precisely to avoid that; make sure you are on a
   recent build of this package.
+- **`TS-992012: Component imports must be standalone components, directives, pipes, or
+  must be NgModules`** (pointing at `imports: [PivotStudioComponent]`) — the copy of
+  this package you installed was compiled with plain `tsc`. Plain `tsc` emits
+  `@Component` as a legacy `__decorate([...])` call, which your app's Angular compiler
+  cannot read, so it sees an ordinary class with no Angular metadata. An Angular
+  library must be compiled by **ngc in partial mode**, which emits
+  `ɵɵngDeclareComponent` metadata that the Angular linker in your app expands at build
+  time. Fix: upgrade to a version of this package built with `ngc` (v1.0.1+), or if you
+  build it yourself, run `npm --prefix angular run build` from a checkout that has
+  `"compilationMode": "partial"` in `angular/tsconfig.build.json`. To confirm a build is
+  good: `grep ngDeclareComponent node_modules/react-pivottable-enhanced-angular/dist/pivot-studio.component.js`
+  must print a match.
+- **`TS2305: module … has no exported member 'XComponent'`** — a name mismatch in your
+  own app. The only component this package exports is `PivotStudioComponent` (plus the
+  optional `PivotStudioModule`).
 
 ## Building and publishing
 
+The package is compiled with the **Angular compiler** (`ngc`), never plain `tsc`:
+`angular/tsconfig.build.json` sets `angularCompilerOptions.compilationMode: "partial"`
+so the published JavaScript carries Angular linker metadata.
+
 ```bash
-npm --prefix angular run typecheck   # tsc against tsconfig.build.json
+npm --prefix angular run typecheck   # ngc --noEmit against tsconfig.build.json
 npm --prefix angular run build       # builds the React package, then emits angular/dist
 bun run test                         # whole repo suite, including the Angular tests
 npm --prefix angular publish         # requires npm login
