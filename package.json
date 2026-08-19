@@ -27,7 +27,7 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:package": "vitest run --config vitest.package.config.ts",
-    "lib:build": "cd standalone && vite build && tsc -p tsconfig.build.json && node scripts/copy-css.mjs",
+    "lib:build": "cd standalone && vite build && tsc -p tsconfig.build.json && node scripts/build-css.mjs",
     "lib:typecheck": "tsc -p standalone/tsconfig.build.json --noEmit",
     "angular:build": "bun run lib:build && node angular/scripts/run-ngc.mjs -p tsconfig.build.json",
     "angular:typecheck": "bun run lib:build && node angular/scripts/run-ngc.mjs -p tsconfig.build.json --noEmit",

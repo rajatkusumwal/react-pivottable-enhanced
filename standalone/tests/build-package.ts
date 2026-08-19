@@ -27,7 +27,7 @@ export function buildPackage(): Promise<void> {
     // vite build empties dist/, so it must run before the declarations land.
     run("bunx", ["vite", "build", "--mode", "production"]);
     run("bunx", ["tsc", "-p", "tsconfig.build.json"]);
-    run(process.execPath, [join(packageDir, "scripts", "copy-css.mjs")]);
+    run(process.execPath, [join(packageDir, "scripts", "build-css.mjs")]);
   })();
   return running;
 }

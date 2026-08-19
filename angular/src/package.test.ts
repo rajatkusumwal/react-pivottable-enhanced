@@ -83,7 +83,6 @@ describe("Angular partial compilation", () => {
     expect(scripts["typecheck"]).not.toMatch(/(^|&&\s*)ngc\s/);
   });
 
-
   it("asks the compiler for partial (publishable) output", () => {
     expect(tsconfig.angularCompilerOptions?.compilationMode).toBe("partial");
   });
@@ -97,5 +96,62 @@ describe("Angular partial compilation", () => {
     expect(js).not.toContain("__decorate(");
     // React, Angular and the pivot library stay external.
     expect(js).not.toContain("createRoot(");
+  });
+});
+
+/**
+ * Styling contract for Angular consumers: one compiled stylesheet, no Tailwind.
+ * An Angular 18 app must get a fully styled grid from the published CSS alone.
+ */
+describe("zero-config styling for Angular apps", () => {
+  const libRoot = join(process.cwd(), "standalone");
+  const libPkg = JSON.parse(readFileSync(join(libRoot, "package.json"), "utf8")) as {
+    exports: Record<string, unknown>;
+    sideEffects: string[];
+  };
+
+  it("exports the compiled stylesheet from the React package", () => {
+    expect(libPkg.exports["./styles.css"]).toBe("./dist/styles.css");
+    expect(libPkg.sideEffects).toContain("**/*.css");
+  });
+
+  it("documents the two-line styling setup and no Tailwind install", () => {
+    const readme = readFileSync(join(root, "README.md"), "utf8");
+    expect(readme).toContain("node_modules/react-pivottable-enhanced/dist/styles.css");
+    expect(readme).toContain('@import "react-pivottable-enhanced/styles.css";');
+    expect(readme).not.toContain("npm i tailwindcss");
+  });
+
+  it("compiles the stylesheet from library sources, not the demo app", () => {
+    expect(existsSync(join(libRoot, "src", "pivot-grid.css"))).toBe(true);
+    expect(existsSync(join(libRoot, "src", "styles.entry.css"))).toBe(true);
+    const demoCss = readFileSync(join(process.cwd(), "src", "styles.css"), "utf8");
+    // The demo consumes the library CSS so missing package styles break locally.
+    expect(demoCss).toContain("../standalone/src/pivot-grid.css");
+    expect(demoCss).not.toContain(".pivot-row-header");
+  });
+
+  it("ships the compiled stylesheet once built", () => {
+    const built = join(libRoot, "dist", "styles.css");
+    if (!existsSync(built)) return; // present after `bun run lib:build`
+    const css = readFileSync(built, "utf8");
+    for (const rule of [".pivot-fm", ".pivot-table", ".pivot-row-header", ".pivot-value"]) {
+      expect(css, rule).toContain(rule);
+    }
+    expect(css).toMatch(/\.flex\s*\{/);
+  });
+
+  it("re-exports the helpers the README examples use", () => {
+    const entry = readFileSync(join(root, "src", "index.ts"), "utf8");
+    for (const name of [
+      "createDefaultConfig",
+      "createLocalEngine",
+      "createBackendEngine",
+      "inferFields",
+      "sampleData",
+      "sampleFields",
+    ]) {
+      expect(entry, name).toContain(name);
+    }
   });
 });

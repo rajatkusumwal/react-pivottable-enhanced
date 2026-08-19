@@ -20,10 +20,47 @@ describe("library build output", () => {
     bundle = await readFile(join(distDir, "index.js"), "utf8");
   }, 300_000);
 
-  it("emits the bundle, the types and the theme CSS", async () => {
+  it("emits the bundle, the types, the compiled CSS and the theme CSS", async () => {
     expect(await exists("index.js")).toBe(true);
     expect(await exists("index.d.ts")).toBe(true);
+    expect(await exists("styles.css")).toBe(true);
     expect(await exists("pivot-theme.css")).toBe(true);
+  });
+
+  describe("compiled stylesheet", () => {
+    let css = "";
+
+    beforeAll(async () => {
+      css = await readFile(join(distDir, "styles.css"), "utf8");
+    });
+
+    it("ships the component rules the markup depends on", () => {
+      for (const rule of [
+        ".pivot-fm",
+        ".pivot-table",
+        ".pivot-row-header",
+        ".pivot-value",
+        ".pivot-resize-handle",
+      ]) {
+        expect(css, `${rule} missing from dist/styles.css`).toContain(rule);
+      }
+    });
+
+    it("ships Tailwind preflight and utilities so hosts need no Tailwind", () => {
+      expect(css).toContain("box-sizing"); // preflight
+      expect(css).toMatch(/\.flex\s*\{/); // compiled utility
+      expect(css).not.toContain("@tailwind");
+      expect(css).not.toContain("@source");
+    });
+
+    it("ships the theme tokens", () => {
+      expect(css).toContain("--color-primary");
+      expect(css).toContain("--border");
+    });
+
+    it("covers dark mode", () => {
+      expect(css).toContain(".dark");
+    });
   });
 
   it("keeps peer and runtime dependencies external", () => {

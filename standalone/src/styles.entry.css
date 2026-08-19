@@ -1,0 +1,14 @@
+/**
+ * Build input for the published stylesheet.
+ *
+ * `bun run build` compiles this file into dist/styles.css: Tailwind preflight,
+ * every utility the pivot source uses, the theme tokens and the component CSS.
+ * Consumers import the compiled file only — they never need Tailwind, PostCSS
+ * or a content configuration of their own.
+ */
+@import "tailwindcss" source(none);
+@import "./pivot-theme.css";
+@import "./pivot-grid.css";
+
+/* Scan the library source so only the utilities the pivot renders are emitted. */
+@source "./pivot";

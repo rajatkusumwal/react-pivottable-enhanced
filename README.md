@@ -853,7 +853,7 @@ file-by-file map.
 package entry point exports every documented name and that those exports work.
 
 `bun run test:package` is the slow suite: it runs the real library build
-(`vite build -> tsc -> copy-css`) and then asserts on `standalone/dist/`
+(`vite build -> tsc -> build-css`) and then asserts on `standalone/dist/`
 — that `index.js`, `index.d.ts` and `pivot-theme.css` exist, that React and the
 runtime deps stay external, and that a consumer can import the built bundle and
 render `PivotStudio`. Run it before every `npm publish`.
@@ -945,11 +945,11 @@ import "react-pivottable-enhanced/styles.css";
 <PivotStudio data={sampleData} fields={sampleFields} />;
 ```
 
-Tailwind v4 hosts add one line so the classes survive purging:
+`styles.css` is compiled and self-contained (Tailwind preflight, the utilities
+the grid uses, theme tokens and the grid CSS), so host apps need no Tailwind,
+PostCSS or content configuration:
 
 ```css
-@import "tailwindcss";
-@source "../node_modules/react-pivottable-enhanced/dist";
 @import "react-pivottable-enhanced/styles.css";
 ```
 
@@ -967,7 +967,7 @@ exactly that.
 ```bash
 cd standalone
 npm install
-npm run build     # types + ESM bundle + theme css -> dist/
+npm run build     # types + ESM bundle + compiled styles.css -> dist/
 npm publish       # prepublishOnly re-runs the build
 ```
 
@@ -981,7 +981,7 @@ Drop `standalone/src/pivot/` into your app, import
 `import { PivotStudio } from "./pivot"`. Every import inside the folder is
 relative, so it works wherever you put it.
 
-Full instructions, including a Tailwind v3 colour map, Next.js SSR notes and the
+Full instructions, including theming, Next.js SSR notes and the
 backend-engine wiring, are in [`standalone/README.md`](./standalone/README.md).
 
 ## Framework integrations

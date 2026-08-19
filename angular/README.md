@@ -160,7 +160,7 @@ Add the theme stylesheet once — in `angular.json`:
 
 ```json
 "styles": [
-  "node_modules/react-pivottable-enhanced/dist/pivot-theme.css",
+  "node_modules/react-pivottable-enhanced/dist/styles.css",
   "src/styles.css"
 ]
 ```
@@ -171,13 +171,13 @@ or in `src/styles.css`:
 @import "react-pivottable-enhanced/styles.css";
 ```
 
-Tailwind is **not** required: the stylesheet ships the compiled utilities the grid
-uses. If your app already runs Tailwind v4, add the library to your content scan
-instead:
+That single file is everything: Tailwind preflight, every utility class the grid
+renders, the theme tokens and the pivot component rules. Angular apps do **not**
+install `tailwindcss`, `@tailwindcss/postcss` or `tw-animate-css`, and need no
+PostCSS or content configuration.
 
-```css
-@source "../node_modules/react-pivottable-enhanced/dist";
-```
+Re-skin it by overriding the CSS custom properties (`--primary`, `--border`,
+`--radius`, …) in your own `styles.css`, loaded after the library file.
 
 ## Hello pivot
 
@@ -696,7 +696,6 @@ The package is compiled with the **Angular compiler** (`ngc`), never plain `tsc`
 `angular/tsconfig.build.json` sets `angularCompilerOptions.compilationMode: "partial"`
 so the published JavaScript carries Angular linker metadata. The scripts launch it via
 `angular/scripts/run-ngc.mjs` so the build works whether or not `ngc` is on PATH.
-
 
 ```bash
 npm --prefix angular run typecheck   # ngc --noEmit against tsconfig.build.json

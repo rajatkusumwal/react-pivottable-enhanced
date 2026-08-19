@@ -55,7 +55,7 @@ function FrameworkTabs({
 
 const TITLE = "react-pivottable-enhanced Docs: Install the React Pivot Table in Minutes";
 const DESCRIPTION =
-  "Install react-pivottable-enhanced from npm, add one Tailwind import and render a commercial-style pivot table in your React app. Props, theming and backend engine reference.";
+  "Install react-pivottable-enhanced from npm, add one stylesheet import and render a commercial-style pivot table in your React app. Props, theming and backend engine reference.";
 
 export const Route = createFileRoute("/docs")({
   head: () => ({
@@ -181,7 +181,7 @@ const toc = [
   ["install", "Install (React & Angular)"],
   ["quick-start", "Quick start"],
   ["examples", "Live examples"],
-  ["tailwind", "Tailwind setup"],
+  ["tailwind", "Styling setup"],
   ["theming", "Theming"],
   ["props", "Props"],
   ["backend", "Backend aggregation"],
@@ -407,8 +407,8 @@ export function Reports() {
   );
 }`}</Code>
                 <p>
-                  React 18.2+ or 19 works. The stylesheet import is the only styling step if you are
-                  not on Tailwind.
+                  React 18.2+ or 19 works. The stylesheet import is the only styling step — no
+                  Tailwind setup required.
                 </p>
               </div>
             ) : (
@@ -667,18 +667,22 @@ const config = createDefaultConfig({
             </p>
           </Section>
 
-          <Section id="tailwind" title="3. Tailwind setup">
+          <Section id="tailwind" title="3. Styling setup">
             <p>
-              The layout is plain Tailwind utility classes, so your app must scan the package and
-              load the colour tokens. Tailwind v4:
+              One import, in React or Angular. The published stylesheet is compiled and
+              self-contained — Tailwind preflight, every utility class the grid renders, the theme
+              tokens and the grid CSS. Your app needs no Tailwind, PostCSS or content configuration.
             </p>
-            <Code label="app.css">{`@import "tailwindcss";
-@source "../node_modules/react-pivottable-enhanced/dist";
-@import "react-pivottable-enhanced/styles.css";`}</Code>
+            <Code label="app.css">{`@import "react-pivottable-enhanced/styles.css";`}</Code>
             <p>
-              On Tailwind v3, add <code>./node_modules/react-pivottable-enhanced/dist/**/*.js</code>{" "}
-              to <code>content</code> and map the same token names in{" "}
-              <code>theme.extend.colors</code> — the package README has the exact block to paste.
+              Angular apps can add the same file to the <code>styles</code> array in{" "}
+              <code>angular.json</code>:{" "}
+              <code>node_modules/react-pivottable-enhanced/dist/styles.css</code>.
+            </p>
+            <p>
+              Already using Tailwind v4 and prefer to compile the utilities yourself? Import{" "}
+              <code>react-pivottable-enhanced/theme.css</code> for the raw tokens and add{" "}
+              <code>@source "../node_modules/react-pivottable-enhanced/dist";</code> instead.
             </p>
           </Section>
 

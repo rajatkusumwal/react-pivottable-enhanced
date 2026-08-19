@@ -32,6 +32,8 @@ standalone/src/pivot/
   engines/            local (browser) engine, REST backend engine, mock API, custom source
   ui/               presentational pieces (grid, toolbar, sidebar, dialogs, chart)
   *.ts                pure helpers: aggregators, filters, calculated, export, format, sort…
+  pivot-grid.css      component CSS (grid skin); compiled into dist/styles.css
+  styles.entry.css    Tailwind input for the published, self-contained stylesheet
   *.test.ts(x)        tests sit next to the code they cover
 src/routes/                   demo site; imports the library as "react-pivottable-enhanced"
 src/lib/pivot-comparison.ts   feature matrix shown on the home page
