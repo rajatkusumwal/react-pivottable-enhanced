@@ -29,8 +29,8 @@
     "test:package": "vitest run --config vitest.package.config.ts",
     "lib:build": "cd standalone && vite build && tsc -p tsconfig.build.json && node scripts/copy-css.mjs",
     "lib:typecheck": "tsc -p standalone/tsconfig.build.json --noEmit",
-    "angular:build": "bun run lib:build && tsc -p angular/tsconfig.build.json",
-    "angular:typecheck": "bun run lib:build && tsc -p angular/tsconfig.build.json --noEmit",
+    "angular:build": "bun run lib:build && ngc -p angular/tsconfig.build.json",
+    "angular:typecheck": "bun run lib:build && ngc -p angular/tsconfig.build.json --noEmit",
     "test:watch": "vitest",
     "format": "prettier --write ."
   },
@@ -56,6 +56,7 @@
   "devDependencies": {
     "@angular/common": "^20",
     "@angular/compiler": "^20",
+    "@angular/compiler-cli": "^20",
     "@angular/core": "^20",
     "@angular/platform-browser": "^20",
     "@angular/platform-browser-dynamic": "^20",
