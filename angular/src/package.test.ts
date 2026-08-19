@@ -4,7 +4,7 @@
  * bundled inside the wrapper.
  */
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const root = join(process.cwd(), "angular");
@@ -50,5 +50,43 @@ describe("react-pivottable-enhanced-angular package", () => {
     expect(source).toContain('from "react-dom/client"');
     expect(source).toContain('from "react-pivottable-enhanced"');
     expect(source).not.toContain("../standalone");
+  });
+});
+
+/**
+ * Angular libraries must be compiled by ngc in partial mode. Plain tsc output
+ * makes consuming apps fail with TS-992012 ("Component imports must be
+ * standalone components"), because the Angular compiler cannot read legacy
+ * __decorate() metadata.
+ */
+describe("Angular partial compilation", () => {
+  const scripts = (
+    JSON.parse(readFileSync(join(root, "package.json"), "utf8")) as {
+      scripts: Record<string, string>;
+    }
+  ).scripts;
+  const tsconfig = JSON.parse(
+    readFileSync(join(root, "tsconfig.build.json"), "utf8").replace(/^\s*\/\/.*$/gm, ""),
+  ) as { angularCompilerOptions?: { compilationMode?: string } };
+
+  it("builds and typechecks with ngc, never plain tsc", () => {
+    expect(scripts["build"]).toContain("ngc -p tsconfig.build.json");
+    expect(scripts["build"]).not.toMatch(/\btsc -p tsconfig\.build\.json/);
+    expect(scripts["typecheck"]).toContain("ngc -p tsconfig.build.json");
+  });
+
+  it("asks the compiler for partial (publishable) output", () => {
+    expect(tsconfig.angularCompilerOptions?.compilationMode).toBe("partial");
+  });
+
+  it("emits linker metadata and no legacy decorators once built", () => {
+    const built = join(root, "dist", "pivot-studio.component.js");
+    if (!existsSync(built)) return; // dist is only present after `bun run angular:build`
+    const js = readFileSync(built, "utf8");
+    expect(js).toContain("ngDeclareComponent");
+    expect(js).toContain("standalone: true");
+    expect(js).not.toContain("__decorate(");
+    // React, Angular and the pivot library stay external.
+    expect(js).not.toContain("createRoot(");
   });
 });
