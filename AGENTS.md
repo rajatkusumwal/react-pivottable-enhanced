@@ -24,17 +24,20 @@ daily, so favour the obvious solution over the clever one.
 
 ```
 angular/src/                  Angular wrapper (<pivot-studio>); no pivot logic lives here
-standalone/src/pivot/
-  PivotStudio.tsx     the one component apps embed
-  types.ts            PivotConfig and friends (the report state)
-  constants.ts        every tunable number lives here — no magic numbers elsewhere
-  result.ts           PivotResult: the contract every engine returns
-  engines/            local (browser) engine, REST backend engine, mock API, custom source
-  ui/               presentational pieces (grid, toolbar, sidebar, dialogs, chart)
-  *.ts                pure helpers: aggregators, filters, calculated, export, format, sort…
+standalone/src/
+  index.ts            public entry point of the npm package
   pivot-grid.css      component CSS (grid skin); compiled into dist/styles.css
+  pivot-theme.css     raw design tokens, published as "./theme.css"
   styles.entry.css    Tailwind input for the published, self-contained stylesheet
-  *.test.ts(x)        tests sit next to the code they cover
+  pivot/
+    PivotStudio.tsx   the one component apps embed
+    types.ts          PivotConfig and friends (the report state)
+    constants.ts      every tunable number lives here — no magic numbers elsewhere
+    result.ts         PivotResult: the contract every engine returns
+    engines/          local (browser) engine, REST backend engine, mock API, custom source
+    ui/               presentational pieces (grid, toolbar, sidebar, dialogs, chart)
+    *.ts              pure helpers: aggregators, filters, calculated, export, format, sort…
+    *.test.ts(x)      tests sit next to the code they cover
 src/routes/                   demo site; imports the library as "react-pivottable-enhanced"
 src/lib/pivot-comparison.ts   feature matrix shown on the home page
 ```
