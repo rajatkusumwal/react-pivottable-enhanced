@@ -21,7 +21,7 @@
   ],
   "type": "module",
   "sideEffects": [
-    "*.css"
+    "**/*.css"
   ],
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -31,7 +31,8 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./styles.css": "./dist/pivot-theme.css",
+    "./styles.css": "./dist/styles.css",
+    "./theme.css": "./dist/pivot-theme.css",
     "./package.json": "./package.json"
   },
   "files": [
@@ -40,7 +41,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "vite build && tsc -p tsconfig.build.json && node scripts/copy-css.mjs",
+    "build": "vite build && tsc -p tsconfig.build.json && node scripts/build-css.mjs",
     "typecheck": "tsc -p tsconfig.build.json --noEmit",
     "prepublishOnly": "npm run build"
   },
@@ -61,7 +62,9 @@
     "@types/react-dom": "^19.2.0",
     "typescript": "^5.8.3",
     "vite": "^8.2.0",
-    "@vitejs/plugin-react": "^6.0.5"
+    "@vitejs/plugin-react": "^6.0.5",
+    "@tailwindcss/vite": "^4.2.1",
+    "tailwindcss": "^4.2.1"
   },
   "publishConfig": {
     "access": "public"

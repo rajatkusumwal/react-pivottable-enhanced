@@ -18,7 +18,7 @@ the demo site; everything a consuming app needs is here.
 2. [For AI coding agents](#for-ai-coding-agents)
 3. [Install](#install)
 4. [Hello pivot](#hello-pivot)
-5. [Tailwind setup](#tailwind-setup)
+5. [Styling setup](#styling-setup)
 6. [Props](#props)
 7. [The report config](#the-report-config)
 8. [Recipes](#recipes) — 14 copy-paste samples
@@ -140,7 +140,7 @@ without opening any other file.
 | Package         | `react-pivottable-enhanced`                                                            |
 | Entry component | `PivotStudio` (named export; there is **no** default export)                           |
 | Styles          | `import "react-pivottable-enhanced/styles.css"` — required                             |
-| Styling engine  | Tailwind CSS v4 (v3 works with a token map) in the **host** app                        |
+| Styling engine  | None required — `styles.css` is compiled and self-contained                            |
 | Peers           | `react` and `react-dom` (18.2+ or 19)                                                  |
 | Runtime deps    | `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`, `lucide-react`, `recharts` |
 | Rendering       | Client only — wrap in a client boundary / dynamic import under SSR                     |
@@ -171,9 +171,8 @@ export function Reports({ rows }: { rows: Record<string, string | number | null>
 **Rules — violating these is the cause of almost every failed integration**
 
 1. Import named exports only: `import { PivotStudio } from "react-pivottable-enhanced"`.
-2. Always import the stylesheet once, and make Tailwind scan the package
-   (`@source "../node_modules/react-pivottable-enhanced/dist";`), or the grid
-   renders unstyled.
+2. Always import `react-pivottable-enhanced/styles.css` once, or the grid
+   renders unstyled. No Tailwind setup is needed — the file is compiled.
 3. A report needs at least one entry in `values`; otherwise the grid is empty.
 4. Field names in `rows`, `cols`, `values` and filters must match keys present
    in the data records exactly (case-sensitive).
@@ -254,16 +253,24 @@ const config = createDefaultConfig({
 value of each key. Declare fields by hand when you want captions, folders,
 hierarchies or restricted aggregations (see [Field metadata](#field-metadata)).
 
-## Tailwind setup
+## Styling setup
 
-Tailwind CSS must be present in the host app (v4 recommended) and must scan the
-package so the utility classes survive purging:
+No Tailwind setup is required. `react-pivottable-enhanced/styles.css` is
+compiled at build time and contains Tailwind preflight, every utility class the
+pivot renders, the theme tokens and the grid component CSS:
 
 ```css
 /* app.css */
+@import "react-pivottable-enhanced/styles.css";
+```
+
+Apps that already run Tailwind v4 and prefer to compile the utilities themselves
+can import the raw tokens instead and scan the package source:
+
+```css
 @import "tailwindcss";
 @source "../node_modules/react-pivottable-enhanced/dist";
-@import "react-pivottable-enhanced/styles.css"; /* semantic colour tokens */
+@import "react-pivottable-enhanced/theme.css";
 ```
 
 On Tailwind v3, add the package to `content` and map the tokens instead:
@@ -807,7 +814,7 @@ Grouped list of the public exports (all named, no default export):
 
 | Symptom                                 | Cause and fix                                                                     |
 | --------------------------------------- | --------------------------------------------------------------------------------- |
-| Grid renders unstyled / black on white  | Tailwind is not scanning `dist`. Add the `@source` line (v4) or `content` entry   |
+| Grid renders unstyled / black on white  | `react-pivottable-enhanced/styles.css` was never imported                         |
 | Colours ignore your brand               | Import `react-pivottable-enhanced/styles.css` **before** your own token overrides |
 | `window is not defined` at build time   | Rendered during SSR — see [Server-side rendering](#server-side-rendering)         |
 | Nothing in the grid                     | `values` is empty; a report needs at least one measure                            |

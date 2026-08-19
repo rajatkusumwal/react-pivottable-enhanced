@@ -1,0 +1,181 @@
+/**
+ * Component CSS for react-pivottable-enhanced.
+ *
+ * These are the rules the pivot markup needs on top of Tailwind utilities:
+ * the grid skin, totals, hover/selection states and the resize handle. They
+ * live in the library (not in the demo site) so the published stylesheet and
+ * the demo render identically.
+ */
+
+/* Grid skin shared by every engine. */
+@layer components {
+  .pivot-fm table {
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .pivot-fm th,
+  .pivot-fm td,
+  .pivot-fm .pvtTotal,
+  .pivot-fm .pvtGrandTotal {
+    border: 1px solid var(--color-border, oklch(0.91 0.01 255));
+    padding: var(--pivot-cell-padding, 0.25rem 0.5rem);
+  }
+
+  .pivot-fm th,
+  .pivot-fm .pvtAxisLabel,
+  .pivot-fm .pvtColLabel,
+  .pivot-fm .pvtRowLabel {
+    background: var(--pivot-header-bg, oklch(0.96 0.006 250));
+    color: var(--color-foreground, oklch(0.21 0.03 260));
+    font-weight: 600;
+    text-align: left;
+  }
+
+  .pivot-fm .pvtVal,
+  .pivot-fm td.pvtTotal,
+  .pivot-fm td.pvtGrandTotal {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pivot-fm .pvtTotalLabel,
+  .pivot-fm .pvtGrandTotal {
+    background: var(--pivot-total-bg, oklch(0.98 0.004 250));
+    font-weight: 600;
+  }
+
+  .pivot-fm .pvtUi,
+  .pivot-fm .pvtAxisContainer,
+  .pivot-fm .pvtRenderers,
+  .pivot-fm .pvtVals {
+    display: none;
+  }
+
+  .pivot-fm .pvtVal:hover {
+    background: color-mix(
+      in oklab,
+      var(--pivot-accent, var(--color-primary, oklch(0.55 0.17 255))) 12%,
+      transparent
+    );
+  }
+}
+
+/* Custom PivotGrid renderer. */
+@layer components {
+  .pivot-table {
+    table-layout: auto;
+  }
+
+  .pivot-caption {
+    caption-side: top;
+    text-align: left;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    color: var(--color-foreground, oklch(0.21 0.03 260));
+  }
+
+  .pivot-fm thead th {
+    position: relative;
+    white-space: nowrap;
+  }
+
+  .pivot-fm .pivot-sheet-headers th,
+  .pivot-fm .pivot-sort-row th {
+    background: var(--pivot-total-bg, oklch(0.98 0.004 250));
+    font-weight: 500;
+    text-align: center;
+    color: var(--color-muted-foreground, oklch(0.53 0.02 258));
+  }
+
+  .pivot-fm .pivot-row-header {
+    background: var(--pivot-header-bg, oklch(0.96 0.006 250));
+    font-weight: 500;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .pivot-fm .pivot-row-header[data-kind="subtotal"],
+  .pivot-fm .pivot-row-header[data-kind="grand"] {
+    font-weight: 700;
+    background: var(--pivot-total-bg, oklch(0.98 0.004 250));
+  }
+
+  .pivot-fm tr[data-kind="subtotal"] td,
+  .pivot-fm tr[data-kind="grand"] td {
+    font-weight: 700;
+    background: var(--pivot-total-bg, oklch(0.98 0.004 250));
+  }
+
+  .pivot-kpi {
+    font-size: 0.8em;
+    vertical-align: middle;
+  }
+  .pivot-kpi[data-kpi="onTarget"] {
+    color: oklch(0.6 0.14 150);
+  }
+  .pivot-kpi[data-kpi="atRisk"] {
+    color: oklch(0.72 0.15 75);
+  }
+  .pivot-kpi[data-kpi="below"] {
+    color: oklch(0.6 0.2 25);
+  }
+
+  .pivot-fm td.pivot-value {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    height: 28px;
+    cursor: pointer;
+  }
+
+  .pivot-fm td.pivot-selected {
+    background: color-mix(
+      in oklab,
+      var(--pivot-accent, var(--color-primary, oklch(0.55 0.17 255))) 18%,
+      transparent
+    );
+  }
+
+  .pivot-fm tr.pivot-stripe td.pivot-value {
+    background: color-mix(in oklab, var(--color-muted, oklch(0.965 0.008 250)) 35%, transparent);
+  }
+
+  .pivot-fm tr.pivot-row-hover td,
+  .pivot-fm td.pivot-col-hover {
+    background: color-mix(
+      in oklab,
+      var(--pivot-accent, var(--color-primary, oklch(0.55 0.17 255))) 8%,
+      transparent
+    );
+  }
+
+  .pivot-resize-handle {
+    display: inline-block;
+    width: 6px;
+    height: 14px;
+    cursor: col-resize;
+    border-right: 2px solid var(--color-border, oklch(0.91 0.01 255));
+  }
+}
+
+/* Dark mode: the grid skin follows the .dark class on any ancestor. */
+@layer components {
+  .dark .pivot-fm th,
+  .dark .pivot-fm .pvtAxisLabel,
+  .dark .pivot-fm .pvtColLabel,
+  .dark .pivot-fm .pvtRowLabel,
+  .dark .pivot-fm .pivot-row-header {
+    background: var(--pivot-header-bg, oklch(0.26 0.03 265));
+  }
+
+  .dark .pivot-fm .pivot-sheet-headers th,
+  .dark .pivot-fm .pivot-sort-row th,
+  .dark .pivot-fm .pvtTotalLabel,
+  .dark .pivot-fm .pvtGrandTotal,
+  .dark .pivot-fm .pivot-row-header[data-kind="subtotal"],
+  .dark .pivot-fm .pivot-row-header[data-kind="grand"],
+  .dark .pivot-fm tr[data-kind="subtotal"] td,
+  .dark .pivot-fm tr[data-kind="grand"] td {
+    background: var(--pivot-total-bg, oklch(0.22 0.025 265));
+  }
+}

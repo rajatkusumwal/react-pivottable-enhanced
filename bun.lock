@@ -82,10 +82,12 @@
         "recharts": "^2.15.4",
       },
       "devDependencies": {
+        "@tailwindcss/vite": "^4.2.1",
         "@types/node": "^22.16.5",
         "@types/react": "^19.2.0",
         "@types/react-dom": "^19.2.0",
         "@vitejs/plugin-react": "^6.0.5",
+        "tailwindcss": "^4.2.1",
         "typescript": "^5.8.3",
         "vite": "^8.2.0",
       },
