@@ -670,7 +670,7 @@ already a dependency of your app.
   rather than constructor injection precisely to avoid that; make sure you are on a
   recent build of this package.
 - **`TS-992012: Component imports must be standalone components, directives, pipes, or
-  must be NgModules`** (pointing at `imports: [PivotStudioComponent]`) — the copy of
+must be NgModules`** (pointing at `imports: [PivotStudioComponent]`) — the copy of
   this package you installed was compiled with plain `tsc`. Plain `tsc` emits
   `@Component` as a legacy `__decorate([...])` call, which your app's Angular compiler
   cannot read, so it sees an ordinary class with no Angular metadata. An Angular

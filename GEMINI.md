@@ -15,3 +15,5 @@ component that mounts the React `PivotStudio`. Rules:
 - Tests sit next to the code (`angular/src/*.test.ts`) and run with the rest of the
   suite via `bun run test`.
 - Build/typecheck with `bun run angular:build` / `bun run angular:typecheck`.
+- The package is compiled with `ngc` in partial mode, never plain `tsc`; plain `tsc`
+  output makes consuming apps fail with `TS-992012`.
