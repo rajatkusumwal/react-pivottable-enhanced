@@ -70,10 +70,19 @@ describe("Angular partial compilation", () => {
   ) as { angularCompilerOptions?: { compilationMode?: string } };
 
   it("builds and typechecks with ngc, never plain tsc", () => {
-    expect(scripts["build"]).toContain("ngc -p tsconfig.build.json");
+    expect(scripts["build"]).toContain("run-ngc.mjs -p tsconfig.build.json");
     expect(scripts["build"]).not.toMatch(/\btsc -p tsconfig\.build\.json/);
-    expect(scripts["typecheck"]).toContain("ngc -p tsconfig.build.json");
+    expect(scripts["typecheck"]).toContain("run-ngc.mjs -p tsconfig.build.json");
   });
+
+  // `ngc` is only on PATH when npm links the compiler-cli bin where the script
+  // can see it; in workspace installs it often is not (sh: ngc: command not found).
+  it("invokes the compiler through the resolver script, not a bare `ngc` binary", () => {
+    expect(existsSync(join(root, "scripts", "run-ngc.mjs"))).toBe(true);
+    expect(scripts["build"]).not.toMatch(/(^|&&\s*)ngc\s/);
+    expect(scripts["typecheck"]).not.toMatch(/(^|&&\s*)ngc\s/);
+  });
+
 
   it("asks the compiler for partial (publishable) output", () => {
     expect(tsconfig.angularCompilerOptions?.compilationMode).toBe("partial");
