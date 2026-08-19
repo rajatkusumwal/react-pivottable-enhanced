@@ -1,6 +1,6 @@
 {
   "name": "react-pivottable-enhanced-angular",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": false,
   "license": "MIT",
   "description": "Angular wrapper for react-pivottable-enhanced: a commercial-grade pivot table with drag & drop fields, filters, charts, drill-through and export.",

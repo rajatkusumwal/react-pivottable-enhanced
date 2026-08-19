@@ -703,7 +703,7 @@ To try it locally without publishing:
 ```bash
 npm --prefix angular run build
 npm pack ./angular                   # produces a tarball
-npm i /absolute/path/to/react-pivottable-enhanced-angular-1.0.0.tgz
+npm i /absolute/path/to/react-pivottable-enhanced-angular-1.0.1.tgz
 ```
 
 ## Licence & provenance
