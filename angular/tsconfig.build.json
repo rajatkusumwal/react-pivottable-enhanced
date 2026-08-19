@@ -19,5 +19,14 @@
     }
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["src/**/*.test.ts"]
+  "exclude": ["src/**/*.test.ts"],
+  // Angular libraries must be published in partial compilation mode: ngc emits
+  // ɵɵngDeclareComponent metadata that the consuming app's Angular linker
+  // expands. Plain tsc output makes apps fail with TS-992012 ("Component
+  // imports must be standalone components").
+  "angularCompilerOptions": {
+    "compilationMode": "partial",
+    "strictTemplates": true,
+    "enableI18nLegacyMessageIdFormat": false
+  }
 }
