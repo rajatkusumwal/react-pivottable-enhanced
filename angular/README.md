@@ -681,6 +681,11 @@ must be NgModules`** (pointing at `imports: [PivotStudioComponent]`) — the cop
   `"compilationMode": "partial"` in `angular/tsconfig.build.json`. To confirm a build is
   good: `grep ngDeclareComponent node_modules/react-pivottable-enhanced-angular/dist/pivot-studio.component.js`
   must print a match.
+- **`sh: ngc: command not found`** when running `npm run build` inside `angular/` — npm
+  did not expose the `@angular/compiler-cli` bin to the workspace script (it is usually
+  hoisted to the repo root). The build no longer calls the bare binary: it runs
+  `node scripts/run-ngc.mjs`, which resolves the compiler from `node_modules` in any
+  layout. If you still see it, run `npm install` at the repo root first.
 - **`TS2305: module … has no exported member 'XComponent'`** — a name mismatch in your
   own app. The only component this package exports is `PivotStudioComponent` (plus the
   optional `PivotStudioModule`).
@@ -689,7 +694,9 @@ must be NgModules`** (pointing at `imports: [PivotStudioComponent]`) — the cop
 
 The package is compiled with the **Angular compiler** (`ngc`), never plain `tsc`:
 `angular/tsconfig.build.json` sets `angularCompilerOptions.compilationMode: "partial"`
-so the published JavaScript carries Angular linker metadata.
+so the published JavaScript carries Angular linker metadata. The scripts launch it via
+`angular/scripts/run-ngc.mjs` so the build works whether or not `ngc` is on PATH.
+
 
 ```bash
 npm --prefix angular run typecheck   # ngc --noEmit against tsconfig.build.json
