@@ -47,7 +47,7 @@ export type {
 
 export { PivotGrid } from "./ui/PivotGrid";
 export type { SelectionStats } from "./ui/PivotGrid";
-export { DataSourceBar, suggestConfig } from "./ui/DataSourceBar";
+export { DataSourceBar } from "./ui/DataSourceBar";
 export type { UploadedDataset } from "./ui/DataSourceBar";
 
 export { PivotToolbar } from "./ui/PivotToolbar";
@@ -127,7 +127,14 @@ export {
   formatCsvNumber,
 } from "./csv";
 export type { CsvOptions } from "./csv";
-export { parseCsv, inferFields, loadCsvUrl, loadJsonUrl, readFileAsRows } from "./data-sources";
+export {
+  parseCsv,
+  inferFields,
+  loadCsvUrl,
+  loadJsonUrl,
+  readFileAsRows,
+  suggestConfig,
+} from "./data-sources";
 export {
   sampleData,
   sampleFields,

@@ -131,7 +131,10 @@ export function PivotGrid({
 
   const rowHeaders = result.rowHeaders;
   const colLeaves = result.colLeaves;
-  const measures = result.measures?.length ? result.measures : [result.measure];
+  const measures = useMemo(
+    () => (result.measures?.length ? result.measures : [result.measure]),
+    [result.measures, result.measure],
+  );
   const measureCount = measures.length;
   /** Measure behind a leaf column (leaves repeat once per measure). */
   const measureIndexAt = useCallback(
