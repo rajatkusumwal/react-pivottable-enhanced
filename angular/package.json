@@ -35,8 +35,11 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "npm --prefix ../standalone run build && tsc -p tsconfig.build.json",
-    "typecheck": "tsc -p tsconfig.build.json --noEmit"
+    "build": "npm --prefix ../standalone run build && ngc -p tsconfig.build.json",
+    "typecheck": "ngc -p tsconfig.build.json --noEmit"
+  },
+  "devDependencies": {
+    "@angular/compiler-cli": "^20"
   },
   "peerDependencies": {
     "@angular/common": ">=16 <22",
