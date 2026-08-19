@@ -39,7 +39,7 @@
     "typecheck": "node scripts/run-ngc.mjs -p tsconfig.build.json --noEmit"
   },
   "devDependencies": {
-    "@angular/compiler-cli": "^20"
+    "@angular/compiler-cli": "~20.3.28"
   },
   "peerDependencies": {
     "@angular/common": ">=16 <22",

@@ -54,12 +54,12 @@
     "vite-tsconfig-paths": "^6.0.2"
   },
   "devDependencies": {
-    "@angular/common": "^20",
-    "@angular/compiler": "^20",
-    "@angular/compiler-cli": "^20",
-    "@angular/core": "^20",
-    "@angular/platform-browser": "^20",
-    "@angular/platform-browser-dynamic": "^20",
+    "@angular/common": "~20.3.28",
+    "@angular/compiler": "~20.3.28",
+    "@angular/compiler-cli": "~20.3.28",
+    "@angular/core": "~20.3.28",
+    "@angular/platform-browser": "~20.3.28",
+    "@angular/platform-browser-dynamic": "~20.3.28",
     "@eslint/js": "^9.32.0",
     "@lovable.dev/vite-tanstack-config": "^2.15.0",
     "@testing-library/dom": "^10.4.1",
