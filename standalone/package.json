@@ -3,7 +3,7 @@
   "version": "1.0.1",
   "private": false,
   "license": "MIT",
-  "description": "Commercial-grade pivot table for React: drag & drop fields, filters, calculated values, charts, drill-through and export. Styled with Tailwind, no UI framework required.",
+  "description": "production-grade pivot table for React: drag & drop fields, filters, calculated values, charts, drill-through and export. Styled with Tailwind, no UI framework required.",
   "repository": {
     "type": "git",
     "url": "https://github.com/rajatkusumwal/react-pivottable-enhanced"
