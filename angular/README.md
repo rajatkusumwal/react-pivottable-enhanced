@@ -714,6 +714,6 @@ npm i /absolute/path/to/react-pivottable-enhanced-angular-1.0.1.tgz
 
 ## Licence & provenance
 
-MIT. Not affiliated with, endorsed by, or derived from any advanced pivot table
+MIT. Not affiliated with, endorsed by, or derived from any third-party pivot table
 product. Developed end to end with AI coding agents and published as is, without
 warranty — review and test it before production use.

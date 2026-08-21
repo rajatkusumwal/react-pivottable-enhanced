@@ -32,7 +32,7 @@ export const Route = createFileRoute("/")({
 });
 
 const plainNames: Record<ProductKey, { name: string; price: string }> = {
-  advanced: { name: "Advanced pivot table features", price: "Paid" },
+  advanced: { name: "Advanced pivot table features", price: "Reference" },
   reactPivottable: { name: "react-pivottable", price: "Free" },
   studio: { name: "react-pivottable-enhanced", price: "Free" },
 };

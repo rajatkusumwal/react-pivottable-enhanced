@@ -32,7 +32,7 @@ export const products: {
   {
     key: "advanced",
     name: "Advanced pivot table features",
-    subtitle: "advanced • paid licence",
+    subtitle: "Reference feature set",
   },
   {
     key: "reactPivottable",
