@@ -13,7 +13,7 @@ import {
 } from "@/lib/pivot-comparison";
 import { cn } from "@/lib/utils";
 
-const TITLE = "Pivot Table Tools Compared: advanced vs Free Options";
+const TITLE = "Pivot Table Tools Compared: Advanced vs Free Options";
 const DESCRIPTION =
   "A plain-English comparison of advanced pivot table features against the free react-pivottable engine and the react-pivottable-enhanced shell built on top of it.";
 
