@@ -113,8 +113,8 @@ function ComparisonPage() {
           </h1>
           <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">
             A pivot table lets people slice and summarise data on a screen, like in Excel. Below we
-            take everything the paid tool{" "}
-            <strong className="font-medium text-foreground">advanced pivot table features</strong> can do
+            take everything the{" "}
+            <strong className="font-medium text-foreground">Advanced pivot table features</strong> can do
             — {totalFeatures} things in total — and check whether the leading free tool,
             react-pivottable, can do the same — plus the{" "}
             <strong className="font-medium text-foreground">react-pivottable-enhanced</strong> shell
