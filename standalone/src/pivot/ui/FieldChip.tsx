@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 export interface FieldChipProps {
   id: string;
   label: string;
-  /** Small suffix such as the aggregation name, commercial pivot table style. */
+  /** Small suffix such as the aggregation name, advanced pivot table style. */
   hint?: string | undefined;
   disabled?: boolean | undefined;
   /** Hides the grab handle when drag & drop is switched off. */
@@ -21,7 +21,7 @@ export interface FieldChipProps {
 }
 
 /**
- * A draggable field chip. Looks like a commercial field token: grab handle,
+ * A draggable field chip. Looks like a advanced field token: grab handle,
  * caption, optional filter funnel and a remove cross.
  */
 export function FieldChip({

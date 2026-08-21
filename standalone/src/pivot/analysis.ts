@@ -32,7 +32,7 @@ export interface ChartData {
  * The axis walks `config.rows` and the legend walks `config.cols`, one level at
  * a time: `config.chart.drillRows` / `drillCols` hold the members already
  * expanded, so `["West"]` on the axis means "show the second row field, filtered
- * to West" — the commercial drillable axis/legend behaviour.
+ * to West" — the advanced drillable axis/legend behaviour.
  * `config.chart.hiddenSeries` removes series from the plot (legend filtering)
  * without changing the report.
  */

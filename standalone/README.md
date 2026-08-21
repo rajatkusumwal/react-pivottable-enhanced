@@ -1,6 +1,6 @@
 # react-pivottable-enhanced
 
-A commercial-style pivot table for React: drag & drop fields, filters,
+A advanced-style pivot table for React: drag & drop fields, filters,
 calculated values, subtotals, charts, drill-through, export and inline editing.
 Aggregation runs in the browser by default and can be moved to a backend
 service by passing a different engine.
@@ -970,7 +970,7 @@ with a measurement that justifies it.
 Released under the [MIT licence](./LICENSE).
 
 This is an independent project. It is not affiliated with, endorsed by or sponsored by
-any commercial pivot table vendor, nor by the `react-pivottable` open-source project.
+any advanced pivot table vendor, nor by the `react-pivottable` open-source project.
 All product names and trademarks mentioned belong to their respective owners and are
 used only for factual, descriptive comparison. No third-party pivot code is bundled:
 the grid, aggregation engine and exporters are written from scratch in this repo.

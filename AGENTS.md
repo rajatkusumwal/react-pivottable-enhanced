@@ -16,7 +16,7 @@
 - Source code: [github.com/rajatkusumwal/react-pivottable-enhanced](https://github.com/rajatkusumwal/react-pivottable-enhanced)
 - Issues: [github.com/rajatkusumwal/react-pivottable-enhanced/issues](https://github.com/rajatkusumwal/react-pivottable-enhanced/issues)
 
-This repo is one product: a commercial-style pivot table (`standalone/src/pivot`, published as the `react-pivottable-enhanced` npm package)
+This repo is one product: a advanced-style pivot table (`standalone/src/pivot`, published as the `react-pivottable-enhanced` npm package)
 plus a small marketing/demo site (`src/routes`). Junior developers read this code
 daily, so favour the obvious solution over the clever one.
 

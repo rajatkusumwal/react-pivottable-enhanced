@@ -330,7 +330,7 @@ describe("PivotStudio grid", () => {
   });
 });
 
-describe("commercial-style field list", () => {
+describe("advanced-style field list", () => {
   it("opens the field list dialog from the toolbar and shows the four areas", async () => {
     const user = userEvent.setup();
     setup({ fieldsUi: "dialog" });

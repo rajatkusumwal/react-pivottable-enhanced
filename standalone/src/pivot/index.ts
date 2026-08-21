@@ -1,5 +1,5 @@
 /**
- * react-pivottable-enhanced — a drop-in, commercial-grade pivot table UI.
+ * react-pivottable-enhanced — a drop-in, production-grade pivot table UI.
  *
  * Aggregation runs in the browser by default and can be moved to a backend
  * service (Spring Boot + DuckDB) by passing a different engine adapter.
