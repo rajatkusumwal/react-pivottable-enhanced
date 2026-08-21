@@ -1043,7 +1043,7 @@ Full input/output reference: [`angular/README.md`](./angular/README.md).
 Released under the [MIT licence](./LICENSE).
 
 This is an independent project. It is not affiliated with, endorsed by or sponsored by
-any advanced pivot table vendor, nor by the `react-pivottable` open-source project.
+any third-party pivot table vendor, nor by the `react-pivottable` open-source project.
 All product names and trademarks mentioned belong to their respective owners and are
 used only for factual, descriptive comparison. No third-party pivot code is bundled:
 the grid, aggregation engine and exporters are written from scratch in this repo.

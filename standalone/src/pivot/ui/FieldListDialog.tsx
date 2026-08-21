@@ -15,7 +15,7 @@ export interface FieldListDialogProps {
   onClose: () => void;
 }
 
-/** a advanced pivot table's popup field list, opened from the toolbar "Fields" button. */
+/** an advanced pivot table's popup field list, opened from the toolbar "Fields" button. */
 export function FieldListDialog({
   open,
   strings,

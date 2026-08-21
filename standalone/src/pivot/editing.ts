@@ -1,7 +1,7 @@
 /**
  * Inline cell editing.
  *
- * advanced pivot tables let a user type a new number straight into a grid cell and
+ * Advanced pivot tables let a user type a new number straight into a grid cell and
  * pushes that change back into the underlying records. We do the same locally:
  * the records behind the cell are updated so every total recomputes naturally.
  *

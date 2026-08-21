@@ -4,7 +4,7 @@
  */
 import type { FieldDef, FilterDef, PivotConfig } from "./types";
 
-/** The five buckets a field can live in, mirroring a advanced pivot table's field list. */
+/** The five buckets a field can live in, mirroring an advanced pivot table's field list. */
 export type PivotArea = "fields" | "filters" | "rows" | "cols" | "values";
 
 export const pivotAreas: PivotArea[] = ["filters", "cols", "rows", "values"];

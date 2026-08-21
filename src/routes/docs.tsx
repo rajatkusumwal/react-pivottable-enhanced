@@ -55,7 +55,7 @@ function FrameworkTabs({
 
 const TITLE = "react-pivottable-enhanced Docs: Install the React Pivot Table in Minutes";
 const DESCRIPTION =
-  "Install react-pivottable-enhanced from npm, add one stylesheet import and render a advanced-style pivot table in your React app. Props, theming and backend engine reference.";
+  "Install react-pivottable-enhanced from npm, add one stylesheet import and render an advanced-style pivot table in your React app. Props, theming and backend engine reference.";
 
 export const Route = createFileRoute("/docs")({
   head: () => ({

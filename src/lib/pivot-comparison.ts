@@ -31,7 +31,7 @@ export const products: {
 }[] = [
   {
     key: "advanced",
-    name: "advanced pivot table",
+    name: "Advanced pivot table features",
     subtitle: "advanced • paid licence",
   },
   {
@@ -56,7 +56,7 @@ export const verdicts: Record<ProductKey, string> = {
   reactPivottable:
     "Free and quick to drop into a React app. Good for simple internal dashboards, but there is no Excel/PDF export, no toolbar and no help desk if you get stuck.",
   studio:
-    "react-pivottable-enhanced: a advanced-style React grid with no third-party pivot dependency — drag-and-drop field list, subtotals, expand/collapse, compact/classic/flat layouts, charts, exports, filters, calculated values and language packs. The maths can also be handed to your own backend service.",
+    "react-pivottable-enhanced: an advanced-style React grid with no third-party pivot dependency — drag-and-drop field list, subtotals, expand/collapse, compact/classic/flat layouts, charts, exports, filters, calculated values and language packs. The maths can also be handed to your own backend service.",
 };
 
 type RawRow = Omit<FeatureRow, "studio">;

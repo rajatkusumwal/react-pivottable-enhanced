@@ -38,7 +38,7 @@ export interface FieldListPanelProps {
   config: PivotConfig;
   readOnly: boolean;
   onChange: (patch: Partial<PivotConfig>) => void;
-  /** Dialog mode lays the panel out in two columns like a advanced pivot table's */
+  /** Dialog mode lays the panel out in two columns like an advanced pivot table's */
   layout?: "dialog" | "sidebar";
 }
 
@@ -47,7 +47,7 @@ const heading = "mb-2 text-xs font-semibold uppercase tracking-wide text-muted-f
 const control = "w-full rounded-md border border-border bg-background px-2 py-1.5 text-sm";
 const small = "rounded-md border border-border bg-background px-1.5 py-1 text-[11px]";
 
-/** Field list ordering, mirroring a advanced pivot table's "sort fields" menu. */
+/** Field list ordering, mirroring an advanced pivot table's "sort fields" menu. */
 export type SortMode = "source" | "asc" | "desc";
 
 interface FieldGroup {

@@ -9,7 +9,7 @@ import {
   createDefaultConfig,
 } from "react-pivottable-enhanced";
 
-const TITLE = "Free Pivot Table Demo: A production-grade Grid You Can Self-Host";
+const TITLE = "Free Pivot Table Demo: A production-grade grid You Can Self-Host";
 const DESCRIPTION =
   "Try a free pivot table with drag-and-drop fields, filters, calculated values, subtotals, charts, drill-through, export and your own uploaded CSV or JSON file.";
 
