@@ -13,7 +13,7 @@ export interface PivotSidebarProps {
 
 /**
  * Docked version of the field list (kept for hosts that prefer a permanent
- * panel over a commercial pivot table's popup). Same drag & drop behaviour.
+ * panel over an advanced pivot table's popup). Same drag & drop behaviour.
  */
 export function PivotSidebar(props: PivotSidebarProps) {
   return (

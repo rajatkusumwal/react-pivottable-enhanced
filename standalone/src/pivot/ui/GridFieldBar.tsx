@@ -21,7 +21,7 @@ export interface GridFieldBarProps {
 const chip =
   "inline-flex max-w-56 items-center gap-1 rounded border border-border bg-card px-2 py-0.5 text-xs";
 
-/** The strip of active fields shown above the grid, like a commercial pivot table's field bar. */
+/** The strip of active fields shown above the grid, like an advanced pivot table's field bar. */
 export function GridFieldBar({
   strings,
   config,

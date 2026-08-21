@@ -14,7 +14,7 @@ export interface MemberFilterPopoverProps {
   onClose: () => void;
 }
 
-/** a commercial pivot table's member checklist: search, select all, tick the values to keep. */
+/** an advanced pivot table's member checklist: search, select all, tick the values to keep. */
 export function MemberFilterPopover({
   field,
   label,

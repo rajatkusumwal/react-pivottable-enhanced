@@ -1,7 +1,7 @@
 # react-pivottable-enhanced-angular
 
 Angular wrapper for [`react-pivottable-enhanced`](https://github.com/rajatkusumwal/react-pivottable-enhanced) —
-a commercial-style pivot table with drag & drop fields, filters, calculated values,
+an advanced-style pivot table with drag & drop fields, filters, calculated values,
 charts, drill-through, export, inline editing and backend aggregation.
 
 The pivot table itself is written in React. This package is a thin `<pivot-studio>`
@@ -714,6 +714,6 @@ npm i /absolute/path/to/react-pivottable-enhanced-angular-1.0.1.tgz
 
 ## Licence & provenance
 
-MIT. Not affiliated with, endorsed by, or derived from any commercial pivot table
+MIT. Not affiliated with, endorsed by, or derived from any third-party pivot table
 product. Developed end to end with AI coding agents and published as is, without
 warranty — review and test it before production use.

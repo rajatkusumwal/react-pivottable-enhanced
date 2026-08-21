@@ -9,7 +9,7 @@ import {
   createDefaultConfig,
 } from "react-pivottable-enhanced";
 
-const TITLE = "Free Pivot Table Demo: A Commercial-Grade Grid You Can Self-Host";
+const TITLE = "Free Pivot Table Demo: A production-grade grid You Can Self-Host";
 const DESCRIPTION =
   "Try a free pivot table with drag-and-drop fields, filters, calculated values, subtotals, charts, drill-through, export and your own uploaded CSV or JSON file.";
 
@@ -75,7 +75,7 @@ function DemosPage() {
           Try the free pivot table yourself
         </h1>
         <p className="mt-3 max-w-3xl text-lg leading-relaxed text-muted-foreground">
-          This is the open-source engine dressed up to feel like the paid tool your team already
+          This is the open-source engine dressed up to feel like the advanced pivot table your team already
           knows: drag fields around, expand rows, filter members, chart it side by side with the
           grid and export it. Load your own CSV or JSON file too — it stays in your browser.
         </p>

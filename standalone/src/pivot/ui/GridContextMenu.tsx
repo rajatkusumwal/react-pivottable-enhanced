@@ -14,7 +14,7 @@ export interface GridContextMenuProps {
   onClose: () => void;
 }
 
-/** Right-click menu used by the grid (a commercial pivot table's context menu equivalent). */
+/** Right-click menu used by the grid (an advanced pivot table's context menu equivalent). */
 export function GridContextMenu({ x, y, items, onClose }: GridContextMenuProps) {
   const ref = useRef<HTMLDivElement>(null);
 

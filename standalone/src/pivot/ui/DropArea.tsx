@@ -11,7 +11,7 @@ export interface DropAreaProps {
   children: ReactNode;
 }
 
-/** One of the standard commercial-tool drop zones: Report filters, Columns, Rows, Measures. */
+/** One of the standard advanced-tool drop zones: Report filters, Columns, Rows, Measures. */
 export function DropArea({ area, title, hint, itemIds, children }: DropAreaProps) {
   const { setNodeRef, isOver } = useDroppable({ id: `area-${area}` });
 

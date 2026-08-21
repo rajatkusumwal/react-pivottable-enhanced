@@ -1,6 +1,6 @@
 # react-pivottable-enhanced
 
-A free, commercial-grade pivot table for React 19, with its own aggregation engine
+A free, production-grade pivot table for React 19, with its own aggregation engine
 and grid renderer — no paid licence and no heavy UI framework. Drag-and-drop field
 list, subtotals, expand/collapse, compact / classic / flat layouts, filters,
 calculated values, charts, drill-through, exports, localisation and row-level
@@ -64,7 +64,7 @@ truth, and this demo site imports it through the `react-pivottable-enhanced` pat
 | `engine`                                              | `PivotEngineAdapter`                                 | Aggregation engine; defaults to the local one                                               |
 | `initialConfig` / `config` + `onConfigChange`         | `PivotConfig`                                        | Uncontrolled or controlled state                                                            |
 | `permissions`                                         | `Permissions`                                        | `readOnly`, `allowExport`, `allowDrillThrough`, `deniedFields`, `maskedFields`, `rowFilter` |
-| `fieldsUi`                                            | `"dialog" \| "sidebar"`                              | commercial-style popup (default) or docked panel                                            |
+| `fieldsUi`                                            | `"dialog" \| "sidebar"`                              | advanced-style popup (default) or docked panel                                            |
 | `allowFileUpload`                                     | `boolean`                                            | Show the CSV/JSON upload bar                                                                |
 | `onUploadToBackend`                                   | `(file) => Promise<{ datasetId, rowCount, fields }>` | Send uploads to your service instead of memory                                              |
 | `datasetId`                                           | `string`                                             | Dataset handle passed to the backend engine                                                 |
@@ -750,7 +750,7 @@ values, charts, export, localisation, permissions, controlled config, the drag-a
 field list, member filters, file upload, and a custom engine adapter (proving the backend
 swap works without UI changes).
 
-`standalone/src/pivot/ui/PivotGrid.test.tsx` covers the commercial-style grid itself:
+`standalone/src/pivot/ui/PivotGrid.test.tsx` covers the advanced-style grid itself:
 compact / classic / flat layouts, subtotals and grand totals, expand and collapse,
 spreadsheet headers, repeated member labels, cell selection with the auto-calculation
 stats, keyboard navigation, clipboard copy, multi-column sorting, column drill and row
@@ -1043,7 +1043,7 @@ Full input/output reference: [`angular/README.md`](./angular/README.md).
 Released under the [MIT licence](./LICENSE).
 
 This is an independent project. It is not affiliated with, endorsed by or sponsored by
-any commercial pivot table vendor, nor by the `react-pivottable` open-source project.
+any third-party pivot table vendor, nor by the `react-pivottable` open-source project.
 All product names and trademarks mentioned belong to their respective owners and are
 used only for factual, descriptive comparison. No third-party pivot code is bundled:
 the grid, aggregation engine and exporters are written from scratch in this repo.

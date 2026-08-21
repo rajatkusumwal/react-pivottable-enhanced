@@ -35,7 +35,7 @@ const OPERATORS: { value: ConditionOperator; label: string }[] = [
 
 const input = "rounded border border-border bg-card px-2 py-1 text-xs";
 
-/** commercial-style Format dialog: number formats, cell rules and export furniture. */
+/** advanced-style Format dialog: number formats, cell rules and export furniture. */
 export function FormatDialog({
   open,
   strings,
