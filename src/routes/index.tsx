@@ -428,7 +428,7 @@ function ComparisonPage() {
           <p>
             Based on publicly published documentation for advanced pivot table features, the
             react-pivottable docs, and our own demo implementation. Last checked 16 August 2026 —
-            always double-check with the vendor before buying.
+            always double-check with the product team before choosing a paid option.
           </p>
           <p className="mt-3">
             This project is independent and is not affiliated with, endorsed by or sponsored by any
