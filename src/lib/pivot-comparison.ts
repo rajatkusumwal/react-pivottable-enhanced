@@ -52,7 +52,7 @@ export type ProductKey = (typeof products)[number]["key"];
 
 export const verdicts: Record<ProductKey, string> = {
   advanced:
-    "Does everything on this list. You get exports, charts, big-data handling and paid support — but you pay a licence fee.",
+    "Covers everything on this list: exports, charts, big-data handling and full support. These are the capabilities you are comparing against, usually available in paid tools.",
   reactPivottable:
     "Free and quick to drop into a React app. Good for simple internal dashboards, but there is no Excel/PDF export, no toolbar and no help desk if you get stuck.",
   studio:
