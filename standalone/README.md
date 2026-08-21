@@ -880,15 +880,15 @@ From the `standalone/` directory:
 
 ```bash
 npm run build
-npm pack           # creates react-pivottable-enhanced-1.0.1.tgz
+npm pack           # creates react-pivottable-enhanced-1.0.2.tgz
 ```
 
 Copy the `.tgz` file to the target machine or project, then install it:
 
 ```bash
-npm install /path/to/react-pivottable-enhanced-1.0.1.tgz
+npm install /path/to/react-pivottable-enhanced-1.0.2.tgz
 # or with yarn
-yarn add file:/path/to/react-pivottable-enhanced-1.0.1.tgz
+yarn add file:/path/to/react-pivottable-enhanced-1.0.2.tgz
 ```
 
 In a consuming app the imports stay the same:
@@ -906,7 +906,7 @@ shared network drive), install straight from that folder:
 ```bash
 npm install /path/to/standalone
 # or
-npm install /path/to/standalone/react-pivottable-enhanced-1.0.1.tgz
+npm install /path/to/standalone/react-pivottable-enhanced-1.0.2.tgz
 ```
 
 This works because `standalone/package.json` declares the correct `main`, `module`,

@@ -676,7 +676,7 @@ must be NgModules`** (pointing at `imports: [PivotStudioComponent]`) — the cop
   cannot read, so it sees an ordinary class with no Angular metadata. An Angular
   library must be compiled by **ngc in partial mode**, which emits
   `ɵɵngDeclareComponent` metadata that the Angular linker in your app expands at build
-  time. Fix: upgrade to a version of this package built with `ngc` (v1.0.1+), or if you
+  time. Fix: upgrade to a version of this package built with `ngc` (v1.0.2+), or if you
   build it yourself, run `npm --prefix angular run build` from a checkout that has
   `"compilationMode": "partial"` in `angular/tsconfig.build.json`. To confirm a build is
   good: `grep ngDeclareComponent node_modules/react-pivottable-enhanced-angular/dist/pivot-studio.component.js`
@@ -709,7 +709,7 @@ To try it locally without publishing:
 ```bash
 npm --prefix angular run build
 npm pack ./angular                   # produces a tarball
-npm i /absolute/path/to/react-pivottable-enhanced-angular-1.0.1.tgz
+npm i /absolute/path/to/react-pivottable-enhanced-angular-1.0.2.tgz
 ```
 
 ## Licence & provenance
